@@ -1,0 +1,44 @@
+﻿@page "/"
+@using industriation_crm.Shared
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject HubConnection HubConnection
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+
+
+<div class="alert alert-success fade-in" role="alert">
+    This is a success alert—check it out!
+</div>
+
+@code {
+    [Inject]
+    AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+    string userid;
+    public string _status = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            userid = user.Claims.Where(_ => _.Type == "userid").FirstOrDefault().Value;
+        }
+        //HubConnection.On<string>("UpdateStatus", status =>
+        //{
+        //    _status = status;
+        //    StateHasChanged();
+        //});
+    }
+    public async Task UpdateStatus()
+    {
+        await Http.GetAsync("api/Status/" + _status);
+    }
+    public void Dispose()
+    {
+        HubConnection.Remove("UpdateStatus");
+    }
+
+}

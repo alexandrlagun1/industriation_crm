@@ -1,0 +1,84 @@
+﻿@page "/producttosupplierorder/add/{supplierOrderId:int}"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h1>Добавить продукт</h1>
+
+<br />
+@if (orderToProductList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @foreach (int id in orderToProductList.GroupBy(o => o.order_id).OrderBy(o=>o.Key).Select(o => o.Key))
+    {
+        <label for="Name" class="form-label">Заказ №@id</label>
+        <table class="table table-striped align-middle table-bordered">
+            <thead class="table-success">
+                <tr>
+                    <th>ID продукта</th>
+                    <th>Наименование</th>
+                    <th>Колличество</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in orderToProductList.Where(o => o.order_id == id))
+                {
+                    <tr>
+                        <td>@p.product.id</td>
+                        <td>@p.product.name</td>
+                        <td>@p.count</td>
+                        <td>
+                            <button class="btn btn-primary" @onclick="()=>AddProduct(p.id)">
+                                Добавить
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    <div class="form-group">
+        <button type="button" class="btn btn-primary" @onclick="Save">Сохранить</button>
+        <button class="btn btn-light" @onclick="Cancel">Закрыть</button>
+    </div>
+}
+@code {
+    [Parameter]
+    public int supplierOrderId { get; set; }
+
+    protected List<product_to_order> orderToProductList = new();
+    protected List<product_to_order> addOrderToProductList = new();
+
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetProducts();
+    }
+    protected async Task GetProducts()
+    {
+        orderToProductList = await Http.GetFromJsonAsync<List<product_to_order>>("api/AddProductOfOrderToSupplierOrder");
+    }
+    protected async Task AddProduct(int id)
+    {
+        product_to_order product_To_Order = orderToProductList.Where(o => o.id == id).FirstOrDefault();
+        orderToProductList.Remove(product_To_Order);
+        addOrderToProductList.Add(product_To_Order);
+    }
+    protected async Task Save()
+    {
+        foreach(var p in addOrderToProductList)
+        {
+            p.supplier_order_id = supplierOrderId;
+        }
+        await Http.PutAsJsonAsync("api/AddProductOfOrderToSupplierOrder", addOrderToProductList);
+        Cancel();
+    }
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo("/supplierorder/edit/"+supplierOrderId);
+    }
+}

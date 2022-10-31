@@ -1,0 +1,319 @@
+﻿@page "/client/add"
+@page "/client/edit/{clientId:int}"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<Alert type="@allert_type" text="@allert_text" CloseAlert="()=>allert_type = null"></Alert>
+
+
+<EditForm Model="@client" OnValidSubmit="SaveClient">
+    <DataAnnotationsValidator />
+    <div class="main-title">@Title</div>
+    <hr />
+
+    <div class="main-section">
+        <div class="main-section-label">Основные данные</div>
+        <div class="section-field">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Закрепленный менеджер</div>
+                <InputSelect class="main-input" @bind-Value="client.user_id">
+                    @foreach (var m in managers)
+                    {
+                        <option value="@m.id">@m.name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Тип клиента</div>
+                <InputSelect class="main-input" @bind-Value="client.client_type">
+                    <option value="0">Физическое лицо</option>
+                    <option value="1">Юридическое лицо</option>
+                </InputSelect>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-section">
+        <div class="main-section-label">Клиент</div>
+        <div class="section-field">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Имя</div>
+                <input type="text" class="main-input" @bind-value="main_contact.name" />
+            </div>
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">E-mail</div>
+                <input type="email" class="main-input" @bind-value="main_contact.email" />
+            </div>
+        </div>
+        <div class="section-field">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Фамилия</div>
+                <input type="text" class="main-input" @bind-value="main_contact.surname" />
+            </div>
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Телефон</div>
+                <input type="tel" class="main-input" @bind-value="main_contact.phone" />
+            </div>
+        </div>
+        <div class="section-field">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Отчество</div>
+                <input type="text" class="main-input" @bind-value="main_contact.patronymic" />
+            </div>
+        </div>
+    </div>
+
+    @if (client.client_type == 1)
+    {
+        <div class="main-section">
+            <div class="main-section-label">Данные по юридическому лицу</div>
+            <div class="section-field">
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Полное наименование</div>
+                    <input type="text" class="main-input" @bind-value="client.org_name" />
+                </div>
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">ИНН</div>
+                    <input type="text" class="main-input" @bind-value="client.org_inn" />
+                </div>
+            </div>
+            <div class="section-field">
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Адрес регистрации</div>
+                    <input type="text" class="main-input" @bind-value="client.org_address" />
+                </div>
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">ОГРН</div>
+                    <input type="text" class="main-input" @bind-value="client.org_ogrn" />
+                </div>
+            </div>
+        </div>
+        <div class="main-section">
+            <div class="main-section-label">Банковские реквизиты</div>
+            <div class="section-field">
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">БИК</div>
+                    <input type="text" class="main-input" @bind="client.bank_bik" />
+                </div>
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Корреспондентский счет</div>
+                    <input type="text" class="main-input" @bind="client.bank_cor_schet" />
+                </div>
+            </div>
+            <div class="section-field">
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Наименование банка</div>
+                    <input type="text" class="main-input" @bind="client.bank_name" />
+                </div>
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Расчетный счет</div>
+                    <input type="text" class="main-input" @bind="client.bank_ras_schet" />
+                </div>
+            </div>
+        </div>
+
+        @if (clientId != 0)
+        {
+            <div class="main-section">
+                <div class="main-section-label">Контакты</div>
+                <div class="section-field">
+                    <a class="score" href='/fetchcontactdetails/@clientId' role="button">
+                        Добавить контактное лицо
+                    </a>
+                </div>
+                <br />
+                <div class="section-field">
+
+                    <table class="order-table ind-col-lg-10">
+                        <thead class="table-success ind-col-lg-10">
+                            <tr class="order-row ind-col-lg-10">
+                                <td class="ind-col-lg-1">ID контакта</td>
+                                <td class="ind-col-lg-3">ФИО</td>
+                                <td class="ind-col-lg-3">Email</td>
+                                <td class="ind-col-lg-1">Основной контакт</td>
+                                <td class="ind-col-lg-2">Действия</td>
+                            </tr>
+                        </thead>
+                        <tbody class="ind-col-lg-10">
+                            @foreach (var c in contacts)
+                            {
+                                <tr class="order-row ind-col-lg-10">
+                                    <td class="ind-col-lg-1">@c.id</td>
+                                    <td class="ind-col-lg-3">@c.full_name</td>
+                                    <td class="ind-col-lg-3">@c.email</td>
+                                    <td class="ind-col-lg-1"><input class="form-check-input" type="radio" @onchange="()=>ChangeMainContact(c)" name="maincontact" checked="@GetIsMain(c.main_contact)"></td>
+                                    <td class="ind-col-lg-2">
+                                        <div class="ind-col-lg-5">
+                                            <a href='/contact/edit/@clientId/@c.id/@true' class="score" role="button">
+                                                Изменить
+                                            </a>
+                                        </div>
+                                        <div class="ind-col-lg-5">
+                                            <button type="button" class="close" role="button" @onclick="()=>RemoveContact(c)">
+                                                Удалить
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+
+
+    }
+    <div class="bottom-buttons ind-col-lg-10">
+        <button type="submit" class="save">Сохранить</button>
+        <button class="close" @onclick="Cancel">Закрыть</button>
+        @if (clientId != 0)
+        {
+
+            <a class="score" type="button" href='/order/add/@clientId' role="button">
+                Добавить заказ
+            </a>
+        }
+    </div>
+
+
+</EditForm>
+@code {
+    [Parameter]
+    public int clientId { get; set; }
+    protected string Title = "Новый клиент";
+    protected client? client = new();
+
+    List<contact> contacts = new();
+    List<user> managers = new();
+    protected List<roles> roles = new();
+
+    protected int? allert_type = null;
+    protected string? allert_text = null;
+    protected List<contact> ChangeContacts = new();
+
+    protected contact main_contact = new();
+    protected int? main_contact_id { get; set; }
+
+    //Методы для определения main contact
+    protected void ChangeMainContact(contact _main_contact)
+    {
+        contact old_main_contact = contacts.Where(c => c.main_contact == 1).First();
+        old_main_contact.main_contact = 0;
+        _main_contact.main_contact = 1;
+
+        CheckContainsContact(old_main_contact);
+        CheckContainsContact(_main_contact);
+
+        main_contact = _main_contact;
+    }
+    protected bool GetIsMain(int? main_contact)
+    {
+        if (main_contact == 1)
+            return true;
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        managers = await Http.GetFromJsonAsync<List<user>>("api/User?trigger=managers");
+        if (clientId == 0)
+        {
+            client.user_id = managers[0].id;
+            client.client_type = 0;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (clientId != 0)
+        {
+
+            client = await Http.GetFromJsonAsync<client>("api/Client/" + clientId);
+            contacts = client?.contacts;
+            main_contact = contacts.Where(c => c.main_contact == 1).FirstOrDefault();
+            if (main_contact != null)
+                main_contact_id = main_contact.id;
+
+            if (client.client_type == 1)
+                Title = $"Клиент {client.org_name}";
+            else
+                Title = $"Клиент {client.contacts.Where(c => c.main_contact == 1).FirstOrDefault()?.full_name}";
+        }
+
+    }
+    protected async Task SaveClient()
+    {
+        //Сохранение и удаление контактов клиента
+        await Http.PutAsJsonAsync("api/Contact/update_contact_to_client", ChangeContacts);
+
+
+        if (clientId != 0)
+        {
+            await Http.PutAsJsonAsync("api/Client", client);
+            await Http.PutAsJsonAsync("api/Contact", main_contact);
+        }
+        else
+        {
+            var clientResponse = await Http.PostAsJsonAsync("api/Client", client);
+            clientId = await clientResponse.Content.ReadFromJsonAsync<int>();
+            client.id = clientId;
+
+            //Добавление основного контакта
+            main_contact.client_id = clientId;
+            main_contact.main_contact = 1;
+            var contactResponse = await Http.PostAsJsonAsync("api/Contact", main_contact);
+            main_contact = await contactResponse.Content.ReadFromJsonAsync<contact>();
+            contacts.Add(main_contact);
+        }
+        if (contacts != null && contacts.Count != 0)
+        {
+            main_contact_id = contacts.Where(c => c.main_contact == 1).FirstOrDefault().id;
+        }
+
+    }
+    //protected async Task AddContact(contact _contact)
+    //{
+    //    _contact.client_id = clientId;
+    //    contacts.Add(_contact);
+    //    ChangeContacts.Add(_contact);
+    //    //await Http.PutAsJsonAsync("api/Contact/", contact);
+    //}
+    protected async Task RemoveContact(contact _contact)
+    {
+        if (main_contact_id == _contact.id)
+        {
+            allert_type = 1;
+            allert_text = "Прежде чем удалять основной контакт, переназначьте его и сохраните заявку.";
+            return;
+        }
+
+        _contact.client_id = null;
+        contacts.Remove(_contact);
+
+        CheckContainsContact(_contact);
+
+    }
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo("/fetchclientdetails");
+    }
+
+    //Проверка дублей изменяемых контактов
+    protected void CheckContainsContact(contact _contact)
+    {
+        var changeContact = ChangeContacts.Where(c => c.id == _contact.id).FirstOrDefault();
+        if (changeContact != null)
+        {
+            ChangeContacts.Remove(changeContact);
+            ChangeContacts.Add(_contact);
+        }
+        else
+        {
+            ChangeContacts.Add(_contact);
+        }
+    }
+}

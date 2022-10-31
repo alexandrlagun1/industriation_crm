@@ -1,0 +1,73 @@
+﻿@page "/fetchorderdetails"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<div class="main-title">Заказы</div>
+@*<div class="row">
+    <div class="col-md-6">
+        <a href='/order/add' class="btn btn-primary" role="button">
+            <i class="fas fa-user-plus"></i>
+            Добавить заказ
+        </a>
+    </div>
+</div>*@
+<hr />
+@if (orderList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="main-section">
+        <div class="section-field">
+            <table class="order-table ind-col-lg-10">
+                <thead class="ind-col-lg-10">
+                    <tr class="order-row ind-col-lg-10">
+                        <td class="ind-col-lg-1">ID заказа</td>
+                        <td class="ind-col-lg-4">Клиент</td>
+                        <td class="ind-col-lg-2">Менеджер</td>
+                        <td class="ind-col-lg-2">Статус заказа</td>
+                        <td class="ind-col-lg-1">Действия</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in orderList)
+                    {
+                        <tr class="order-row ind-col-lg-10">
+                            <td class="ind-col-lg-1">@order.id</td>
+
+                            <td class="ind-col-lg-4">
+                                @*@if (@order.client?.client_type == 1)
+                        @order.client?.org_name
+                        @if (@order.client?.client_type == 0)
+                        @order.client?.contacts.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name*@
+                            </td>
+                            <td class="ind-col-lg-2">@order.user?.name</td>
+                            <td class="ind-col-lg-2">@order.order_status?.name</td>
+                            <td class="ind-col-lg-1">
+                                <a href='/order/edit/@order.id' class="score" role="button">
+                                    Изменить
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+}
+@code {
+    protected List<order> orderList = new();
+    protected order order = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetOrders();
+    }
+    protected async Task GetOrders()
+    {
+        orderList = await Http.GetFromJsonAsync<List<order>>("api/Order");
+    }
+
+}

@@ -1,0 +1,85 @@
+﻿@page "/fetchcontactdetails/{clientId:int}"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h1>Контакты</h1>
+
+<br />
+@if (contactList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="col-md-6">
+        <a href='/contact/add/@clientId' class="btn btn-primary" role="button">
+            <i class="fas fa-user-plus"></i>
+            Добавить контакт
+        </a>
+    </div>
+    <br />
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>ID</th>
+                <th>ФИО</th>
+                <th>Email</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var _contact in contactList)
+            {
+                <tr>
+                    <td>@_contact.id</td>
+                    <td>@_contact.full_name</td>
+                    <td>@_contact.email</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-success" role="button" @onclick="()=>AddContact(_contact)">
+                            Добавить
+                        </button>
+                        <a href='/contact/edit/@clientId/@_contact.id/@false' class="btn btn-outline-dark" role="button">
+                            Изменить
+                        </a>
+                        <button type="button" class="btn btn-outline-danger" role="button" @onclick="()=>RemoveContact(_contact.id)">
+                            Удалить
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+    <button class="btn btn-light" @onclick="Cancel">Закрыть</button>
+
+}
+@code {
+    [Parameter]
+    public int clientId { get; set; }
+    protected List<contact> contactList = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetContacts();
+    }
+    protected async Task GetContacts()
+    {
+        contactList = await Http.GetFromJsonAsync<List<contact>>("api/Contact/GetNoClientContacts");
+    }
+    protected async Task RemoveContact(int id)
+    {
+        await Http.DeleteAsync("api/Contact/" + id);
+        contactList.Remove(contactList.Where(c => c.id == id).FirstOrDefault());
+    }
+    protected async Task AddContact(contact contact)
+    {
+        contact.client_id = clientId;
+
+        await Http.PutAsJsonAsync("api/Contact", contact);
+        contactList.Remove(contact);
+    }
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo($"/client/edit/{clientId}");
+    }
+}

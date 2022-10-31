@@ -1,0 +1,60 @@
+﻿@page "/fetchproductdetails"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<div class="main-title">Продукты</div>
+
+<hr />
+@if (productList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="section-field">
+        <a href='/product/add' class="score" role="button">
+            Добавить продукт
+        </a>
+    </div>
+    <div class="main-section">
+        <div class="section-field">
+            <table class="order-table ind-col-lg-10">
+                <thead class="ind-col-lg-10">
+                    <tr class="order-row ind-col-lg-10">
+                        <td class="ind-col-lg-1">ID</td>
+                        <td class="ind-col-lg-7">Наименование</td>
+                        <td class="ind-col-lg-2">Действия</td>
+                    </tr>
+                </thead>
+                <tbody class="ind-col-lg-10">
+                    @foreach (var product in productList)
+                    {
+                        <tr class="order-row ind-col-lg-10">
+                            <td class="ind-col-lg-1">@product.id</td>
+                            <td class="ind-col-lg-7">@product.name</td>
+                            <td class="ind-col-lg-2">
+                                <a href='/product/edit/@product.id' class="score" role="button">
+                                    Изменить
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+}
+@code {
+    protected List<product> productList = new();
+    protected product product = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetClient();
+    }
+    protected async Task GetClient()
+    {
+        productList = await Http.GetFromJsonAsync<List<product>>("api/Product");
+    }
+}

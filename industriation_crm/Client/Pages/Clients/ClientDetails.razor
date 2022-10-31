@@ -1,0 +1,89 @@
+﻿@page "/fetchclientdetails"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<div class="main-title">Клиенты</div>
+<hr />
+@if (clientList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="section-field">
+        <a class="score" type="button" href='/Client/add' role="button">
+            Добавить клиента
+        </a>
+    </div>
+    <div class="main-section">
+        <div class="section-field">
+            <table class="order-table ind-col-lg-10">
+                <thead class="ind-col-lg-10">
+                    <tr class="order-row ind-col-lg-10">
+                        <td class="ind-col-lg-1">ID</td>
+                        <td class="ind-col-lg-3">ФИО</td>
+                        <td class="ind-col-lg-2">Тип клиента</td>
+                        <td class="ind-col-lg-2">Закрепленный менеджер</td>
+                        <td class="ind-col-lg-2">Действия</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var _client in clientList)
+                    {
+                        <tr class="order-row ind-col-lg-10">
+                            <td class="ind-col-lg-1">@_client.id</td>
+                            <td class="ind-col-lg-3">@_client.main_contact?.full_name</td>
+                            <td class="ind-col-lg-2">
+                                @if (_client.client_type == 0)
+                                {
+                                    <i>Физическое лицо</i>
+                                }
+                                else if (_client.client_type == 1)
+                                {
+                                    <i>Юридическое лицо</i>
+                                }
+                            </td>
+                            <td class="ind-col-lg-2">@_client.user?.name</td>
+                            <td class="ind-col-lg-2">
+                                <div class="ind-col-lg-5">
+                                    <a class="score" type="button" href='/client/edit/@_client.id'>
+                                        Изменить
+                                    </a>
+                                </div>
+                                <div class="ind-col-lg-5">
+                                    <button type="button" class="close" role="button" @onclick="()=>RemoveClient(_client)">
+                                        Удалить
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+}
+@code {
+    protected List<client> clientList = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetClient();
+    }
+    protected async Task GetClient()
+    {
+        clientList = await Http.GetFromJsonAsync<List<client>>("api/Client");
+        foreach(var c in clientList)
+        {
+            var main_contact = c.contacts.Where(c => c.main_contact == 1).FirstOrDefault();
+            if (main_contact != null)
+                c.main_contact = main_contact;
+        }
+    }
+    protected async Task RemoveClient(client client)
+    {
+        await Http.DeleteAsync("api/Client/" + client.id);
+        clientList.Remove(client);
+    }
+}

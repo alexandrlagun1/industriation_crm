@@ -1,0 +1,83 @@
+﻿@page "/user/add"
+@page "/user/edit/{userId:int}"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<EditForm Model="@user" OnValidSubmit="SaveUser">
+    <DataAnnotationsValidator />
+    <div class="main-title">@Title пользователя</div>
+    <hr />
+    <div class="main-section">
+        <div class="main-section-label">Основная информация о пользователе</div>
+        <div class="mb-3">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Имя</div>
+                <InputText class="main-input" @bind-Value="user.name" />
+                <ValidationMessage For="@(() => user.name)" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Роль</div>
+                <InputSelect class="main-input" @bind-Value="user.role_id">
+                    @foreach (var r in roles)
+                    {
+                        <option value="@r.id">@r.name</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => user.role_id)" />
+            </div>
+        </div>
+    </div>
+    <div class="bottom-buttons ind-col-lg-10">
+        <button type="submit" class="save">Сохранить</button>
+        <button class="close" @onclick="Cancel">Закрыть</button>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public int userId { get; set; }
+    protected string Title = "Добавить";
+    protected user user = new();
+
+    protected List<roles> roles = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetRoles();
+    }
+    protected async Task GetRoles()
+    {
+        roles = await Http.GetFromJsonAsync<List<roles>>("api/Roles/");
+        if (user.role_id == null)
+            user.role_id = roles[0].id;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (userId != 0)
+        {
+            Title = "Изменить";
+            user = await Http.GetFromJsonAsync<user>("api/User/" + userId);
+        }
+    }
+    protected async Task SaveUser()
+    {
+
+        if (user.id != 0)
+        {
+            await Http.PutAsJsonAsync("api/User", user);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/User", user);
+        }
+        Cancel();
+    }
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo("/fetchuserdetails");
+    }
+}

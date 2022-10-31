@@ -1,0 +1,62 @@
+﻿@page "/supplier/add/"
+@page "/supplier/edit/{supplierId:int}"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<EditForm Model="@supplier" OnValidSubmit="SaveContact">
+    <DataAnnotationsValidator />
+    <div class="main-title">@Title поставщика</div>
+    <hr />
+    <div class="main-section">
+        <div class="main-section-label">Основная информация о поставщике</div>
+        <div class="mb-3">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Полное название</div>
+                <InputText class="main-input" @bind-Value="supplier.name" />
+                <ValidationMessage For="@(() => supplier.name)" />
+            </div>
+        </div>
+    </div>
+    <div class="bottom-buttons ind-col-lg-10">
+        <button type="submit" class="save">Сохранить</button>
+        <button class="close" @onclick="Cancel">Закрыть</button>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public int supplierId { get; set; }
+    protected string Title = "Добавить";
+    protected supplier supplier = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (supplierId != 0)
+        {
+            Title = "Изменить";
+            supplier = await Http.GetFromJsonAsync<supplier>("api/Supplier/" + supplierId);
+        }
+    }
+    protected async Task SaveContact()
+    {
+
+        if (supplier.id != 0)
+        {
+            await Http.PutAsJsonAsync("api/Supplier", supplier);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/Supplier", supplier);
+        }
+        Cancel();
+    }
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo($"/fetchsupplierdetails");
+    }
+}

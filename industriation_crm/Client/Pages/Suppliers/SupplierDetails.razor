@@ -1,0 +1,71 @@
+﻿@page "/fetchsupplierdetails"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<div class="main-title">Поставщики</div>
+<hr />
+@if (supplierList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="section-field">
+        <a href='/supplier/add' class="score" role="button">
+            <i class="fas fa-user-plus"></i>
+            Добавить поставщика
+        </a>
+    </div>
+    <div class="main-section">
+        <div class="section-field">
+            <table class="order-table ind-col-lg-10">
+                <thead class="ind-col-lg-10">
+                    <tr class="order-row ind-col-lg-10">
+                        <td class="ind-col-lg-1">ID</td>
+                        <td class="ind-col-lg-7">Имя</td>
+                        <td class="ind-col-lg-2">Действия</td>
+                    </tr>
+                </thead>
+                <tbody class="ind-col-lg-10">
+                    @foreach (var supplier in supplierList)
+                    {
+                        <tr class="order-row ind-col-lg-10">
+                            <td class="ind-col-lg-1">@supplier.id</td>
+                            <td class="ind-col-lg-7">@supplier.name</td>
+                            <td class="ind-col-lg-2">
+                                <div class="ind-col-lg-5">
+                                    <a href='/supplier/edit/@supplier.id' class="score" role="button">
+                                        Изменить
+                                    </a>
+                                </div>
+                                <div class="ind-col-lg-5">
+                                    <a class="close" @onclick="()=>DeleteSupplier(supplier)" role="button">
+                                        Удалить
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+}
+@code {
+    protected List<supplier> supplierList = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetClient();
+    }
+    protected async Task GetClient()
+    {
+        supplierList = await Http.GetFromJsonAsync<List<supplier>>(@"api/Supplier");
+    }
+    protected async Task DeleteSupplier(supplier supplier)
+    {
+        await Http.DeleteAsync("api/Supplier/" + supplier.id);
+        supplierList.Remove(supplier);
+    }
+}

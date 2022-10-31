@@ -1,0 +1,69 @@
+﻿@page "/product/add/"
+@page "/product/edit/{productId:int}"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<EditForm Model="@product" OnValidSubmit="SaveProduct">
+    <DataAnnotationsValidator />
+    <div class="main-title">@Title продукт</div>
+    <hr />
+    <div class="main-section">
+        <div class="main-section-label">Основная информация о продукте</div>
+        <div class="mb-3">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Наименование</div>
+                <InputText class="main-input" @bind-Value="product.name" />
+                <ValidationMessage For="@(() => product.name)" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Цена</div>
+                <InputNumber class="main-input" @bind-Value="product.price" />
+                <ValidationMessage For="@(() => product.price)" />
+            </div>
+        </div>
+    </div>
+    <div class="bottom-buttons ind-col-lg-10">
+        <button type="submit" class="save">Сохранить</button>
+        <button class="close" @onclick="Cancel">Закрыть</button>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public int productId { get; set; }
+    protected string Title = "Добавить";
+    protected product product = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (productId != 0)
+        {
+            Title = "Изменить";
+            product = await Http.GetFromJsonAsync<product>("api/product/" + productId);
+        }
+    }
+    protected async Task SaveProduct()
+    {
+
+        if (product.id != 0)
+        {
+            await Http.PutAsJsonAsync("api/product", product);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/product", product);
+        }
+        Cancel();
+    }
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo($"/fetchproductdetails");
+    }
+}

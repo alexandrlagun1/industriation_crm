@@ -1,0 +1,10 @@
+﻿.my-style {
+    width: 400px;
+    color: white;
+    background-color: mediumpurple;
+}
+.main-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: red;
+}

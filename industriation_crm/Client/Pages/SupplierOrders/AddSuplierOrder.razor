@@ -1,0 +1,149 @@
+﻿@page "/supplierorder/add"
+@page "/supplierorder/edit/{supplierOrderId:int}"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<h1>@Title заказ поставщику @supplierOrderId</h1>
+
+<hr />
+<EditForm Model="@supplier_order" OnValidSubmit="SaveOrder">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="Name" class="form-label">Специалист по снабжению</label>
+        <div class="col-md-4">
+            <InputSelect class="form-control" @bind-Value="supplier_order.user_id">
+                @foreach (var u in users)
+                {
+                    <option value="@u.id">@u.name</option>
+                }
+            </InputSelect>
+        </div>
+        <ValidationMessage For="@(() => supplier_order.user_id)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Name" class="form-label">Поставщик</label>
+        <div class="col-md-4">
+            <InputSelect class="form-control" @bind-Value="supplier_order.supplier_id">
+                @foreach (var s in suppliers)
+                {
+                    <option value="@s.id">@s.name</option>
+                }
+            </InputSelect>
+        </div>
+        <ValidationMessage For="@(() => supplier_order.supplier_id)" />
+    </div>
+    @if (supplierOrderId != 0)
+    {
+        <label for="Name" class="form-label">
+            Товары заказов
+            <a href='/producttosupplierorder/add/@supplierOrderId' class="btn btn-primary" role="button">
+                Добавить
+            </a>
+        </label>
+        <div class="mb-3">
+
+            @foreach (int i in products_To_Supplier_Order.GroupBy(p => p.order_id).OrderBy(o => o.Key).Select(p => p.Key))
+            {
+                <label for="Name" class="form-label">Заказ №@i</label>
+
+                <table class="table table-striped align-middle table-bordered">
+                    <thead class="table-success">
+                        <tr>
+                            <th>ID продукта</th>
+                            <th>Наименование</th>
+                            <th>Колличество</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in products_To_Supplier_Order.Where(p => p.order_id == i))
+                        {
+                            <tr>
+                                <td>@p.product?.id</td>
+                                <td>@p.product?.name</td>
+                                <td>@p.count</td>
+                                <td>
+                                    <button type="button" class="btn btn-danger" @onclick="(async () => await RemoveProductFromSup(p))">Удалить</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            }
+        </div>
+    }
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <button type="button" class="btn btn-light" @onclick="Cancel">Закрыть</button>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public int supplierOrderId { get; set; }
+    protected string Title = "Добавить";
+    protected supplier_order supplier_order = new();
+
+    protected List<user> users = new();
+    protected List<product_to_order> products_To_Supplier_Order = new();
+    protected List<product_to_order> removed_products_To_Supplier_Order = new();
+    protected List<supplier> suppliers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetClientsManagers();
+    }
+    protected async Task GetClientsManagers()
+    {
+        suppliers = await Http.GetFromJsonAsync<List<supplier>>("api/SUpplier");
+        if (supplierOrderId == 0)
+            supplier_order.supplier_id = suppliers[0].id;
+
+        users = await Http.GetFromJsonAsync<List<user>>("api/User?trigger=suppliers");
+        if (supplierOrderId == 0)
+            supplier_order.user_id = users[0].id;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (supplierOrderId != 0)
+        {
+            Title = "Изменить";
+            supplier_order = await Http.GetFromJsonAsync<supplier_order>("api/SupplierOrder/" + supplierOrderId);
+            if (supplier_order.user_id == 0)
+                supplier_order.user_id = users[0].id;
+
+            products_To_Supplier_Order = await Http.GetFromJsonAsync<List<product_to_order>>("api/ProductsToSupplierOrder/" + supplierOrderId);
+        }
+    }
+    protected async Task RemoveProductFromSup(product_to_order product_To_Order)
+    {
+        products_To_Supplier_Order.Remove(product_To_Order);
+        removed_products_To_Supplier_Order.Add(product_To_Order);
+    }
+    protected async Task SaveOrder()
+    {
+
+        if (supplier_order.id != 0)
+        {
+
+            foreach (var p in removed_products_To_Supplier_Order)
+            {
+                p.supplier_order_id = null;
+            }
+            await Http.PutAsJsonAsync("api/SupplierOrder", supplier_order);
+            await Http.PutAsJsonAsync("api/AddProductOfOrderToSupplierOrder", removed_products_To_Supplier_Order);
+        }
+        else
+        {
+
+            await Http.PostAsJsonAsync("api/SupplierOrder", supplier_order);
+        }
+    }
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo("/fetchsupplierordersdetails");
+    }
+}

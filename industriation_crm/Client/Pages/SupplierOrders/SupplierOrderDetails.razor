@@ -1,0 +1,70 @@
+﻿@page "/fetchsupplierordersdetails"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+
+@*<AuthorizeView Roles="6">
+    <Authorized>*@
+<h1>Заказы поставщикам</h1>
+
+
+<br />
+@if (supplierOrderList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="col-md-6">
+        <a href='/supplierorder/add' class="btn btn-primary" role="button">
+            <i class="fas fa-user-plus"></i>
+            Добавить заказ
+        </a>
+    </div>
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>ID заказа</th>
+                <th>Наименование поставщика</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var supplierOrder in supplierOrderList)
+            {
+                <tr>
+                    <td>@supplierOrder.id</td>
+                    <td>@supplierOrder.supplier?.name</td>
+                    <td>
+                        <a href='/supplierorder/edit/@supplierOrder.id' class="btn btn-outline-dark" role="button">
+                            Изменить
+                        </a>
+                        <button class="btn btn-outline-dark" @onclick="()=>DeleteSupplierOrder(supplierOrder)">Удалить</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+@* </Authorized>
+    <NotAuthorized>
+        Доступ запрещен
+    </NotAuthorized>
+</AuthorizeView>*@
+
+@code {
+    protected List<supplier_order> supplierOrderList = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetClient();
+    }
+    protected async Task GetClient()
+    {
+        supplierOrderList = await Http.GetFromJsonAsync<List<supplier_order>>("api/SupplierOrder");
+    }
+    protected async Task DeleteSupplierOrder(supplier_order supplier_order)
+    {
+        
+        await Http.DeleteAsync($"api/SupplierOrder/{supplier_order.id}");
+        supplierOrderList.Remove(supplier_order);
+    }
+}

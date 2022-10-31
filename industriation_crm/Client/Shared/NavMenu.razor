@@ -1,0 +1,100 @@
+﻿@inject HubConnection HubConnection
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+@*<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Industriation CRM</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+*@
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        @*<div class="nav-item px-3">
+        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+        <span class="oi oi-home" aria-hidden="true"></span> Home
+        </NavLink>
+        </div>
+        <div class="nav-item px-3">
+        <NavLink class="nav-link" href="counter">
+        <span class="oi oi-plus" aria-hidden="true"></span> Counter
+        </NavLink>
+        </div>
+        <div class="nav-item px-3">
+        <NavLink class="nav-link" href="fetchdata">
+        <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+        </NavLink>
+        </div>*@
+        <div class="leftside-bar-btn">
+            <div class="lefside-bar-btn">
+                <a class="leftsidebar-link" href="fetchuserdetails">Пользователи</a>
+                <img src="./icons/users.svg" alt="" class="icon">
+            </div>
+        </div>
+        <div class="leftside-bar-btn">
+            <div class="lefside-bar-btn">
+                <a class="leftsidebar-link" href="fetchclientdetails">Клиенты</a>
+                <img src="./icons/users.svg" alt="" class="icon">
+            </div>
+        </div>
+        <div class="leftside-bar-btn">
+            <div class="lefside-bar-btn">
+                <a class="leftsidebar-link" href="fetchproductdetails">Продукты</a>
+                <img src="./icons/cart.svg" alt="" class="icon">
+            </div>
+        </div>
+        <div class="leftside-bar-btn">
+            <div class="lefside-bar-btn">
+                <a class="leftsidebar-link" href="fetchorderdetails">Заказы</a>
+                <img src="./icons/order.svg" alt="" class="icon">
+            </div>
+        </div>
+        <div class="leftside-bar-btn">
+            <div class="lefside-bar-btn">
+                <a class="leftsidebar-link" href="fetchsupplierdetails">Поставщики</a>
+                <img src="./icons/shipper.svg" alt="" class="icon">
+            </div>
+        </div>
+        <div class="leftside-bar-btn">
+            <div class="lefside-bar-btn">
+                <a class="leftsidebar-link" href="fetchsupplierordersdetails">
+                    Заказы поставщикам
+                    @if (isNewZakaziPostavshikam)
+                    {
+                        <font color="#FF0000" style="font-size: 23pt">&#8226;</font>
+                    }
+                </a>
+                <img src="./icons/shipper.svg" alt="" class="icon">
+            </div>
+        </div>
+        @*<AuthorizeView Roles="6">
+        <Authorized>*@
+        @* </Authorized>
+        </AuthorizeView>*@
+    </nav>
+</div>
+
+@code {
+    [Inject]
+    AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    private bool collapseNavMenu = true;
+    private bool isNewZakaziPostavshikam = false;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        HubConnection.On<string>("UpdateStatus", status =>
+        {
+            isNewZakaziPostavshikam = true;
+            StateHasChanged();
+        });
+    }
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

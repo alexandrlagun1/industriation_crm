@@ -1,0 +1,46 @@
+﻿@page "/login"
+@inject HttpClient Http
+@inject AuthenticationStateProvider _authStateProvider
+@inject NavigationManager _navigationManager
+@inject ILocalStorageService _localStorageService
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<div class="row ind-col-lg-10 ind-centered-block">
+    <div class="main-section ind-col-lg-2-5">
+        <legend style="width: 100%;">
+            <img src="https://industriation.ru/Catalog/view/theme/default/img/main_logo.svg" alt="" style="width: 100%;">
+        </legend>
+        <br />
+        <hr />
+        <div class="section-field">
+            <div class="input-field ind-col-lg-10">
+                <label for="txtEmail" class="ind-col-lg-3 login-input-label">E-mail</label>
+                <input @bind="user.login" type="text" class="ind-col-lg-7 main-input" id="txtEmail" />
+            </div>
+        </div>
+
+        <div class="section-field">
+            <div class="input-field ind-col-lg-10">
+                <label for="txtPassword" class="ind-col-lg-3 login-input-label">Пароль</label>
+                <input @bind="user.password" type="password" class="ind-col-lg-7 main-input" id="txtPassword" />
+            </div>
+        </div>
+        <div class="field-section ind-col-lg-10">
+            <button type="button" @onclick="UserLogin" class="score" style="margin: 15px 0 auto auto; padding: 5px 20px; display: flex;">Вход</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private user user = new user();
+
+    private async Task UserLogin()
+    {
+        var message = await Http.PostAsJsonAsync<user>("api/Auth", user);
+        if (message != null)
+        {
+            await _localStorageService.SetItemAsStringAsync("isauthenticated", "true");
+            _navigationManager.NavigateTo("/", true);
+        }
+    }
+}

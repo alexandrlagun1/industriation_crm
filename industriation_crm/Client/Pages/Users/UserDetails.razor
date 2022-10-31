@@ -1,0 +1,101 @@
+﻿@page "/fetchuserdetails"
+@using industriation_crm.Shared.Models
+@inject HttpClient Http
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<div class="main-title">Пользователи</div>
+<hr />
+
+<div class="main-section">
+    <div class="row">
+        <div class="ind-col-lg-2">
+            <a href='/user/add' class="score" role="button">
+                Добавить пользователя
+            </a>
+        </div>
+        <div class="ind-col-lg-8">
+            <input type="text" class="main-input" placeholder="Поиск по имени"
+                   @bind="SearchString" @bind:event="oninput" @onkeyup="FilterUser" />
+        </div>
+    </div>
+    <br />
+    @if (userList == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="section-field">
+            <table class="order-table ind-col-lg-10">
+                <thead class="table-success ind-col-lg-10">
+                    <tr class="order-row ind-col-lg-10">
+                        <td class="ind-col-lg-1">ID</td>
+                        <td class="ind-col-lg-4">Имя</td>
+                        <td class="ind-col-lg-3">Роль</td>
+                        <td class="ind-col-lg-2">Действия</td>
+                    </tr>
+                </thead>
+                <tbody class="ind-col-lg-10">
+                    @foreach (var user in userList)
+                    {
+                        <tr class="order-row ind-col-lg-10">
+                            <td class="ind-col-lg-1">@user.id</td>
+                            <td class="ind-col-lg-4">@user.name</td>
+                            <td class="ind-col-lg-3">@user.roles?.name</td>
+                            <td class="ind-col-lg-2">
+                                <div class=" ind-col-lg-5">
+                                    <a href='/user/edit/@user.id' class="score" role="button">
+                                        Изменить
+                                    </a>
+                                </div>
+                                <div classclass="ind-col-lg-5">
+                                    <a href='/user/delete/@user.id' class="close" role="button">
+                                        Удалить
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
+</div>
+@code {
+    protected List<user> userList = new();
+    protected List<user> searchUserData = new();
+    protected user user = new();
+    protected string SearchString { get; set; } = string.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUser();
+    }
+    protected async Task GetUser()
+    {
+        userList = await Http.GetFromJsonAsync<List<user>>("api/User?trigger=all");
+        searchUserData = userList;
+    }
+    protected void FilterUser()
+    {
+        if (!string.IsNullOrEmpty(SearchString))
+        {
+            userList = searchUserData
+                .Where(x => x.name.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) != -1)
+                .ToList();
+        }
+        else
+        {
+            userList = searchUserData;
+        }
+    }
+    protected void DeleteConfirm(int userID)
+    {
+        user = userList.FirstOrDefault(x => x.id == userID);
+    }
+    public void ResetSearch()
+    {
+        SearchString = string.Empty;
+        userList = searchUserData;
+    }
+}

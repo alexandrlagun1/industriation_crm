@@ -1,0 +1,29 @@
+﻿@inherits LayoutComponentBase
+
+<link rel="stylesheet" href="bootstrap 2.0.css" />
+
+<header>
+    <div class="row-f ind-col-lg-10">
+        <div class="header-image ind-col-lg-1-5">
+            <a href="">
+                <img src="https://industriation.ru/Catalog/view/theme/default/img/main_logo.svg" alt="" style="width: 100%;">
+            </a>
+        </div>
+        <div class="ind-col-lg-8-5">
+            <LoginDisplay></LoginDisplay>
+        </div>
+    </div>
+</header>
+<div class="g-container-w">
+    <div class="row-f ind-col-lg-10 fullpage-height">
+        <div class="leftside-bar ind-col-lg-1-5">
+            <NavMenu />
+        </div>
+
+        <main class="ind-col-lg-8-5">
+            <div class="main-block ind-col-lg-10">
+                @Body
+            </div>
+        </main>
+    </div>
+</div>

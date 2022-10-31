@@ -1,0 +1,142 @@
+﻿@using industriation_crm.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+
+
+<div class="modal" tabindex="-1" style="display:block" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content b-s">
+            <div class="modal-header">
+
+                <div class="container">
+                    <div class="row-f ind-col-lg-10">
+                        <div class="main-title ind-col-lg-3">Добавление товаров</div>
+                        <div class="ind-col-lg-7 row-f">
+                            <input class="main-input ind-col-lg-4" placeholder="Название, артикул" @bind="searchByName" @bind:event="oninput" @onkeyup="FilterByName">
+                            <div class="ind-col-lg-1"></div>
+                            <input class="main-input ind-col-lg-4" placeholder="Производитель" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                            <div class="ind-col-lg-1 a-i-c">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="CloseModal"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="section-field">
+                    <table class="order-table ind-col-lg-10">
+                        <thead class="ind-col-lg-10">
+                            <tr class="order-row ind-col-lg-10">
+                                <td class="ind-col-lg-1">ID</td>
+                                <td class="ind-col-lg-5">Наименование</td>
+                                <td class="ind-col-lg-2">Цена</td>
+                                <td class="ind-col-lg-1">Колличество</td>
+                                <td class="ind-col-lg-1"></td>
+                            </tr>
+                        </thead>
+                        <tbody class="ind-col-lg-10">
+                            @foreach (var p in productPackages.Take(productsCountOnPage))
+                            {
+                                <tr class="order-row">
+                                    <td class="ind-col-lg-1">@p.product.id</td>
+                                    <td class="ind-col-lg-5">@p.product.name</td>
+                                    <td class="ind-col-lg-2">@p.product.price</td>
+                                    <td class="ind-col-lg-1"><input class="main-input" type="number" @bind-value="p.count"></input></td>
+                                    <td class="ind-col-lg-1">
+                                        <button class="add-item" @onclick="()=>AddProduct(p)">
+                                            Добавить
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+                </div>
+                <br />
+                <div class="section-field">
+                    <button class="form-control" @onclick="ViewProducts">Загрузить еще</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public int orderId { get; set; }
+    [Parameter]
+    public Action CloseModal { get; set; }
+    [Parameter]
+    public Action<product_to_order> AddProductToproductToOrder { get; set; }
+
+    int productsCountOnPage = 5;
+
+    protected void ViewProducts()
+    {
+        if (productsCountOnPage + 5 > productPackages.Count)
+            productsCountOnPage = productPackages.Count;
+        else
+            productsCountOnPage = productsCountOnPage + 5;
+
+    }
+    private void InvokeCloseModal()
+    {
+        CloseModal?.Invoke();
+    }
+    protected bool OpenModal = false;
+    protected List<ProductPackage> productPackages = new();
+    protected List<ProductPackage> searchProduct = new();
+    protected string searchByName { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetProducts();
+    }
+    protected async Task GetProducts()
+    {
+        List<product> productList = await Http.GetFromJsonAsync<List<product>>("api/Product");
+        foreach (var p in productList)
+        {
+            ProductPackage productPackage = new ProductPackage();
+            productPackage.product = p;
+            productPackages.Add(productPackage);
+        }
+        searchProduct = productPackages;
+    }
+    protected void FilterByName()
+    {
+        if (!string.IsNullOrEmpty(searchByName))
+        {
+            productPackages = searchProduct
+                .Where(x => x.product.name.IndexOf(searchByName, StringComparison.OrdinalIgnoreCase) != -1)
+                .ToList();
+        }
+        else
+        {
+            productPackages = searchProduct;
+        }
+    }
+    protected async Task AddProduct(ProductPackage productPackage)
+    {
+        product_to_order product_To_Order = new product_to_order();
+        product_To_Order.product_id = productPackage.product.id;
+        product_To_Order.order_id = orderId;
+        product_To_Order.count = productPackage.count;
+        product_To_Order._product_price = productPackage.product.price;
+        product_To_Order.total_price = productPackage.product.price * productPackage.count;
+
+        //var response = await Http.PostAsJsonAsync("api/ProductToOrder", product_To_Order);
+        //product_To_Order = response.Content.ReadFromJsonAsync<product_to_order>().Result;
+        product_To_Order.product = productPackage.product;
+        AddProductToproductToOrder?.Invoke(product_To_Order);
+    }
+    protected class ProductPackage
+    {
+        public int count = 0;
+        public product product { get; set; }
+    }
+}
