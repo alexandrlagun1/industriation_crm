@@ -6,15 +6,11 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 <link rel="stylesheet" href="bootstrap 2.0.css" />
-@*1*@
-
-@*2*@
 
 @if (OpenProductAddModel)
 {
     <NewProductToOrder orderId="orderId" CloseModal="CloseAddProductModal" AddProductToproductToOrder="AddProductToProductToOrder"></NewProductToOrder>
 }
-@*3*@
 <EditForm Model="@order" OnValidSubmit="SaveOrder">
     <DataAnnotationsValidator />
 
@@ -39,6 +35,9 @@
                     @client?.org_name
                 else
                     @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
+
+
+
 
 
 
@@ -122,289 +121,296 @@
             </div>
         }
     </div>
-        @if (client?.client_type == 1)
-        {
-            <div class="main-section">
-                <div class="main-section-label">Данные юридического лица</div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 input-field">
-                        <div class="input-label">Полное наименование</div>
-                        <input type="text" class="main-input" @bind="client.org_name">
-                    </div>
-                    <div class="ind-col-lg-5 input-field">
-                        <div class="input-label">ИНН</div>
-                        <input type="text" class="main-input" @bind="client.org_inn">
-                    </div>
-                </div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 input-field">
-                        <div class="input-label">Адрес регистрации</div>
-                        <input type="text" class="main-input" @bind="client.org_address">
-                    </div>
-                    <div class="ind-col-lg-5 input-field">
-                        <div class="input-label">ОГРН</div>
-                        <input type="text" class="main-input" @bind="client.org_ogrn">
-                    </div>
-                </div>
-            </div>
-
-            <div class="main-section">
-                <div class="main-section-label">Банковские реквизиты</div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 input-field">
-                        <div class="input-label">БИК</div>
-                        <input type="text" class="main-input" @bind="client.bank_bik">
-                    </div>
-                    <div class="ind-col-lg-5 input-field">
-                        <div class="input-label">Корреспондентский счет</div>
-                        <input type="text" class="main-input" @bind="client.bank_cor_schet">
-                    </div>
-                </div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 input-field">
-                        <div class="input-label">Наименование банка</div>
-                        <input type="text" class="main-input" @bind="client.bank_name">
-                    </div>
-                    <div class="ind-col-lg-5 input-field">
-                        <div class="input-label">Расчетный счет</div>
-                        <input type="text" class="main-input" @bind="client.bank_ras_schet">
-                    </div>
-                </div>
-            </div>
-        }
+    @if (client?.client_type == 1)
+    {
         <div class="main-section">
-            <div class="main-section-label">Состав заказа</div>
+            <div class="main-section-label">Данные юридического лица</div>
             <div class="section-field">
-                <table class="order-table ind-col-lg-10">
-                    <thead class="table-success ind-col-lg-10">
-                        <tr class="order-row ind-col-lg-10">
-                            <td class="ind-col-lg-1">ID продукта</td>
-                            <td class="ind-col-lg-3">Наименование</td>
-                            <td class="ind-col-lg-2">Срок доставки</td>
-                            <td class="ind-col-lg-1">Цена</td>
-                            <td class="ind-col-lg-1">Количество</td>
-                            <td class="ind-col-lg-1">Скидка</td>
-                            <td class="ind-col-lg-1">Стоимость</td>
-                        </tr>
-                    </thead>
-                    <tbody class="ind-col-lg-10">
-                        @if (order != null && order.product_To_Orders != null)
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Полное наименование</div>
+                    <input type="text" class="main-input" @bind="client.org_name">
+                </div>
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">ИНН</div>
+                    <input type="text" class="main-input" @bind="client.org_inn">
+                </div>
+            </div>
+            <div class="section-field">
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Адрес регистрации</div>
+                    <input type="text" class="main-input" @bind="client.org_address">
+                </div>
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">ОГРН</div>
+                    <input type="text" class="main-input" @bind="client.org_ogrn">
+                </div>
+            </div>
+        </div>
+
+        <div class="main-section">
+            <div class="main-section-label">Банковские реквизиты</div>
+            <div class="section-field">
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">БИК</div>
+                    <input type="text" class="main-input" @bind="client.bank_bik">
+                </div>
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Корреспондентский счет</div>
+                    <input type="text" class="main-input" @bind="client.bank_cor_schet">
+                </div>
+            </div>
+            <div class="section-field">
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Наименование банка</div>
+                    <input type="text" class="main-input" @bind="client.bank_name">
+                </div>
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Расчетный счет</div>
+                    <input type="text" class="main-input" @bind="client.bank_ras_schet">
+                </div>
+            </div>
+        </div>
+    }
+    <div class="main-section">
+        <div class="main-section-label">Состав заказа</div>
+        <div class="section-field">
+            <table class="order-table ind-col-lg-10">
+                <thead class="table-success ind-col-lg-10">
+                    <tr class="order-row ind-col-lg-10">
+                        <td class="ind-col-lg-1">ID продукта</td>
+                        <td class="ind-col-lg-3">Наименование</td>
+                        <td class="ind-col-lg-2">Срок доставки</td>
+                        <td class="ind-col-lg-1">Цена</td>
+                        <td class="ind-col-lg-1">Количество</td>
+                        <td class="ind-col-lg-1">Скидка</td>
+                        <td class="ind-col-lg-1">Стоимость</td>
+                    </tr>
+                </thead>
+                <tbody class="ind-col-lg-10">
+                    @if (order != null && order.product_To_Orders != null)
+                    {
+                        @foreach (var p in order!.product_To_Orders.OrderBy(p => p.product_postition))
                         {
-                            @foreach (var p in order!.product_To_Orders.OrderBy(p => p.product_postition))
-                            {
-                                <tr class="order-row" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
-                                    <td class="ind-col-lg-1" id="model">
-                                        <img src="./icons/drag.png" alt="" class="drag">
-                                        @p?.product?.id
-                                    </td>
-                                    <td class="ind-col-lg-3">
-                                        <a href="" class="table-link">
-                                            @p?.product?.name
-                                            <div class="table-link-modal">
-                                                <div class="ind-col-lg-2">
-                                                    <img src="./images/table-modal-img.png" alt="" class="table-modal-img">
+                            <tr class="order-row" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
+                                <td class="ind-col-lg-1" id="model">
+                                    <img src="./icons/drag.png" alt="" class="drag">
+                                    @p?.product?.id
+                                </td>
+                                <td class="ind-col-lg-3">
+                                    <a href="" class="table-link">
+                                        @p?.product?.name
+                                        <div class="table-link-modal">
+                                            <div class="ind-col-lg-2">
+                                                <img src="./images/table-modal-img.png" alt="" class="table-modal-img">
+                                            </div>
+                                            <div class="ind-col-lg-8">
+                                                <div class="table-modal-title">
+                                                    @p?.product?.name
                                                 </div>
-                                                <div class="ind-col-lg-8">
-                                                    <div class="table-modal-title">
-                                                        @p?.product?.name
-                                                    </div>
-                                                    <div class="table-modal-price">
-                                                        @p._product_price
-                                                    </div>
+                                                <div class="table-modal-price">
+                                                    @p._product_price
                                                 </div>
                                             </div>
-                                        </a>
-                                    </td>
-                                    <td class="ind-col-lg-2">
-                                        <div class="ind-col-lg-3">
-                                            <input type="number" class="table-input">
                                         </div>
-                                        <div class="ind-col-lg-7">
-                                            <select name="" id="" class="table-input">
-                                                @foreach (var delivery_period_type in delivery_Period_Types!)
-                                                {
-                                                    <option value="@delivery_period_type.id">@delivery_period_type.name</option>
-                                                }
-                                            </select>
-                                        </div>
-                                    </td>
-                                    <td class="ind-col-lg-1"><input type="number" class="main-input" step="0.1" @bind="@p._product_price" /></td>
-                                    <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" /></td>
-                                    <td class="ind-col-lg-1">@p?.discount_total_price</td>
-                                    <td class="ind-col-lg-1">
-                                        @PriceWithDiscount(p)
-                                        <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
-                                            <img src="./icons/delete-icon.svg" class="delete-button">
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
+                                    </a>
+                                </td>
+                                <td class="ind-col-lg-2">
+                                    <div class="ind-col-lg-3">
+                                        <input type="number" class="table-input">
+                                    </div>
+                                    <div class="ind-col-lg-7">
+                                        <select name="" id="" class="table-input">
+                                            @foreach (var delivery_period_type in delivery_Period_Types!)
+                                            {
+                                                <option value="@delivery_period_type.id">@delivery_period_type.name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class="ind-col-lg-1"><input type="number" class="main-input" step="0.1" @bind="@p._product_price" /></td>
+                                <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" /></td>
+                                <td class="ind-col-lg-1">@p?.discount_total_price</td>
+                                <td class="ind-col-lg-1">
+                                    @PriceWithDiscount(p)
+                                    <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
+                                        <img src="./icons/delete-icon.svg" class="delete-button">
+                                    </button>
+                                </td>
+                            </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
-            </div>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="section-field a-i-c mt-20">
             <div class="section-field ind-col-lg-10">
-                
-                @if (order.product_To_Orders == null || order.product_To_Orders.Count == 0)
-                {
-                    <p align="center">Товары в заказе отсутствуют</p>
-                }
-                else
-                {
-                    <div class="col-12">
-                        <label>Разовая скидка</label>
-                    </div>
-                    <div class="col-1">
-                        <input class="form-control" id="ex1" type="number" @bind="@order._ruble_discount">₽
+            @if (order.product_To_Orders == null || order.product_To_Orders.Count == 0)
+            {
+                <p align="center" class="ind-col-lg-10">Товары в заказе отсутствуют</p>
+            }
+            else
+            {
+                <div class="ind-col-lg-4"></div>
+                <div class="ind-col-lg-2 ta-right mr-20">
+                    <label>Разовая скидка</label>
                 </div>
-                    <div class="col-1">
-                        <input class="form-control" id="ex2" type="number" @bind="@order._percent_discount">%
-                    </div>
+                <div class="ind-col-lg-2 a-i-c">
+                    <input class="main-input ind-col-lg-6" id="ex1" type="number" @bind="@order._ruble_discount">
+                    <div class="ind-col-lg-1">&nbsp; ₽</div> 
+                </div>
+                <div class="ind-col-lg-2 a-i-c">
+                    <input class="main-input ind-col-lg-6" id="ex2" type="number" @bind="@order._percent_discount">
+                    <div class="ind-col-lg-1">&nbsp; %</div>
+                </div>
 
-                }
-            
+            }
+        </div>
+        </div>
+        <hr class="custom-hr" />
+        <button type="button" class="add-item" @onclick="()=>OpenProductAddModel=true">Добавить позицию</button>
+        <div class="section-field ind-col-lg-10">
+            <div class="ind-col-lg-10">
+                <div class="ind-col-lg-10 row-f">
+                    <div class="ind-col-lg-7"></div>
+                    <div class="ind-col-lg-3 row-f">
+                        <div class="ind-col-lg-7" style="text-align: right;">
+                            Стоимость товаров:
+                        </div>
+                        <div class="ind-col-lg-3" style="text-align: right;">
+                            @all_product_summ
+                        </div>
+                    </div>
+                </div>
+                <div class="ind-col-lg-10 row-f">
+                    <div class="ind-col-lg-7"></div>
+                    <div class="ind-col-lg-3 row-f">
+                        <div class="ind-col-lg-7" style="text-align: right;">
+                            Стоимость доставки:
+                        </div>
+                        <div class="ind-col-lg-3" style="text-align: right;">
+                            @order.delivery.price
+                        </div>
+                    </div>
+                </div>
+                <div class="ind-col-lg-10 row-f">
+                    <div class="ind-col-lg-7"></div>
+                    <div class="ind-col-lg-3 row-f">
+                        <div class="ind-col-lg-7" style="text-align: right;">
+                            Итог:
+                        </div>
+                        <div class="ind-col-lg-3" style="text-align: right;">
+                            @(order.delivery.price + all_product_summ)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-f">
+        <div class="main-section ind-col-lg-5">
+            <div class="main-section-label">Отгрузка и доставка</div>
+            <div class="section-field">
                 <div class="ind-col-lg-10">
-                    <div class="ind-col-lg-10 row-f">
-                        <div class="ind-col-lg-7"></div>
-                        <div class="ind-col-lg-3 row-f">
-                            <div class="ind-col-lg-7" style="text-align: right;">
-                                Стоимость товаров:
-                            </div>
-                            <div class="ind-col-lg-3" style="text-align: right;">
-                                @all_product_summ
-                            </div>
-                        </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Тип доставки</div>
+                        <select type="text" class="main-input" value="@order.delivery?.delivery_type?.id" @onchange="ChangeDeliveryType">
+                            @foreach (var delivery_type in delivery_Types!)
+                            {
+                                <option value="@delivery_type.id">@delivery_type.name</option>
+                            }
+                        </select>
                     </div>
-                    <div class="ind-col-lg-10 row-f">
-                        <div class="ind-col-lg-7"></div>
-                        <div class="ind-col-lg-3 row-f">
-                            <div class="ind-col-lg-7" style="text-align: right;">
-                                Стоимость доставки:
-                            </div>
-                            <div class="ind-col-lg-3" style="text-align: right;">
-                                @order.delivery.price
-                            </div>
-                        </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Зафиксированная дата отгрузки на момент оплаты</div>
+                        <input type="date" class="main-input" @bind="@order.delivery.shipment_date">
                     </div>
-                    <div class="ind-col-lg-10 row-f">
-                        <div class="ind-col-lg-7"></div>
-                        <div class="ind-col-lg-3 row-f">
-                            <div class="ind-col-lg-7" style="text-align: right;">
-                                Итог:
-                            </div>
-                            <div class="ind-col-lg-3" style="text-align: right;">
-                                @(order.delivery.price + all_product_summ)
-                            </div>
-                        </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Стоимость</div>
+                        <input type="number" class="main-input" @bind-value="delivery_price">
+                    </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">ФИО Получателя</div>
+                        <input type="text" class="main-input" @bind="@order.delivery.recipient_name">
+                    </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Телефон Получателя</div>
+                        <input type="tel" class="main-input" @bind="@order.delivery.recipient_phone">
+                    </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Адрес получателя</div>
+                        <textarea type="text" class="main-input" @bind="@order.delivery.address" />
                     </div>
                 </div>
             </div>
-            <div class="row-f">
-                <div class="main-section ind-col-lg-5">
-                    <div class="main-section-label">Отгрузка и доставка</div>
-                    <div class="section-field">
-                        <div class="ind-col-lg-10">
-                            <div class="ind-col-lg-10 input-field">
-                                <div class="input-label">Тип доставки</div>
-                                <select type="text" class="main-input" value="@order.delivery?.delivery_type?.id" @onchange="ChangeDeliveryType">
-                                    @foreach (var delivery_type in delivery_Types!)
-                                    {
-                                        <option value="@delivery_type.id">@delivery_type.name</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="ind-col-lg-10 input-field">
-                                <div class="input-label">Зафиксированная дата отгрузки на момент оплаты</div>
-                                <input type="date" class="main-input" @bind="@order.delivery.shipment_date">
-                            </div>
-                            <div class="ind-col-lg-10 input-field">
-                                <div class="input-label">Стоимость</div>
-                                <input type="number" class="main-input" @bind-value="delivery_price">
-                            </div>
-                            <div class="ind-col-lg-10 input-field">
-                                <div class="input-label">ФИО Получателя</div>
-                                <input type="text" class="main-input" @bind="@order.delivery.recipient_name">
-                            </div>
-                            <div class="ind-col-lg-10 input-field">
-                                <div class="input-label">Телефон Получателя</div>
-                                <input type="tel" class="main-input" @bind="@order.delivery.recipient_phone">
-                            </div>
-                            <div class="ind-col-lg-10 input-field">
-                                <div class="input-label">Адрес получателя</div>
-                                <textarea type="text" class="main-input" @bind="@order.delivery.address" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="ind-col-lg-5 background-for-comment">
-                    <div class="main-section ind-col-lg-10">
-                        <div class="main-section-label">Комментарии к заказу</div>
-                        <div class="section-field">
-                            <div class="ind-col-lg-10 flex">
-                                <textarea type="text" class="main-input" @bind="order.comments"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="main-section ind-col-lg-5">
-                <div class="main-section-label">Оплата</div>
+        </div>
+        <div class="ind-col-lg-5 background-for-comment">
+            <div class="main-section ind-col-lg-10">
+                <div class="main-section-label">Комментарии к заказу</div>
                 <div class="section-field">
-                    <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
+                    <div class="ind-col-lg-10 flex">
+                        <textarea type="text" class="main-input" @bind="order.comments"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-section ind-col-lg-5">
+        <div class="main-section-label">Оплата</div>
+        <div class="section-field">
+            <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
+        </div>
+        <div class="input-field">
+            <div class="input-label">К оплате:</div>
+            <label>@order._price_summ</label>
+        </div>
+        <hr class="custom-hr" />
+
+        @foreach (var p in order?.order_Pays!.Where(o => o.isRemove == false))
+        {
+            <div class="payment-field ind-col-lg-10">
+                <div class="input-field">
+                    <div class="input-label">
+                        Статус
+                    </div>
+                    <select class="main-input" value="@p.pay_status_id" @onchange="(e)=>ChangePayStatus(e, p)">
+                        @foreach (var pay_status in pay_Statuses!)
+                        {
+                            <option value="@pay_status.id">@pay_status.name</option>
+                        }
+                    </select>
                 </div>
                 <div class="input-field">
-                    <div class="input-label">К оплате:</div>
-                    <label>@order._price_summ</label>
-                </div>
-                <hr class="custom-hr" />
-
-                @foreach (var p in order?.order_Pays!.Where(o => o.isRemove == false))
-                {
-                    <div class="payment-field ind-col-lg-10">
-                        <div class="input-field">
-                            <div class="input-label">
-                                Статус
-                            </div>
-                            <select class="main-input" value="@p.pay_status_id" @onchange="(e)=>ChangePayStatus(e, p)">
-                                @foreach (var pay_status in pay_Statuses!)
-                                {
-                                    <option value="@pay_status.id">@pay_status.name</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="input-field">
-                            <div class="input-label">
-                                Дата оплаты
-                            </div>
-                            <input type="date" class="main-input" @bind="@p.date">
-                        </div>
-                        <div class="input-field">
-                            <div class="input-label">
-                                Сумма
-                            </div>
-                            @if (p.pay_status_id != 2)
-                            {
-                            <input type="number" step="0.1" class="main-input" @bind-value="@p.price">
-                            }
-                            else
-                            {
-                                <label>@p.price</label>
-                            }
-                        </div>
-                        <button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>
+                    <div class="input-label">
+                        Дата оплаты
                     </div>
-                }
+                    <input type="date" class="main-input" @bind="@p.date">
+                </div>
+                <div class="input-field">
+                    <div class="input-label">
+                        Сумма
+                    </div>
+                    @if (p.pay_status_id != 2)
+                    {
+                        <input type="number" step="0.1" class="main-input" @bind-value="@p.price">
+                    }
+                    else
+                    {
+                        <label>@p.price</label>
+                    }
+                </div>
+                <button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>
             </div>
-            <div class="bottom-buttons ind-col-lg-10">
-                <button type="submit" class="save">Сохранить</button>
-                <button class="close" @onclick="Cancel">Закрыть</button>
-                @if (order?.order_status_id == 1)
-                {
-                    <button class="score">Выставить счет</button>
-                }
-            </div>
+        }
+    </div>
+    <div class="bottom-buttons ind-col-lg-10">
+        <button type="submit" class="save">Сохранить</button>
+        <button class="close" @onclick="Cancel">Закрыть</button>
+        @if (order?.order_status_id == 1)
+        {
+            <button class="score">Выставить счет</button>
+        }
+    </div>
 </EditForm>
 
 

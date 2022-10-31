@@ -5,11 +5,11 @@
 
 <AuthorizeView>
     <Authorized>
-        <a href="">@context.User.Identity?.Name</a>
+        <a href="" class="auth-link">@context.User.Identity?.Name</a>
         <button type="button" @onclick="Logout" class="nav-link btn btn-link">Выйти</button>
     </Authorized>
     <NotAuthorized>
-        <a href="/login">Войти</a>
+        <a href="/login" class="auth-link">Войти</a>
     </NotAuthorized>
 </AuthorizeView>
 
