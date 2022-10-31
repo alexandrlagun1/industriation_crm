@@ -5,16 +5,6 @@
 	padding: 0;
 }
 
-/* //////////////////////////// */
-
-/* test-block */
-
-.test-block {
-	border: 1px solid #000;
-	display: flex;
-	height: 250px;
-}
-
 /* CATEGORY-BLOCK */
 
 .category-block {
@@ -678,6 +668,15 @@ li {
 
 /* ////////////////////////////////////////////////////////////////// */
 
+.mt-20 {
+	margin-top: 20px;
+}
+
+.mr-20 {
+	margin-right: 20px;
+}
+
+
 .ind-col-lg-1-5 {
 	flex: 0 0 15%;
 	max-width: 15%;
@@ -708,7 +707,7 @@ header {
 	display: flex;
 	align-items: center;
 	height: 100%;
-	margin-right: 15px;
+	margin-right: 30px;
 	outline: none;
 }
 
