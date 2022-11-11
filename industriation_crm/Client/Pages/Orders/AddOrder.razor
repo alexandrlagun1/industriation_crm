@@ -5,6 +5,8 @@
 @using industriation_crm.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject HubConnection HubConnection
+
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
 @if (OpenProductAddModel)
@@ -35,11 +37,6 @@
                     @client?.org_name
                 else
                     @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
-
-
-
-
-
 
                 </a>
                 <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
@@ -199,9 +196,10 @@
                                 <td class="ind-col-lg-3">
                                     <a href="" class="table-link">
                                         @p?.product?.name
+                                        
                                         <div class="table-link-modal">
                                             <div class="ind-col-lg-2">
-                                                <img src="./images/table-modal-img.png" alt="" class="table-modal-img">
+                                                <img src='@("https://industriation.ru/image/"+p.product.image)' alt="" class="table-modal-img">
                                             </div>
                                             <div class="ind-col-lg-8">
                                                 <div class="table-modal-title">
@@ -213,6 +211,9 @@
                                             </div>
                                         </div>
                                     </a>
+                                    <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" />P<br>
+                                    <input type="number" class="main-input" @bind="@p.percent_discount" />%<br>
+                                    <p>@p._product_price_with_discount</p>
                                 </td>
                                 <td class="ind-col-lg-2">
                                     <div class="ind-col-lg-3">
@@ -227,11 +228,15 @@
                                         </select>
                                     </div>
                                 </td>
-                                <td class="ind-col-lg-1"><input type="number" class="main-input" step="0.1" @bind="@p._product_price" /></td>
-                                <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" /></td>
-                                <td class="ind-col-lg-1">@p?.discount_total_price</td>
                                 <td class="ind-col-lg-1">
-                                    @PriceWithDiscount(p)
+                                    <input type="number" class="main-input" step="0.1" @bind="@p._product_price" /><br>
+                                   
+                                </td>
+                                
+                                <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" /></td>
+                                <td class="ind-col-lg-1">@p?._discount_total_price</td>
+                                <td class="ind-col-lg-1">
+                                    @p?._total_price
                                     <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
                                         <img src="./icons/delete-icon.svg" class="delete-button">
                                     </button>
@@ -277,7 +282,7 @@
                             Стоимость товаров:
                         </div>
                         <div class="ind-col-lg-3" style="text-align: right;">
-                            @all_product_summ
+                            @order._total_price
                         </div>
                     </div>
                 </div>
@@ -288,7 +293,7 @@
                             Стоимость доставки:
                         </div>
                         <div class="ind-col-lg-3" style="text-align: right;">
-                            @order.delivery.price
+                            @order.delivery._price
                         </div>
                     </div>
                 </div>
@@ -299,7 +304,7 @@
                             Итог:
                         </div>
                         <div class="ind-col-lg-3" style="text-align: right;">
-                            @(order.delivery.price + all_product_summ)
+                            @order.products_with_delivery_price
                         </div>
                     </div>
                 </div>
@@ -326,8 +331,9 @@
                     </div>
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">Стоимость</div>
-                        <input type="number" class="main-input" @bind-value="delivery_price">
+                        <input type="number" step="0.01" class="main-input" @bind="order.delivery._price">
                     </div>
+                    
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">ФИО Получателя</div>
                         <input type="text" class="main-input" @bind="@order.delivery.recipient_name">
@@ -436,25 +442,8 @@
     protected bool OpenProductAddModel = false;
     protected bool clientChange = false;
     protected bool viewContacts = false;
-    protected double? delivery_price
-    {
-        get => order.delivery.price; set
-        {
-            order.delivery.price = value;
-            // UpdatePriceSumm();
-        }
-    }
-    protected double? all_product_summ
-    {
-        get
-        {
-            if (order?.product_To_Orders != null && order?.product_To_Orders.Count != 0)
-            {
-                return order?.product_To_Orders.Select(p => p.total_price).Sum();
-            }
-            return 0;
-        }
-    }
+
+
 
 
     //Методы Drag&Drop
@@ -475,6 +464,15 @@
     //Методы инициализвции
     protected override async Task OnInitializedAsync()
     {
+        HubConnection.On<string>("UpdateStatus", async status =>
+        {
+            if (orderId != 0)
+            {
+               order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
+
+            }
+            StateHasChanged();
+        });
         await GetClientsManagers();
     }
     protected async Task GetClientsManagers()
@@ -594,13 +592,6 @@
 
 
     //Методы для работы с товарами в заказе
-    protected double? PriceWithDiscount(product_to_order product_to_order)
-    {
-        double? price = product_to_order?.total_price - product_to_order?.discount_total_price;
-        if (price == null || price < 0)
-            return 0;
-        return price;
-    }
     protected void CloseAddProductModal()
     {
         OpenProductAddModel = false;
@@ -610,11 +601,10 @@
     {
         if (order?.product_To_Orders == null)
             order.product_To_Orders = new List<product_to_order>();
-        if (order._percent_discount != null)
-            product_To_Order.discount_total_price += product_To_Order.total_price / 100 * order._percent_discount;
-        if (order._ruble_discount != null)
-            product_To_Order.discount_total_price += order._ruble_discount;
-
+        if (order.percent_discount != null)
+            product_To_Order.order_ruble_discount = order._ruble_discount;
+        if (order.ruble_discount != null)
+            product_To_Order.order_percent_discount = order._percent_discount;
 
         order.product_To_Orders.Add(product_To_Order);
         int? last_position = order.product_To_Orders.OrderByDescending(p => p.product_postition)?.FirstOrDefault()?.product_postition;
@@ -639,7 +629,7 @@
     {
         var delivery_type = delivery_Types.Where(d => d.id == Convert.ToInt32(e.Value)).FirstOrDefault();
         order.delivery.delivery_type = delivery_type;
-        order.delivery.price = delivery_type.price;
+        order.delivery._price = delivery_type.price;
         order.delivery.delivery_type_id = delivery_type.id;
     }
 

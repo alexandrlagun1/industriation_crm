@@ -1,4 +1,6 @@
-﻿@using industriation_crm.Shared.Models
+﻿@using Newtonsoft.Json
+@using industriation_crm.Shared.FilterModels
+@using industriation_crm.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
@@ -13,9 +15,17 @@
                     <div class="row-f ind-col-lg-10">
                         <div class="main-title ind-col-lg-3">Добавление товаров</div>
                         <div class="ind-col-lg-7 row-f">
-                            <input class="main-input ind-col-lg-4" placeholder="Название, артикул" @bind="searchByName" @bind:event="oninput" @onkeyup="FilterByName">
+                            @*<input class="main-input ind-col-lg-4" placeholder="Название, артикул" @bind="searchByName" @bind:event="oninput" @onkeyup="FilterByName">
                             <div class="ind-col-lg-1"></div>
-                            <input class="main-input ind-col-lg-4" placeholder="Производитель" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                            <input class="main-input ind-col-lg-4" placeholder="Производитель" aria-label="Recipient's username" aria-describedby="basic-addon2">*@
+                            <div>
+                                Наименование товара: <input @bind="productFilter.name"></input>&nbsp;
+                                Артикул: <input @bind="productFilter.article"></input>&nbsp;
+                                Цена от: <input @bind="productFilter.price_from"></input>&nbsp;
+                                Цена до: <input @bind="productFilter.price_to"></input>&nbsp;
+                            </div>
+                            <button @onclick="FindByFilter">Поиск</button>
+                            <button @onclick="CleanFilter">Очистить фильтр</button>
                             <div class="ind-col-lg-1 a-i-c">
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="CloseModal"></button>
                             </div>
@@ -24,11 +34,26 @@
                 </div>
             </div>
             <div class="modal-body">
+                @if (currentCategory != null && currentCategory.id != 0)
+                {
+                    List<category> categoryTree = GetCategoryTree(new List<category>(), currentCategory);
+                    categoryTree.Reverse();
+                    foreach (var category in categoryTree)
+                    {
+                        <button type="button" class="btn btn-primary btn-lg" @onclick="()=>GetProducts(category)">@category.name</button>
+                    }
+                    <br>
+                    @foreach (var category in categoriesList.Where(c => c.parent_id == currentCategory.id))
+                    {
+                        <button @onclick="()=>GetProducts(category)">@category.name</button>
+                        <br />
+                    }
+                }
                 <div class="section-field">
                     <table class="order-table ind-col-lg-10">
                         <thead class="ind-col-lg-10">
                             <tr class="order-row ind-col-lg-10">
-                                <td class="ind-col-lg-1">ID</td>
+                                <td class="ind-col-lg-1">Артикул</td>
                                 <td class="ind-col-lg-5">Наименование</td>
                                 <td class="ind-col-lg-2">Цена</td>
                                 <td class="ind-col-lg-1">Колличество</td>
@@ -36,21 +61,41 @@
                             </tr>
                         </thead>
                         <tbody class="ind-col-lg-10">
-                            @foreach (var p in productPackages.Take(productsCountOnPage))
-                            {
-                                <tr class="order-row">
-                                    <td class="ind-col-lg-1">@p.product.id</td>
-                                    <td class="ind-col-lg-5">@p.product.name</td>
-                                    <td class="ind-col-lg-2">@p.product.price</td>
-                                    <td class="ind-col-lg-1"><input class="main-input" type="number" @bind-value="p.count"></input></td>
-                                    <td class="ind-col-lg-1">
-                                        <button class="add-item" @onclick="()=>AddProduct(p)">
-                                            Добавить
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
 
+                            @if (currentCategory == null && productList?.Count != 0)
+                            {
+                                @foreach (var p in productPackages.Take(productsCountOnPage))
+                                {
+                                    <tr class="order-row">
+                                        <td class="ind-col-lg-1">@p.product.article</td>
+                                        <td class="ind-col-lg-5">@p.product.name</td>
+                                        <td class="ind-col-lg-2">@p.product.price</td>
+                                        <td class="ind-col-lg-1"><input class="main-input" type="number" @bind-value="p.count"></input></td>
+                                        <td class="ind-col-lg-1">
+                                            <button class="add-item" @onclick="()=>AddProduct(p)">
+                                                Добавить
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                @foreach (var p in productPackages.Where(p => p.product.category_id == currentCategory.id).Take(productsCountOnPage))
+                                {
+                                    <tr class="order-row">
+                                        <td class="ind-col-lg-1">@p.product.article</td>
+                                        <td class="ind-col-lg-5">@p.product.name</td>
+                                        <td class="ind-col-lg-2">@p.product.price</td>
+                                        <td class="ind-col-lg-1"><input class="main-input" type="number" @bind-value="p.count"></input></td>
+                                        <td class="ind-col-lg-1">
+                                            <button class="add-item" @onclick="()=>AddProduct(p)">
+                                                Добавить
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
                         </tbody>
 
                     </table>
@@ -73,52 +118,72 @@
     [Parameter]
     public Action<product_to_order> AddProductToproductToOrder { get; set; }
 
-    int productsCountOnPage = 5;
+    protected ProductFilter productFilter = new();
+
+    protected category currentCategory = new();
+    protected List<category> categoriesList = new();
+    protected List<product> productList = new();
+    protected bool OpenModal = false;
+    protected List<ProductPackage> productPackages = new();
+    protected string searchByName { get; set; } = string.Empty;
+
+    int productsCountOnPage = 20;
 
     protected void ViewProducts()
     {
         if (productsCountOnPage + 5 > productPackages.Count)
             productsCountOnPage = productPackages.Count;
         else
-            productsCountOnPage = productsCountOnPage + 5;
+            productsCountOnPage = productsCountOnPage + 20;
 
     }
     private void InvokeCloseModal()
     {
         CloseModal?.Invoke();
     }
-    protected bool OpenModal = false;
-    protected List<ProductPackage> productPackages = new();
-    protected List<ProductPackage> searchProduct = new();
-    protected string searchByName { get; set; } = string.Empty;
+
 
     protected override async Task OnInitializedAsync()
     {
-        await GetProducts();
+        await GetData();
     }
-    protected async Task GetProducts()
+    protected async Task GetData()
     {
-        List<product> productList = await Http.GetFromJsonAsync<List<product>>("api/Product");
-        foreach (var p in productList)
-        {
-            ProductPackage productPackage = new ProductPackage();
-            productPackage.product = p;
-            productPackages.Add(productPackage);
-        }
-        searchProduct = productPackages;
+        categoriesList = await Http.GetFromJsonAsync<List<category>>("api/Category");
+
+        currentCategory = categoriesList.Where(c => c.parent_id == 0).FirstOrDefault();
+        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + 1);
+        CompleteProductPackage(productList);
+
+
     }
-    protected void FilterByName()
+    protected async Task GetProducts(category category)
     {
-        if (!string.IsNullOrEmpty(searchByName))
+        currentCategory = category;
+        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + category.id);
+        CompleteProductPackage(productList);
+    }
+    protected void CategoryBack()
+    {
+        if (currentCategory.parent_id != 0)
+            currentCategory = categoriesList.Where(c => c.id == currentCategory.parent_id).FirstOrDefault();
+    }
+    protected async Task FindByFilter()
+    {
+        if (productFilter.article == "" && productFilter.name == "" && (productFilter.price_from == null || productFilter.price_from == 0) && (productFilter.price_to == null || productFilter.price_to == 10000000))
         {
-            productPackages = searchProduct
-                .Where(x => x.product.name.IndexOf(searchByName, StringComparison.OrdinalIgnoreCase) != -1)
-                .ToList();
+            CleanFilter();
+            return;
         }
-        else
-        {
-            productPackages = searchProduct;
-        }
+        if (productFilter.price_to == null)
+            productFilter.price_to = 10000000;
+        var json = JsonConvert.SerializeObject(productFilter);
+        var stringContent = new StringContent(json);
+        var response = await Http.PostAsJsonAsync("api/Product/FindByFilter", productFilter);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        productList = JsonConvert.DeserializeObject<List<product>>(responseBody);
+        currentCategory = null;
+        CompleteProductPackage(productList);
     }
     protected async Task AddProduct(ProductPackage productPackage)
     {
@@ -127,16 +192,38 @@
         product_To_Order.order_id = orderId;
         product_To_Order.count = productPackage.count;
         product_To_Order._product_price = productPackage.product.price;
-        product_To_Order.total_price = productPackage.product.price * productPackage.count;
-
-        //var response = await Http.PostAsJsonAsync("api/ProductToOrder", product_To_Order);
-        //product_To_Order = response.Content.ReadFromJsonAsync<product_to_order>().Result;
         product_To_Order.product = productPackage.product;
         AddProductToproductToOrder?.Invoke(product_To_Order);
+    }
+    protected List<category> GetCategoryTree(List<category> categoryTree, category category)
+    {
+        categoryTree.Add(category);
+        if (category.parent_id != 0)
+            GetCategoryTree(categoryTree, categoriesList.Where(c => c.id == category.parent_id).FirstOrDefault());
+        return categoryTree;
+    }
+    protected async Task CleanFilter()
+    {
+        productFilter = new();
+        currentCategory = categoriesList.Where(c => c.id == 1).FirstOrDefault();
+
+        productFilter = new();
+        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + 1);
+        CompleteProductPackage(productList);
     }
     protected class ProductPackage
     {
         public int count = 0;
         public product product { get; set; }
+    }
+    protected void CompleteProductPackage(List<product> _productList)
+    {
+        productPackages = new();
+        foreach (var p in _productList)
+        {
+            ProductPackage productPackage = new ProductPackage();
+            productPackage.product = p;
+            productPackages.Add(productPackage);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using industriation_crm.Server.Interfaces;
 using industriation_crm.Shared.Models;
+using industriation_crm.Shared.FilterModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace industriation_crm.Server.Controllers
@@ -13,10 +14,15 @@ namespace industriation_crm.Server.Controllers
         {
             _IProduct = IProduct;
         }
-        [HttpGet]
-        public async Task<List<product>> Get()
+        [HttpGet("GetProductDetails/{categoryId}")]
+        public async Task<List<product>> GetProductDetails(int categoryId)
         {
-            return await Task.FromResult(_IProduct.GetProductDetails());
+            return await Task.FromResult(_IProduct.GetProductDetails(categoryId));
+        }
+        [HttpPost("FindByFilter")]
+        public async Task<List<product>> FindByFilter([FromBody]ProductFilter productFilter)
+        {
+            return await Task.FromResult(_IProduct.GetFromFilter(productFilter));
         }
         [HttpPost]
         public void Post(product product)

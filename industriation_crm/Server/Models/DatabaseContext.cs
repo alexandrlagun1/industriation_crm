@@ -5,7 +5,7 @@ namespace industriation_crm.Server.Models
 {
     public partial class DatabaseContext : DbContext
     {
-
+        public DbSet<category> category { get; set; }
         public DbSet<user> user { get; set; }
         public DbSet<roles> roles { get; set; }
         public DbSet<client> client { get; set; }

@@ -5,13 +5,17 @@ using industriation_crm.Server.SignalRNotification;
 using industriation_crm.Shared.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DatabaseContext>
     (options =>
-    options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")).LogTo(Console.WriteLine, LogLevel.Information));
+    {
+        options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")).LogTo(Console.WriteLine, LogLevel.Information);
+        options.ConfigureWarnings(warnings =>warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
+    });
 
 builder.Services.AddOidcAuthentication(options =>
 {
@@ -20,6 +24,7 @@ builder.Services.AddOidcAuthentication(options =>
 
 //Авторизация
 
+builder.Services.AddScoped<ICategory, CategoryManager>();
 builder.Services.AddScoped<IContact, ContactManager>();
 builder.Services.AddScoped<IUser, UserManager>();
 builder.Services.AddScoped<IClient, ClientManager>();

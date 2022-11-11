@@ -67,12 +67,23 @@ namespace industriation_crm.Shared.Models
         public contact? main_contact { get; set; } = new();
 
     }
+    public class category
+    {
+        [Key]
+        public int id { get; set; }
+        public string? name { get; set; }
+        public int parent_id { get; set; }
+    }
     public class product
     {
         [Key]
         public int id { get; set; }
         public string? name { get; set; }
         public double? price { get; set; }
+        public int? category_id { get; set; } 
+        public int? external_id { get; set; }
+        public string? image { get; set; }
+        public string? article { get; set; }
     }
     public class order
     {
@@ -84,62 +95,71 @@ namespace industriation_crm.Shared.Models
         public int? main_contact_id { get; set; }
         public int? delivery_id { get; set; }
         public string? comments { get; set; }
-        public int? percent_discount { get; set; } = 0;
+        public int? percent_discount { get; set; }
+        public double? ruble_discount { get; set; }
+        public double? price_summ { get; set; }
+
         [NotMapped]
         public int? _percent_discount
         {
             get
             {
-                return percent_discount;
+                if (percent_discount != null)
+                    return percent_discount;
+                else
+                    return 0;
             }
             set
             {
-
-                if (product_To_Orders != null && product_To_Orders.Count != 0)
-                {
-                    if (percent_discount == null)
-                        percent_discount = 0;
-                    if (value == null)
-                        product_To_Orders?.ForEach(p => p.discount_total_price = p.discount_total_price - (p.total_price / 100 * percent_discount));
-                    else
-                        product_To_Orders?.ForEach(p => p.discount_total_price = (p.discount_total_price - (p.total_price / 100 * percent_discount)) + p.total_price / 100 * value);
-                }
-                percent_discount = value;
+                if (value != null)
+                    percent_discount = value;
+                else
+                    percent_discount = 0;
+                product_To_Orders?.ForEach(p => p.order_percent_discount = value);
             }
         }
-        public double? ruble_discount { get; set; } = 0;
         [NotMapped]
         public double? _ruble_discount
         {
             get
             {
-                return ruble_discount;
+                if (ruble_discount != null)
+                    return ruble_discount;
+                else
+                    return 0;
             }
             set
             {
-                if (product_To_Orders != null && product_To_Orders.Count != 0)
-                {
-                    if (ruble_discount == null)
-                        ruble_discount = 0;
-                    if (value == null)
-                        product_To_Orders?.ForEach(p => p.discount_total_price = p.discount_total_price - ruble_discount);
-                    else
-                    {
-                        product_To_Orders?.ForEach(p => p.discount_total_price = (p.discount_total_price - ruble_discount) + value);
-                    }
-                }
-                ruble_discount = value;
+                if (value != null)
+                    ruble_discount = value;
+                else
+                    ruble_discount = 0;
+                product_To_Orders?.ForEach(p => p.order_ruble_discount = value);
+            }
+        }
+        [NotMapped]
+        public double? products_with_delivery_price
+        {
+            get
+            {
+                if (delivery.price == null)
+                    return _total_price;
+                return delivery.price + _total_price;
             }
         }
 
-        public double? price_summ { get; set; }
+
         [NotMapped]
         public double? _price_summ
         {
             get
             {
-                double? product_summ = product_To_Orders?.Select(p => p._product_price * p._count).Sum();
-                price_summ = product_summ + delivery?.price! - _current_pay_summ;
+                if (delivery?.price == null)
+                    price_summ = _total_price - _current_pay_summ;
+                else
+                    price_summ = _total_price + delivery?.price - _current_pay_summ;
+                if (price_summ < 0)
+                    price_summ = 0;
                 return price_summ;
             }
             set
@@ -148,6 +168,14 @@ namespace industriation_crm.Shared.Models
                 if (value < 0)
                     price_summ = 0;
 
+            }
+        }
+        [NotMapped]
+        public double? _total_price
+        {
+            get
+            {
+                return product_To_Orders?.Select(p => p._total_price).Sum();
             }
         }
         public double? current_pay_summ { get; set; }
@@ -196,44 +224,19 @@ namespace industriation_crm.Shared.Models
         public int id { get; set; }
         public int? count { get; set; }
 
-        [NotMapped]
-        public int? _count
-        {
-            get
-            {
-                return count;
-            }
-            set
-            {
-                count = value;
-                total_price = product_price * value;
-            }
-        }
+
         public int? product_id { get; set; }
         public int? order_id { get; set; }
         public int? supplier_order_id { get; set; }
-        public double? discount_total_price { get; set; } = 0;
 
         public double? product_price { get; set; }
 
-        [NotMapped]
-        public double? _product_price
-        {
-            get
-            {
-                return product_price;
-            }
-            set
-            {
-                product_price = value;
-                total_price = count * value;
-            }
-        }
-        public double? total_price { get; set; } = 0;
+        //public double? total_price { get; set; } = 0;
         public int? product_postition { get; set; } = 0;
         public int? delivery_period { get; set; }
         public int? delivery_period_type_id { get; set; }
-        public double? discount { get; set; }
+        public double? ruble_discount { get; set; }
+        public int percent_discount { get; set; }
 
         [ForeignKey("product_id")]
         public product? product { get; set; }
@@ -241,25 +244,126 @@ namespace industriation_crm.Shared.Models
         [ForeignKey("order_id")]
         public order? order { get; set; }
 
-        [NotMapped]
-        public order? _order
-        {
-            get
-            {
-                return order;
-            }
-            set
-            {
-                order = value;
-            }
-        }
-
         [ForeignKey("supplier_order_id")]
         public supplier_order? supplier_order { get; set; }
 
         [ForeignKey("delivery_period_type_id")]
         public delivery_period_type? delivery_period_type { get; set; }
 
+        private double? total_price
+        {
+            get
+            {
+                double result = Math.Round(Convert.ToDouble(_product_price_with_discount * _count), 2);
+                return result;
+            }
+        }
+        [NotMapped]
+        public double? _total_price
+        {
+            get
+            {
+                double result = Math.Round(Convert.ToDouble(_product_price_with_discount * _count - _discount_total_price), 2);
+                if (result < 0)
+                    return 0;
+                return result;
+            }
+        }
+
+        private double? _order_ruble_discount;
+        [NotMapped]
+        public double? order_ruble_discount
+        {
+            get
+            {
+                if (_order_ruble_discount == null)
+                    return 0;
+                else
+                    return _order_ruble_discount;
+            }
+            set
+            {
+                if (value == null)
+                    _order_ruble_discount = 0;
+                else
+                    _order_ruble_discount = value;
+            }
+        }
+
+        private double? _order_percent_discount;
+        [NotMapped]
+        public double? order_percent_discount 
+        {
+            get
+            {
+                if (_order_percent_discount == null)
+                    return 0;
+                else
+                    return _order_percent_discount;
+            }
+            set
+            {
+                if (value == null)
+                    _order_percent_discount = 0;
+                else
+                    _order_percent_discount = value;
+            }
+        }
+
+        [NotMapped]
+        public double? _discount_total_price
+        {
+            get
+            {
+                double result = Math.Round(Convert.ToDouble(order_ruble_discount + (total_price / 100 * order_percent_discount)),2);
+                return result;
+            }
+        }
+
+        [NotMapped]
+        public double? _product_price_with_discount
+        {
+            get
+            {
+                if (ruble_discount == null)
+                    ruble_discount = 0;
+                if (percent_discount == null)
+                    percent_discount = 0;
+                double result = Convert.ToDouble(product_price - (product_price / 100 * percent_discount) - ruble_discount);
+                return Math.Round(result,2);
+            }
+        }
+
+        [NotMapped]
+        public int? _count
+        {
+            get
+            {
+                if (count != null)
+                    return count;
+                else
+                    return 0;
+            }
+            set
+            {
+                count = value;
+            }
+        }
+        [NotMapped]
+        public double? _product_price
+        {
+            get
+            {
+                if (product_price != null)
+                    return product_price;
+                else
+                    return 0;
+            }
+            set
+            {
+                product_price = value;
+            }
+        }
 
     }
     public class supplier
@@ -294,6 +398,23 @@ namespace industriation_crm.Shared.Models
         public string? recipient_phone { get; set; }
         public int? order_id { get; set; }
         public double? price { get; set; } = 0;
+        [NotMapped]
+        public double? _price
+        {
+            get
+            {
+                if (price == null)
+                    return 0;
+                return price;
+            }
+            set
+            {
+                if (value == null)
+                    price = 0;
+                else
+                    price = value;
+            }
+        }
         public string? address { get; set; }
 
         [ForeignKey("order_id")]

@@ -78,7 +78,7 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                return _dbContext.product_to_order.Include("product").Include("order").Where(p => p.supplier_order_id == null && p.order.order_status_id == 3).ToList();
+                return _dbContext.product_to_order.Include(p => p.product).Include(p => p.order).Where(p => p.supplier_order_id == null && p.order.order_status_id == 3).ToList();
             }
             catch
             {
@@ -89,7 +89,7 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                return _dbContext.product_to_order.Include(o => o.delivery_period_type).Include("product").Include("order").Where(p => p.supplier_order_id == suplier_order_id).ToList();
+                return _dbContext.product_to_order.Include(o => o.delivery_period_type).Include(p => p.product).Include(p => p.order).Where(p => p.supplier_order_id == suplier_order_id).ToList();
             }
             catch
             {
@@ -101,7 +101,8 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                return _dbContext.product_to_order.Include(o=>o.delivery_period_type).Include("product").Include("order").Where(p => p.order_id == order_id).ToList();
+                List<product_to_order> product_To_Order = _dbContext.product_to_order.Include(o => o.delivery_period_type).Include(p => p.product).Include(p => p.order).Where(p => p.order_id == order_id).ToList();
+                return product_To_Order;
             }
             catch
             {

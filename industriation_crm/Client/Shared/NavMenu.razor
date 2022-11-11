@@ -86,11 +86,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        HubConnection.On<string>("UpdateStatus", status =>
-        {
-            isNewZakaziPostavshikam = true;
-            StateHasChanged();
-        });
+        
     }
 
     private void ToggleNavMenu()

@@ -1,5 +1,8 @@
 ﻿@page "/fetchproductdetails"
+@using System.Text
 @using industriation_crm.Shared.Models
+@using industriation_crm.Shared.FilterModels
+@using Newtonsoft.Json
 @inject HttpClient Http
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
@@ -12,49 +15,176 @@
 }
 else
 {
+    <p>Фильтр:</p>
+    <div>
+        Наименование товара: <input @bind="productFilter.name"></input>&nbsp;
+        Артикул: <input @bind="productFilter.article"></input>&nbsp;
+        Цена от: <input @bind="productFilter.price_from"></input>&nbsp;
+        Цена до: <input @bind="productFilter.price_to"></input>&nbsp;
+    </div>
+    <button @onclick="FindByFilter">Поиск</button>
+    <button @onclick="CleanFilter">Очистить фильтр</button>
+
     <div class="section-field">
         <a href='/product/add' class="score" role="button">
             Добавить продукт
         </a>
     </div>
+
     <div class="main-section">
+        @*<button type="button" class="btn btn-primary btn-lg" @onclick="CategoryBack">&#9664;</button>&nbsp;*@
+        @if (currentCategory != null && currentCategory.id != 0)
+        {
+            List<category> categoryTree = GetCategoryTree(new List<category>(), currentCategory);
+            categoryTree.Reverse();
+            foreach (var category in categoryTree)
+            {
+                <button type="button" class="btn btn-primary btn-lg" @onclick="()=>GetProducts(category)">@category.name</button>
+            }
+            <br>
+            @foreach (var category in categoriesList.Where(c => c.parent_id == currentCategory.id))
+            {
+                <button @onclick="()=>GetProducts(category)">@category.name</button>
+                <br />
+            }
+        }
+
         <div class="section-field">
+
             <table class="order-table ind-col-lg-10">
                 <thead class="ind-col-lg-10">
                     <tr class="order-row ind-col-lg-10">
-                        <td class="ind-col-lg-1">ID</td>
+                        <td class="ind-col-lg-1">Артикул</td>
                         <td class="ind-col-lg-7">Наименование</td>
                         <td class="ind-col-lg-2">Действия</td>
                     </tr>
                 </thead>
                 <tbody class="ind-col-lg-10">
-                    @foreach (var product in productList)
+                    @if (currentCategory == null && productList?.Count != 0)
                     {
-                        <tr class="order-row ind-col-lg-10">
-                            <td class="ind-col-lg-1">@product.id</td>
-                            <td class="ind-col-lg-7">@product.name</td>
-                            <td class="ind-col-lg-2">
-                                <a href='/product/edit/@product.id' class="score" role="button">
-                                    Изменить
-                                </a>
-                            </td>
-                        </tr>
+                        @foreach (var product in productList.Skip(skip).Take(count_on_page))
+                        {
+                            <tr class="order-row ind-col-lg-10">
+                                <td class="ind-col-lg-1">@product.article</td>
+                                <td class="ind-col-lg-7">@product.name</td>
+                                <td class="ind-col-lg-2">
+                                    <a href='/product/edit/@product.id' class="score" role="button">
+                                        Изменить
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        @foreach (var product in productList.Where(p => p.category_id == currentCategory.id).Skip(skip).Take(count_on_page))
+                        {
+                            <tr class="order-row ind-col-lg-10">
+                                <td class="ind-col-lg-1">@product.id</td>
+                                <td class="ind-col-lg-7">@product.name</td>
+                                <td class="ind-col-lg-2">
+                                    <a href='/product/edit/@product.id' class="score" role="button">
+                                        Изменить
+                                    </a>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
 
             </table>
         </div>
+        <button @onclick="PagPrev">Prev</button>
+        <button @onclick="PagNext">Next</button>
     </div>
 }
 @code {
+    protected int count_on_page = 50;
+    protected int current_page = 1;
+    public int total_page;
+
+    public int skip = 0;
+
+    protected ProductFilter productFilter = new();
+
+    protected category currentCategory = new();
+    protected List<category> categoriesList = new();
     protected List<product> productList = new();
     protected product product = new();
     protected override async Task OnInitializedAsync()
     {
-        await GetClient();
+        await GetData();
     }
-    protected async Task GetClient()
+    protected async Task GetData()
     {
-        productList = await Http.GetFromJsonAsync<List<product>>("api/Product");
+        categoriesList = await Http.GetFromJsonAsync<List<category>>("api/Category");
+
+        currentCategory = categoriesList.Where(c => c.parent_id == 0).FirstOrDefault();
+        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + 1);
+
+
+    }
+    protected async Task GetProducts(category category)
+    {
+        currentCategory = category;
+        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + category.id);
+        total_page = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(productList.Count) / Convert.ToDouble(count_on_page)));
+    }
+    protected void PagPrev()
+    {
+        if (current_page > 1)
+        {
+            current_page--;
+            skip -= count_on_page;
+        }
+    }
+    protected void PagNext()
+    {
+        if (current_page < total_page)
+        {
+            current_page++;
+            skip += count_on_page;
+        }
+    }
+    protected void CategoryBack()
+    {
+        if (currentCategory.parent_id != 0)
+            currentCategory = categoriesList.Where(c => c.id == currentCategory.parent_id).FirstOrDefault();
+    }
+    protected async Task FindByFilter()
+    {
+        if (productFilter.article == "" && productFilter.name == "" && (productFilter.price_from == null || productFilter.price_from == 0) && (productFilter.price_to == null || productFilter.price_to == 10000000))
+        {
+            CleanFilter();
+            return;
+        }
+        if (productFilter.price_to == null)
+            productFilter.price_to = 10000000;
+        var json = JsonConvert.SerializeObject(productFilter);
+        var stringContent = new StringContent(json);
+        var response = await Http.PostAsJsonAsync("api/Product/FindByFilter", productFilter);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        productList = JsonConvert.DeserializeObject<List<product>>(responseBody);
+        skip = 0;
+        total_page = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(productList.Count) / Convert.ToDouble(count_on_page)));
+        currentCategory = null;
+        //var response = await Http.PostAsync("api/Product/FindByFilter", stringContent);
+        //var responseBody = await response.Content.ReadAsStringAsync();
+        //productList = JsonConvert.DeserializeObject<List<product>>(responseBody);
+    }
+    protected List<category> GetCategoryTree(List<category> categoryTree, category category)
+    {
+        categoryTree.Add(category);
+        if (category.parent_id != 0)
+            GetCategoryTree(categoryTree, categoriesList.Where(c => c.id == category.parent_id).FirstOrDefault());
+        return categoryTree;
+    }
+    protected async Task CleanFilter()
+    {
+        productFilter = new();
+        currentCategory = categoriesList.Where(c => c.id == 1).FirstOrDefault();
+
+        productFilter = new();
+        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + 1);
     }
 }

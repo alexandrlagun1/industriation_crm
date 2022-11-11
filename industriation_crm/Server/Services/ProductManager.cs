@@ -1,5 +1,6 @@
 ﻿using industriation_crm.Server.Interfaces;
 using industriation_crm.Server.Models;
+using industriation_crm.Shared.FilterModels;
 using industriation_crm.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,19 @@ namespace industriation_crm.Server.Services
             {
                 _dbContext.product.Add(product);
                 _dbContext.SaveChanges();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public List<product> GetFromFilter(ProductFilter productFilter)
+        {
+            try
+            {
+                List<product> products = _dbContext.product.Where(p => p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Take(500).ToList();
+                return products;
             }
             catch
             {
@@ -45,11 +59,12 @@ namespace industriation_crm.Server.Services
             }
         }
 
-        public List<product> GetProductDetails()
+        public List<product> GetProductDetails(int categoryId)
         {
             try
             {
-                return _dbContext.product.ToList();
+                List<product> products = _dbContext.product.Where(p => p.category_id == categoryId).ToList();
+                return products;
             }
             catch
             {

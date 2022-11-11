@@ -71,6 +71,7 @@ namespace industriation_crm.Server.Services
             try
             {
                 order? order = _dbContext.order.Include(o => o.order_Pays).ThenInclude(p => p.pay_Status).Include(o => o.delivery).ThenInclude(d => d.delivery_type).Include(o => o.user).Include(o => o.client).ThenInclude(c => c.contacts).ThenInclude(c=>c.contact_phones).Include(o => o.order_status).Include(o => o.product_To_Orders).ThenInclude(o => o.product).Include(o => o.main_contact).FirstOrDefault(u => u.id == id);
+                order.product_To_Orders.ForEach((p) => { p.order_percent_discount = order._percent_discount; p.order_ruble_discount = order._ruble_discount; });
                 if (order != null)
                 {
                     return order;
