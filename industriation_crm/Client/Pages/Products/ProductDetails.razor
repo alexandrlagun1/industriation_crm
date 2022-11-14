@@ -15,40 +15,64 @@
 }
 else
 {
-    <p>Фильтр:</p>
-    <div>
-        Наименование товара: <input @bind="productFilter.name"></input>&nbsp;
-        Артикул: <input @bind="productFilter.article"></input>&nbsp;
-        Цена от: <input @bind="productFilter.price_from"></input>&nbsp;
-        Цена до: <input @bind="productFilter.price_to"></input>&nbsp;
+    <div class="main-section">
+        <div class="main-section-label">
+            Фильтр
+        </div>
+        <div class="row-f mt-10">
+            @*<button type="button" class="btn btn-primary btn-lg" @onclick="CategoryBack">&#9664;</button>&nbsp;*@
+            @if (currentCategory != null && currentCategory.id != 0)
+            {
+                List<category> categoryTree = GetCategoryTree(new List<category>(), currentCategory);
+                categoryTree.Reverse();
+                foreach (var category in categoryTree)
+                {
+                    <button type="button" class="filter-button selected" @onclick="()=>GetProducts(category)">@category.name <img class="arrow" src="./icons/arrow-right.svg" /></button>
+                }
+                @foreach (var category in categoriesList.Where(c => c.parent_id == currentCategory.id))
+                {
+                    <button class="filter-button" @onclick="()=>GetProducts(category)">@category.name</button>
+                }
+            }
+        </div>
+        <hr/>
+        <div class="section-field mb-20">
+            <div class="ind-col-lg-2-5 pad-0-10-0-0">
+                <div class="input-label">
+                    Наименование товара:
+                </div>
+                <input class="main-input" @bind="productFilter.name" />
+            </div>
+            <div class="ind-col-lg-2-5 pad-0-10-0-0">
+                <div class="input-label">
+                    Артикул:
+                </div>
+                <input class="main-input" @bind="productFilter.article" />
+            </div>
+            <div class="ind-col-lg-2-5 pad-0-10-0-0">
+                <div class="input-label">
+                    Цена от:
+                </div>
+                <input class="main-input" @bind="productFilter.price_from" />
+            </div>
+            <div class="ind-col-lg-2-5 pad-0-10-0-0">
+                <div class="input-label">
+                    Цена до:
+                </div>
+                <input class="main-input" @bind="productFilter.price_to" />
+            </div>
+        </div>
+        <div class="section-field pad-0-5">
+            <button class="score mr-20" @onclick="FindByFilter">Поиск</button>
+            <button class="close" @onclick="CleanFilter">Очистить фильтр</button>
+        </div>
     </div>
-    <button @onclick="FindByFilter">Поиск</button>
-    <button @onclick="CleanFilter">Очистить фильтр</button>
 
-    <div class="section-field">
-        <a href='/product/add' class="score" role="button">
-            Добавить продукт
-        </a>
-    </div>
+
+
+
 
     <div class="main-section">
-        @*<button type="button" class="btn btn-primary btn-lg" @onclick="CategoryBack">&#9664;</button>&nbsp;*@
-        @if (currentCategory != null && currentCategory.id != 0)
-        {
-            List<category> categoryTree = GetCategoryTree(new List<category>(), currentCategory);
-            categoryTree.Reverse();
-            foreach (var category in categoryTree)
-            {
-                <button type="button" class="btn btn-primary btn-lg" @onclick="()=>GetProducts(category)">@category.name</button>
-            }
-            <br>
-            @foreach (var category in categoriesList.Where(c => c.parent_id == currentCategory.id))
-            {
-                <button @onclick="()=>GetProducts(category)">@category.name</button>
-                <br />
-            }
-        }
-
         <div class="section-field">
 
             <table class="order-table ind-col-lg-10">
