@@ -180,6 +180,7 @@ namespace industriation_crm.Shared.Models
         }
         public double? current_pay_summ { get; set; }
 
+        
         [NotMapped]
         public double? _current_pay_summ
         {
@@ -224,7 +225,8 @@ namespace industriation_crm.Shared.Models
         public int id { get; set; }
         public int? count { get; set; }
 
-
+        [NotMapped]
+        public bool showPriceModal = false;
         public int? product_id { get; set; }
         public int? order_id { get; set; }
         public int? supplier_order_id { get; set; }

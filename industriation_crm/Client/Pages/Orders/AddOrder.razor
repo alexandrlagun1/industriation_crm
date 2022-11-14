@@ -51,29 +51,29 @@
         @if (viewContacts == false)
         {
             <div class="section-field">
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">Имя</div>
-                    <input type="text" class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
+                <div class="ind-col-lg-5">
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Имя</div>
+                        <input type="text" class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
+                    </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Фамилия</div>
+                        <input type="text" class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
+                    </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Отчество</div>
+                        <input type="text" class="main-input" value="@order?.main_contact?.patronymic" @oninput="@((ChangeEventArgs e) => {order.main_contact.patronymic = e.Value.ToString();clientChange = true;})">
+                    </div>
                 </div>
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">E-mail</div>
-                    <input type="email" class="main-input" value="@order?.main_contact?.email" @oninput="@((ChangeEventArgs e) => {order.main_contact.email = e.Value.ToString();clientChange = true;})">
-                </div>
-            </div>
-            <div class="section-field">
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">Фамилия</div>
-                    <input type="text" class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
-                </div>
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">Номер телефона</div>
-                    <input type="tel" class="main-input" value="@order?.main_contact?.phone" @oninput="@((ChangeEventArgs e) => {order.main_contact.phone = e.Value.ToString();clientChange = true;})">
-                </div>
-            </div>
-            <div class="section-field">
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">Отчество</div>
-                    <input type="text" class="main-input" value="@order?.main_contact?.patronymic" @oninput="@((ChangeEventArgs e) => {order.main_contact.patronymic = e.Value.ToString();clientChange = true;})">
+                <div class="ind-col-lg-5">
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">E-mail</div>
+                        <input type="email" class="main-input" value="@order?.main_contact?.email" @oninput="@((ChangeEventArgs e) => {order.main_contact.email = e.Value.ToString();clientChange = true;})">
+                    </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Номер телефона</div>
+                        <input type="tel" class="main-input" value="@order?.main_contact?.phone" @oninput="@((ChangeEventArgs e) => {order.main_contact.phone = e.Value.ToString();clientChange = true;})">
+                    </div>
                 </div>
             </div>
             @if (order?.main_contact?.contact_phones != null)
@@ -211,9 +211,6 @@
                                             </div>
                                         </div>
                                     </a>
-                                    <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" />P<br>
-                                    <input type="number" class="main-input" @bind="@p.percent_discount" />%<br>
-                                    <p>@p._product_price_with_discount</p>
                                 </td>
                                 <td class="ind-col-lg-2">
                                     <div class="ind-col-lg-3">
@@ -229,8 +226,29 @@
                                     </div>
                                 </td>
                                 <td class="ind-col-lg-1">
-                                    <input type="number" class="main-input" step="0.1" @bind="@p._product_price" /><br>
-                                   
+                                    <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">@p._product_price</button>
+                                    @if (p.showPriceModal)
+                                    {
+                                        <div class="price-modal" tabindex="0">
+                                            <div class="input-label mb-10">Цена</div>
+                                            <div class="row-f ind-col-lg-10">
+                                                <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" />
+                                            </div>
+                                            <div class="input-label mt-10">Дополнительная скидка</div>
+                                            <div class="row-f">
+                                                <div class="ind-col-lg-5 discount-input">
+                                                    <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" />P
+                                                </div>
+                                                <div class="ind-col-lg-5 discount-input">
+                                                    <input type="number" class="main-input" @bind="@p.percent_discount" />%
+                                                    <p>@p._product_price_with_discount</p>
+                                                </div>
+                                            </div>
+                                            <div class="discount-buttons mt-10">
+                                                <button class="score" @onclick="() => p.showPriceModal = false">Закрыть</button>
+                                            </div>
+                                        </div>
+                                    }
                                 </td>
                                 
                                 <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" /></td>
@@ -421,9 +439,12 @@
 
 
 @code {
+    //Изменение классов модалки скидки
+
     //Изменение классов контакта и клиента
     protected string clientClass = "client client--active";
     protected string contactClass = "contact";
+    protected bool showPriceModal = false;
     [Parameter]
     public int clientId { get; set; }
 

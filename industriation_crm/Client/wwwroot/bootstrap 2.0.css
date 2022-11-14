@@ -107,22 +107,6 @@
 	}
 
 
-/* //////////////////////////// */
-
-.qwe .col-lg-1:hover,
-.qwe .col-lg-2:hover,
-.qwe .col-lg-3:hover,
-.qwe .col-lg-4:hover,
-.qwe .col-lg-5:hover,
-.qwe .col-lg-6:hover,
-.qwe .col-lg-7:hover,
-.qwe .col-lg-8:hover,
-.qwe .col-lg-9:hover,
-.qwe .col-lg-10:hover {
-	background-color: #8b8b8b;
-}
-
-/* //////////////////////////// */
 
 /* FONTS */
 
@@ -305,6 +289,29 @@ img {
 	.btn-locked:hover {
 		cursor: not-allowed;
 	}
+
+.filter-button {
+	font-size: 14px;
+	background-color: #fff;
+	border: none;
+	transition: color .5s;
+	margin-right: 15px;
+}
+
+.filter-button:hover {
+	color: #0099ff;
+	transition: all .5s;
+}
+
+.filter-button.selected {
+	color: #0099ff;
+	border-bottom: dashed 1px #0099ff;
+}
+
+.filter-button.selected:last-child img {
+	display: none;
+}
+
 
 /* INPUTS */
 
@@ -676,6 +683,18 @@ li {
 	margin-right: 20px;
 }
 
+.mb-20 {
+	margin-bottom: 20px;
+}
+
+.mb-10 {
+	margin-bottom: 10px;
+}
+
+.mt-10 {
+	margin-top: 10px;
+}
+
 
 .ind-col-lg-1-5 {
 	flex: 0 0 15%;
@@ -834,9 +853,24 @@ header {
 	padding: 5px 10px;
 }
 
-	.main-input::placeholder {
-		color: #636f7f;
-	}
+.price-button {
+	border: none;
+	border-radius: 3px;
+	color: #0099ff;
+	font-size: 13px;
+	display: block;
+	width: 100%;
+	font-style: normal;
+	outline: none !important;
+	padding: 5px 10px;
+	text-decoration: underline;
+	position: relative;
+	background-color: #fff;
+}
+
+.main-input::placeholder {
+	color: #636f7f;
+}
 
 .client {
 	font-size: 15px;
@@ -1277,7 +1311,44 @@ td.ind-col-lg-1 {
 	height: calc(100% - 50px);
 }
 
+.pad-0-10-0-0 {
+	padding: 0 10px 0 0;
+}
+
+.price-modal {
+	background-color: #fff;
+	display: block;
+	width: 250px;
+	box-shadow: 0 0px 32px rgb(30 34 72 / 16%) ;
+	border-radius: 4px;
+	position: absolute;
+	top: calc(50% + 15px);
+	right: 0;
+	z-index: 1;
+	padding: 10px;
+}
+
+.price-modal .input-label {
+	text-align: left;
+}
 
 
+.discount-input {
+	display: flex;
+	align-items: center;
+}
+
+.discount-input input::-webkit-inner-spin-button {
+	display: none;
+}
+
+.discount-input input {
+	width: 50%;
+	margin-right: 10px;
+}
+
+.discount-buttons button {
+	width: 100%;
+}
 
 /* ////////////////////////////////////////////////////////////////// */
