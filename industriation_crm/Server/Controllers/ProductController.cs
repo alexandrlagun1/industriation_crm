@@ -20,7 +20,7 @@ namespace industriation_crm.Server.Controllers
             return await Task.FromResult(_IProduct.GetProductDetails(categoryId));
         }
         [HttpPost("FindByFilter")]
-        public async Task<List<product>> FindByFilter([FromBody]ProductFilter productFilter)
+        public async Task<ProductReturnData> FindByFilter([FromBody]ProductFilter productFilter)
         {
             return await Task.FromResult(_IProduct.GetFromFilter(productFilter));
         }

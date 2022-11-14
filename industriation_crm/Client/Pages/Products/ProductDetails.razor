@@ -60,42 +60,29 @@ else
                     </tr>
                 </thead>
                 <tbody class="ind-col-lg-10">
-                    @if (currentCategory == null && productList?.Count != 0)
+                    @foreach (var product in productList)
                     {
-                        @foreach (var product in productList.Skip(skip).Take(count_on_page))
-                        {
-                            <tr class="order-row ind-col-lg-10">
-                                <td class="ind-col-lg-1">@product.article</td>
-                                <td class="ind-col-lg-7">@product.name</td>
-                                <td class="ind-col-lg-2">
-                                    <a href='/product/edit/@product.id' class="score" role="button">
-                                        Изменить
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        @foreach (var product in productList.Where(p => p.category_id == currentCategory.id).Skip(skip).Take(count_on_page))
-                        {
-                            <tr class="order-row ind-col-lg-10">
-                                <td class="ind-col-lg-1">@product.id</td>
-                                <td class="ind-col-lg-7">@product.name</td>
-                                <td class="ind-col-lg-2">
-                                    <a href='/product/edit/@product.id' class="score" role="button">
-                                        Изменить
-                                    </a>
-                                </td>
-                            </tr>
-                        }
+                        <tr class="order-row ind-col-lg-10">
+                            <td class="ind-col-lg-1">@product.article</td>
+                            <td class="ind-col-lg-7">@product.name</td>
+                            <td class="ind-col-lg-2">
+                                <a href='/product/edit/@product.id' class="score" role="button">
+                                    Изменить
+                                </a>
+                            </td>
+                        </tr>
                     }
                 </tbody>
 
             </table>
         </div>
-        <button @onclick="PagPrev">Prev</button>
-        <button @onclick="PagNext">Next</button>
+        Страница:
+        <select @onchange="(e)=>ChangePage(e)">
+            @foreach (int i in page_count!)
+            {
+                <option>@i</option>
+            }
+        </select>
     </div>
 }
 @code {
@@ -104,13 +91,19 @@ else
     public int total_page;
 
     public int skip = 0;
-
+    List<int> page_count = new List<int>();
     protected ProductFilter productFilter = new();
 
     protected category currentCategory = new();
     protected List<category> categoriesList = new();
     protected List<product> productList = new();
     protected product product = new();
+
+    protected async Task ChangePage(ChangeEventArgs e)
+    {
+        current_page = Convert.ToInt32(e.Value);
+        await FindByFilter();
+    }
     protected override async Task OnInitializedAsync()
     {
         await GetData();
@@ -120,9 +113,7 @@ else
         categoriesList = await Http.GetFromJsonAsync<List<category>>("api/Category");
 
         currentCategory = categoriesList.Where(c => c.parent_id == 0).FirstOrDefault();
-        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + 1);
-
-
+        await FindByFilter();
     }
     protected async Task GetProducts(category category)
     {
@@ -130,22 +121,7 @@ else
         productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + category.id);
         total_page = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(productList.Count) / Convert.ToDouble(count_on_page)));
     }
-    protected void PagPrev()
-    {
-        if (current_page > 1)
-        {
-            current_page--;
-            skip -= count_on_page;
-        }
-    }
-    protected void PagNext()
-    {
-        if (current_page < total_page)
-        {
-            current_page++;
-            skip += count_on_page;
-        }
-    }
+
     protected void CategoryBack()
     {
         if (currentCategory.parent_id != 0)
@@ -153,24 +129,23 @@ else
     }
     protected async Task FindByFilter()
     {
-        if (productFilter.article == "" && productFilter.name == "" && (productFilter.price_from == null || productFilter.price_from == 0) && (productFilter.price_to == null || productFilter.price_to == 10000000))
-        {
-            CleanFilter();
-            return;
-        }
+        productFilter.current_page = current_page;
+        productFilter.product_on_page = count_on_page;
+        productFilter.category_id = currentCategory.id;
+
         if (productFilter.price_to == null)
             productFilter.price_to = 10000000;
         var json = JsonConvert.SerializeObject(productFilter);
         var stringContent = new StringContent(json);
         var response = await Http.PostAsJsonAsync("api/Product/FindByFilter", productFilter);
         var responseBody = await response.Content.ReadAsStringAsync();
-        productList = JsonConvert.DeserializeObject<List<product>>(responseBody);
-        skip = 0;
-        total_page = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(productList.Count) / Convert.ToDouble(count_on_page)));
-        currentCategory = null;
-        //var response = await Http.PostAsync("api/Product/FindByFilter", stringContent);
-        //var responseBody = await response.Content.ReadAsStringAsync();
-        //productList = JsonConvert.DeserializeObject<List<product>>(responseBody);
+        ProductReturnData productReturnData = JsonConvert.DeserializeObject<ProductReturnData>(responseBody);
+        productList = productReturnData.products;
+
+        total_page = Convert.ToInt32(Math.Ceiling(productReturnData.count / Convert.ToDouble(count_on_page)));
+        page_count = new();
+        for (int i = 1; i <= total_page; i++)
+            page_count.Add(i);
     }
     protected List<category> GetCategoryTree(List<category> categoryTree, category category)
     {
@@ -183,8 +158,7 @@ else
     {
         productFilter = new();
         currentCategory = categoriesList.Where(c => c.id == 1).FirstOrDefault();
+        current_page = 1;
 
-        productFilter = new();
-        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + 1);
     }
 }

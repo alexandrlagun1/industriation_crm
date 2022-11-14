@@ -26,18 +26,35 @@ namespace industriation_crm.Server.Services
             }
         }
 
-        public List<product> GetFromFilter(ProductFilter productFilter)
+        public ProductReturnData GetFromFilter(ProductFilter productFilter)
         {
             try
             {
-                List<product> products = _dbContext.product.Where(p => p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Take(500).ToList();
-                return products;
+                ProductReturnData productReturnData = new ProductReturnData();
+                List<product> products = new();
+                int count = 0;
+                if (productFilter.category_id != 1)
+                {
+                    count = _dbContext.product.Where(p => p.category_id == productFilter.category_id && p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Count();
+                    products = _dbContext.product.Where(p => p.category_id == productFilter.category_id && p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Skip((productFilter.product_on_page - 1) * productFilter.current_page).Take(productFilter.product_on_page).ToList();
+                }
+                else
+                {
+                    count = _dbContext.product.Where(p => p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Count();
+                    products = _dbContext.product.Where(p => p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Skip((productFilter.product_on_page - 1) * productFilter.current_page).Take(productFilter.product_on_page).ToList();
+                }
+                productReturnData.count = count;
+                productReturnData.products = products.ToList();
+
+                return productReturnData;
             }
             catch
             {
                 throw;
             }
         }
+
+       
 
         public product GetProductData(int id)
         {

@@ -8,6 +8,6 @@ namespace industriation_crm.Server.Interfaces
         public void AddProduct(product product);
         public void UpdateProductDetails(product product);
         public product GetProductData(int id);
-        public List<product> GetFromFilter(ProductFilter productFilter);
+        public ProductReturnData GetFromFilter(ProductFilter productFilter);
     }
 }
