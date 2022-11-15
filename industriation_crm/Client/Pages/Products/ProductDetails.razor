@@ -78,9 +78,11 @@ else
                 <thead class="ind-col-lg-10">
                     <tr class="order-row ind-col-lg-10">
                         <td class="ind-col-lg-1">Артикул</td>
-                        <td class="ind-col-lg-6">Наименование</td>
+                        <td class="ind-col-lg-1">Производитель</td>
+                        <td class="ind-col-lg-5">Наименование</td>
+                        <td class="ind-col-lg-1">Количество</td>
                         <td class="ind-col-lg-1">Цена</td>
-                        <td class="ind-col-lg-2">Действия</td>
+                        <td class="ind-col-lg-1">Действия</td>
                     </tr>
                 </thead>
                 <tbody class="ind-col-lg-10">
@@ -88,9 +90,11 @@ else
                     {
                         <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1">@product.article</td>
-                            <td class="ind-col-lg-6">@product.name</td>
+                            <td class="ind-col-lg-1">Pneumax</td>
+                            <td class="ind-col-lg-5">@product.name</td>
+                            <td class="ind-col-lg-1">100</td>
                             <td class="ind-col-lg-1">@product.price</td>
-                            <td class="ind-col-lg-2">
+                            <td class="ind-col-lg-1">
                                 <a href='/product/edit/@product.id' class="score" role="button">
                                     Изменить
                                 </a>
@@ -101,12 +105,18 @@ else
 
             </table>
         </div>
-        Страница:
-        <input type="number" @bind="current_page" @bind:event="oninput" @onkeydown="OnKeyDown">
-        из @page_count.Count()
-        <button @onclick="FindByFilter">Перейти</button>
-        <button @onclick="PagPrev">Prev</button>
-        <button @onclick="PagNext">Next</button>
+        <div class="section-field filter-pagination mt-20">
+            <div>
+                Страница:
+                <input class="pagination-input" type="number" min="1" @bind="current_page" @bind:event="oninput" @onkeydown="OnKeyDown">
+                из @page_count.Count()
+                <button class="score" @onclick="FindByFilter">Перейти</button>
+            </div>
+            <div>
+                <button class="score" @onclick="PagPrev">Предыдущая</button>
+                <button class="score" @onclick="PagNext">Следующая</button>
+            </div>
+        </div>
     </div>
 }
 @code {

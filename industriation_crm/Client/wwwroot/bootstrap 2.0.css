@@ -1351,4 +1351,47 @@ td.ind-col-lg-1 {
 	width: 100%;
 }
 
+.filter-pagination {
+	align-items: center;
+	justify-content: space-between;
+	height: 31px;
+}
+
+.filter-pagination div {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+}
+
+.filter-pagination div:last-child {
+	justify-content: end;
+}
+
+
+.pagination-input {
+	border: 1px solid #d9d9d9;
+	border-radius: 4px;
+	outline: none;
+	margin: 0 10px;
+	padding: 5px;
+	max-width: 80px;
+	width: 100%;
+	text-align: center;
+	transition: border-color .5s;
+	height: 100%
+}
+
+.pagination-input:focus {
+	border-color: #0099ff;
+	transition: all .5s;
+}
+
+.filter-pagination button {
+	width: 100%;
+	margin-left: 10px;
+	text-align: center;
+	max-width: 120px;
+}
+
 /* ////////////////////////////////////////////////////////////////// */
