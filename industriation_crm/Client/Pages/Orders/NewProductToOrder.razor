@@ -61,10 +61,7 @@
                             </tr>
                         </thead>
                         <tbody class="ind-col-lg-10">
-
-                            @if (currentCategory == null && productList?.Count != 0)
-                            {
-                                @foreach (var p in productPackages.Take(productsCountOnPage))
+                                @foreach (var p in productPackages)
                                 {
                                     <tr class="order-row">
                                         <td class="ind-col-lg-1">@p.product.article</td>
@@ -78,24 +75,6 @@
                                         </td>
                                     </tr>
                                 }
-                            }
-                            else
-                            {
-                                @foreach (var p in productPackages.Where(p => p.product.category_id == currentCategory.id).Take(productsCountOnPage))
-                                {
-                                    <tr class="order-row">
-                                        <td class="ind-col-lg-1">@p.product.article</td>
-                                        <td class="ind-col-lg-5">@p.product.name</td>
-                                        <td class="ind-col-lg-2">@p.product.price</td>
-                                        <td class="ind-col-lg-1"><input class="main-input" type="number" @bind-value="p.count"></input></td>
-                                        <td class="ind-col-lg-1">
-                                            <button class="add-item" @onclick="()=>AddProduct(p)">
-                                                Добавить
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
-                            }
                         </tbody>
 
                     </table>
@@ -129,12 +108,10 @@
 
     int productsCountOnPage = 20;
 
-    protected void ViewProducts()
+    protected async Task ViewProducts()
     {
-        if (productsCountOnPage + 5 > productPackages.Count)
-            productsCountOnPage = productPackages.Count;
-        else
             productsCountOnPage = productsCountOnPage + 20;
+        await FindByFilter();
 
     }
     private void InvokeCloseModal()
@@ -145,23 +122,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await GetData();
-    }
-    protected async Task GetData()
-    {
         categoriesList = await Http.GetFromJsonAsync<List<category>>("api/Category");
-
         currentCategory = categoriesList.Where(c => c.parent_id == 0).FirstOrDefault();
-        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + 1);
-        CompleteProductPackage(productList);
-
-
+        await FindByFilter();
+        
     }
     protected async Task GetProducts(category category)
     {
         currentCategory = category;
-        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + category.id);
-        CompleteProductPackage(productList);
+        productFilter.child_categories = new();
+        GetChildCategories(currentCategory.id);
+        await FindByFilter();
     }
     protected void CategoryBack()
     {
@@ -170,20 +141,23 @@
     }
     protected async Task FindByFilter()
     {
-        if (productFilter.article == "" && productFilter.name == "" && (productFilter.price_from == null || productFilter.price_from == 0) && (productFilter.price_to == null || productFilter.price_to == 10000000))
-        {
-            CleanFilter();
-            return;
-        }
+        productFilter.current_page = 0;
+        productFilter.product_on_page = productsCountOnPage;
+        productFilter.category_id = currentCategory.id;
+
         if (productFilter.price_to == null)
             productFilter.price_to = 10000000;
+        if (productFilter.price_from == null)
+            productFilter.price_from = 0;
+
         var json = JsonConvert.SerializeObject(productFilter);
         var stringContent = new StringContent(json);
         var response = await Http.PostAsJsonAsync("api/Product/FindByFilter", productFilter);
         var responseBody = await response.Content.ReadAsStringAsync();
-        productList = JsonConvert.DeserializeObject<List<product>>(responseBody);
-        currentCategory = null;
+        ProductReturnData productReturnData = JsonConvert.DeserializeObject<ProductReturnData>(responseBody);
+        productList = productReturnData.products;
         CompleteProductPackage(productList);
+        StateHasChanged();
     }
     protected async Task AddProduct(ProductPackage productPackage)
     {
@@ -206,16 +180,9 @@
     {
         productFilter = new();
         currentCategory = categoriesList.Where(c => c.id == 1).FirstOrDefault();
-
-        productFilter = new();
-        productList = await Http.GetFromJsonAsync<List<product>>("api/Product/GetProductDetails/" + 1);
-        CompleteProductPackage(productList);
+        await FindByFilter();
     }
-    protected class ProductPackage
-    {
-        public int count = 0;
-        public product product { get; set; }
-    }
+    
     protected void CompleteProductPackage(List<product> _productList)
     {
         productPackages = new();
@@ -226,4 +193,21 @@
             productPackages.Add(productPackage);
         }
     }
+    protected void GetChildCategories(int category_id)
+    {
+        productFilter.child_categories.Add(category_id);
+        List<category> childs = categoriesList?.Where(c => c.parent_id == category_id).ToList();
+        if (childs == null || childs.Count == 0)
+            return;
+        foreach (var c in childs)
+        {
+            GetChildCategories(c.id);
+        }
+    }
+    protected class ProductPackage
+    {
+        public int count = 0;
+        public product product { get; set; }
+    }
+
 }

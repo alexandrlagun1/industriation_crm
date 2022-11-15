@@ -204,7 +204,7 @@ else
         productFilter = new();
         currentCategory = categoriesList.Where(c => c.id == 1).FirstOrDefault();
         current_page = 1;
-        FindByFilter();
+        await FindByFilter();
     }
     protected void GetChildCategories(int category_id)
     {
