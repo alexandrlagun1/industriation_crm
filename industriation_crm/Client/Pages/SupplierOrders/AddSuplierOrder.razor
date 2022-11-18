@@ -101,7 +101,7 @@
         if (supplierOrderId == 0)
             supplier_order.supplier_id = suppliers[0].id;
 
-        users = await Http.GetFromJsonAsync<List<user>>("api/User?trigger=suppliers");
+        users = await Http.GetFromJsonAsync<List<user>>("api/User?type=suppliers");
         if (supplierOrderId == 0)
             supplier_order.user_id = users[0].id;
     }

@@ -14,9 +14,9 @@ namespace industriation_crm.Server.Controllers
             _IUser = iUser;
         }
         [HttpGet]
-        public async Task<List<user>> Get(string trigger)
+        public async Task<List<user>> Get(string type)
         {
-            return await Task.FromResult(_IUser.GetUserDetails(trigger));
+            return await Task.FromResult(_IUser.GetUserDetails(type));
         }
         [HttpGet("{id}")]
         public IActionResult Get(int id)

@@ -35,6 +35,7 @@ namespace industriation_crm.Shared.Models
         public int? client_id { get; set; }
         public int? main_contact { get; set; }
         public string? phone { get; set; }
+        public int? is_active { get; set; }
         public client? client { get; set; }
         public List<contact_phone>? contact_phones { get; set; } = new();
     }
@@ -98,6 +99,7 @@ namespace industriation_crm.Shared.Models
         public int? percent_discount { get; set; }
         public double? ruble_discount { get; set; }
         public double? price_summ { get; set; }
+        public DateTime? order_date { get; set; }
 
         [NotMapped]
         public int? _percent_discount

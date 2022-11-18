@@ -73,7 +73,7 @@
     }
     protected async Task GetUser()
     {
-        userList = await Http.GetFromJsonAsync<List<user>>("api/User?trigger=all");
+        userList = await Http.GetFromJsonAsync<List<user>>("api/User?type=all");
         searchUserData = userList;
     }
     protected void FilterUser()

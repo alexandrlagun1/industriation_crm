@@ -123,7 +123,7 @@
             <div class="main-section">
                 <div class="main-section-label">Контакты</div>
                 <div class="section-field">
-                    <a class="score" href='/fetchcontactdetails/@clientId' role="button">
+                    <a href='/contact/add/@clientId' class="btn btn-primary" role="button">
                         Добавить контактное лицо
                     </a>
                 </div>
@@ -141,7 +141,7 @@
                             </tr>
                         </thead>
                         <tbody class="ind-col-lg-10">
-                            @foreach (var c in contacts)
+                            @foreach (var c in contacts.Where(c=>c.is_active == 1))
                             {
                                 <tr class="order-row ind-col-lg-10">
                                     <td class="ind-col-lg-1">@c.id</td>
@@ -223,7 +223,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        managers = await Http.GetFromJsonAsync<List<user>>("api/User?trigger=managers");
+        managers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
         if (clientId == 0)
         {
             client.user_id = managers[0].id;
@@ -251,10 +251,6 @@
     }
     protected async Task SaveClient()
     {
-        //Сохранение и удаление контактов клиента
-        await Http.PutAsJsonAsync("api/Contact/update_contact_to_client", ChangeContacts);
-
-
         if (clientId != 0)
         {
             await Http.PutAsJsonAsync("api/Client", client);
@@ -295,9 +291,8 @@
             return;
         }
 
-        _contact.client_id = null;
+        await Http.DeleteAsync("api/Contact/" + _contact.id);
         contacts.Remove(_contact);
-
         CheckContainsContact(_contact);
 
     }

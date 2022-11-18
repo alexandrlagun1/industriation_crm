@@ -507,7 +507,7 @@
             }
         }
 
-        managers = await Http.GetFromJsonAsync<List<user>>("api/User?trigger=managers");
+        managers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
         if (orderId == 0 && clientId == 0)
         {
             order.user_id = managers[0].id;

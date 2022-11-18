@@ -18,7 +18,7 @@ namespace industriation_crm.Shared.FilterModels
         public string? article { get; set; } = "";
         public double? price_from { get; set; } = 0;
         public double? price_to { get; set; } = 10000000;
-        public int current_page { get; set; } 
+        public int current_page { get; set; }
         public int product_on_page { get; set; }
         public int category_id { get; set; }
         public List<int?>? child_categories { get; set; }

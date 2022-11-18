@@ -39,10 +39,7 @@ builder.Services.AddScoped<IPayStatus, PayStatusManager>();
 builder.Services.AddScoped<IDeliveryPeriodType, DeliveryPeriodTypeManager>();
 
 builder.Services.AddSignalR();
-builder.Services.AddControllersWithViews().AddJsonOptions(
-             options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
-         ); ;
-
+builder.Services.AddControllersWithViews().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddRazorPages();
 
 //Авторизация

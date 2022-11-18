@@ -12,6 +12,7 @@ namespace industriation_crm.Server.Controllers
         public SupplierController(ISupplier ISupplier)
         {
             _ISupplier = ISupplier;
+            
         }
         [HttpGet]
         public async Task<List<supplier>> Get()

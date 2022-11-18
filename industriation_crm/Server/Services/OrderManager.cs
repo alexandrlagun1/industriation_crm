@@ -1,7 +1,12 @@
-﻿using industriation_crm.Server.Interfaces;
+﻿using AutoMapper.Internal;
+using industriation_crm.Server.Interfaces;
 using industriation_crm.Server.Models;
+using industriation_crm.Shared.FilterModels;
 using industriation_crm.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace industriation_crm.Server.Services
 {
@@ -70,7 +75,7 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                order? order = _dbContext.order.Include(o => o.order_Pays).ThenInclude(p => p.pay_Status).Include(o => o.delivery).ThenInclude(d => d.delivery_type).Include(o => o.user).Include(o => o.client).ThenInclude(c => c.contacts).ThenInclude(c=>c.contact_phones).Include(o => o.order_status).Include(o => o.product_To_Orders).ThenInclude(o => o.product).Include(o => o.main_contact).FirstOrDefault(u => u.id == id);
+                order? order = _dbContext.order.Include(o => o.order_Pays).ThenInclude(p => p.pay_Status).Include(o => o.delivery).ThenInclude(d => d.delivery_type).Include(o => o.user).Include(o => o.client).ThenInclude(c => c.contacts).ThenInclude(c => c.contact_phones).Include(o => o.order_status).Include(o => o.product_To_Orders).ThenInclude(o => o.product).Include(o => o.main_contact).FirstOrDefault(u => u.id == id);
                 order.product_To_Orders.ForEach((p) => { p.order_percent_discount = order._percent_discount; p.order_ruble_discount = order._ruble_discount; });
                 if (order != null)
                 {
@@ -87,12 +92,44 @@ namespace industriation_crm.Server.Services
             }
         }
 
-        public List<order> GetOrderDetails()
+        public OrdersReturnData GetOrderDetails(OrdersFilter ordersFilter)
         {
+            OrdersReturnData ordersReturnData = new OrdersReturnData();
+            if (ordersFilter.order_date_from == null)
+                ordersFilter.order_date_from = DateTime.MinValue;
+            if (ordersFilter.order_date_to == null)
+                ordersFilter.order_date_to = DateTime.MaxValue;
             try
             {
-                List<order> orders = _dbContext.order.Include(o => o.user).Include(o => o.client).Include(o => o.order_status).ToList();
-                return orders;
+                if (ordersFilter.order_id == null || ordersFilter.order_id == "")
+                {
+                    ordersReturnData.count = _dbContext.order.Where(o => ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to).Count();
+
+                    ordersReturnData.orders = _dbContext.order.Where(o => ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to)
+                        .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o=>o.main_contact)
+                        .Skip(ordersFilter.client_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.client_on_page).ToList();
+                }
+                else
+                {
+                    ordersReturnData.count = _dbContext.order.Where(o => o.id == Convert.ToInt32(ordersFilter.order_id) && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to).Count();
+
+                    ordersReturnData.orders = _dbContext.order.Where(o => o.id == Convert.ToInt32(ordersFilter.order_id) && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to)
+                        .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o => o.main_contact)
+                        .Skip(ordersFilter.client_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.client_on_page).ToList();
+                }
+                foreach(var o in ordersReturnData.orders)
+                {
+                    if(o.client != null)
+                    {
+                        o.client.user = null;
+                        o.client.orders = null;
+                    }
+                    if (o.user != null)
+                        o.user.clients = null;
+                    if (o.main_contact != null)
+                        o.main_contact.client = null;
+                }
+                return ordersReturnData;
             }
             catch
             {

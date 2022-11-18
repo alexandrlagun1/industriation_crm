@@ -103,15 +103,13 @@
         }
         else
         {
+            contact.client_id = clientId;
             await Http.PostAsJsonAsync("api/Contact", contact);
         }
         Cancel();
     }
     public void Cancel()
     {
-        if (isClient)
             NavigationManager.NavigateTo($"/client/edit/{clientId}");
-        else
-            NavigationManager.NavigateTo($"/fetchcontactdetails/{clientId}");
     }
 }

@@ -1,6 +1,7 @@
 ﻿using industriation_crm.Server._1C;
 using industriation_crm.Server.Interfaces;
 using industriation_crm.Server.SignalRNotification;
+using industriation_crm.Shared.FilterModels;
 using industriation_crm.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -19,10 +20,10 @@ namespace industriation_crm.Server.Controllers
             _IOrder = IOrder;
             this.hubContext = statusHub;
         }
-        [HttpGet]
-        public async Task<List<order>> Get()
+        [HttpPost("GetOrders")]
+        public async Task<OrdersReturnData> GetOrders([FromBody]OrdersFilter ordersFilter)
         {
-            return await Task.FromResult(_IOrder.GetOrderDetails());
+            return await Task.FromResult(_IOrder.GetOrderDetails(ordersFilter));
         }
         [HttpGet("{id}")]
         public IActionResult Get(int id)

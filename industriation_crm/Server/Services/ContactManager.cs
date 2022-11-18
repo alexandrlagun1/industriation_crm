@@ -19,7 +19,7 @@ namespace industriation_crm.Server.Services
             contact.full_name = $"{contact.surname} {contact.name} {contact.patronymic}";
             try
             {
-                
+                contact.is_active = 1;
                 _dbContext.contact.Add(contact);
                 
                 _dbContext.SaveChanges();
@@ -101,7 +101,7 @@ namespace industriation_crm.Server.Services
                 contact? contact = _dbContext.contact.Find(id);
                 if (contact != null)
                 {
-                    _dbContext.contact.Remove(contact);
+                    contact.is_active = 0;
                     _dbContext.SaveChanges();
                 }
                 else

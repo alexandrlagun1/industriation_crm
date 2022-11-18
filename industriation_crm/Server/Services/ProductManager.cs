@@ -36,12 +36,12 @@ namespace industriation_crm.Server.Services
                 if (productFilter.category_id != 1)
                 {
                     count = _dbContext.product.Where(p => productFilter.child_categories.Contains(p.category_id) && p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Count();
-                    products = _dbContext.product.Where(p => productFilter.child_categories.Contains(p.category_id) && p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Skip((productFilter.product_on_page - 1) * productFilter.current_page).Take(productFilter.product_on_page).ToList();
+                    products = _dbContext.product.Where(p => productFilter.child_categories.Contains(p.category_id) && p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Skip(productFilter.product_on_page * (productFilter.current_page - 1)).Take(productFilter.product_on_page).ToList();
                 }
                 else
                 {
                     count = _dbContext.product.Where(p =>  p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Count();
-                    products = _dbContext.product.Where(p =>  p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Skip((productFilter.product_on_page - 1) * productFilter.current_page).Take(productFilter.product_on_page).ToList();
+                    products = _dbContext.product.Where(p =>  p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Skip(productFilter.product_on_page * (productFilter.current_page - 1)).Take(productFilter.product_on_page).ToList();
                 }
                 productReturnData.count = count;
                 productReturnData.products = products.ToList();

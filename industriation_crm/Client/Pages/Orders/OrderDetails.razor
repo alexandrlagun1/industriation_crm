@@ -1,50 +1,93 @@
 ﻿@page "/fetchorderdetails"
+@using Newtonsoft.Json
 @using industriation_crm.Shared.Models
+@using industriation_crm.Shared.FilterModels
 @inject HttpClient Http
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
 <div class="main-title">Заказы</div>
-@*<div class="row">
-    <div class="col-md-6">
-        <a href='/order/add' class="btn btn-primary" role="button">
-            <i class="fas fa-user-plus"></i>
-            Добавить заказ
-        </a>
-    </div>
-</div>*@
 <hr />
-@if (orderList == null)
+@if (load)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
     <div class="main-section">
+        Фильтр:
+        <div>
+            @foreach (var m in SelectManagers)
+            {
+                @m.name
+                <button @onclick="()=>{SelectManagers.Remove(m); noSelectManagers.Add(m);}">X</button>
+
+                <br />
+            }
+        </div>
+        _______________________
+        <div>
+            @foreach (var m in noSelectManagers)
+            {
+                @m.name
+                <button @onclick="()=>{noSelectManagers.Remove(m); SelectManagers.Add(m);}">+</button>
+
+                <br />
+            }
+        </div>
+        <br>
+        <div>
+            Номер заказа:
+            <input type="number" @bind="ordersFilter.order_id"></input>
+        </div>
+        <br>
+        <div>
+            Покупатель:
+            <input @bind="ordersFilter.client"></input>
+        </div>
+        <br>
+        <div>
+            Дата заказа от:
+            <input type="date" @bind="ordersFilter.order_date_from"></input>
+        </div>
+        <div>
+            Дата заказа до:
+            <input type="date" @bind="ordersFilter.order_date_to"></input>
+        </div>
+        <br>
+        <button @onclick="GetOrders">Поиск</button>
+
+
         <div class="section-field">
             <table class="order-table ind-col-lg-10">
                 <thead class="ind-col-lg-10">
                     <tr class="order-row ind-col-lg-10">
-                        <td class="ind-col-lg-1">ID заказа</td>
-                        <td class="ind-col-lg-4">Клиент</td>
+                        <td class="ind-col-lg-1">Номер заказа</td>
+                        <td class="ind-col-lg-2">Покупатель</td>
+                        <td class="ind-col-lg-3">Контрагент</td>
+
                         <td class="ind-col-lg-2">Менеджер</td>
-                        <td class="ind-col-lg-2">Статус заказа</td>
+                        <td class="ind-col-lg-1">Статус заказа</td>
                         <td class="ind-col-lg-1">Действия</td>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var order in orderList)
+                    @foreach (var order in ordersReturnData?.orders)
                     {
                         <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1">@order.id</td>
-
-                            <td class="ind-col-lg-4">
-                                @*@if (@order.client?.client_type == 1)
-                        @order.client?.org_name
-                        @if (@order.client?.client_type == 0)
-                        @order.client?.contacts.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name*@
+                            <td class="ind-col-lg-2">@order.main_contact.full_name</td>
+                            <td class="ind-col-lg-3">
+                                @if (@order.client?.client_type == 1)
+                                {
+                                    @order.client?.org_name
+                                }
+                                @if (@order.client?.client_type == 0)
+                                {
+                                    <div>---</div>
+                                }
                             </td>
                             <td class="ind-col-lg-2">@order.user?.name</td>
-                            <td class="ind-col-lg-2">@order.order_status?.name</td>
+                            <td class="ind-col-lg-1">@order.order_status?.name</td>
                             <td class="ind-col-lg-1">
                                 <a href='/order/edit/@order.id' class="score" role="button">
                                     Изменить
@@ -56,18 +99,86 @@ else
 
             </table>
         </div>
+        <div class="section-field filter-pagination mt-20">
+            <div>
+                Страница:
+                <input class="pagination-input" type="number" min="1" @bind="current_page" @bind:event="oninput" @onkeydown="OnKeyDown">
+                из @page_count.Count()
+                <button class="score" @onclick="GetOrders">Перейти</button>
+            </div>
+            <div>
+                <button class="score" @onclick="PagPrev">Предыдущая</button>
+                <button class="score" @onclick="PagNext">Следующая</button>
+            </div>
+        </div>
     </div>
 }
 @code {
-    protected List<order> orderList = new();
+    protected int count_on_page = 50;
+    protected int current_page = 1;
+    List<int> page_count = new List<int>();
+    protected OrdersFilter ordersFilter = new();
+
     protected order order = new();
+    bool load = true;
+    protected List<user> SelectManagers = new();
+    protected List<user> noSelectManagers = new();
+
+    protected OrdersReturnData ordersReturnData = new();
     protected override async Task OnInitializedAsync()
     {
+        noSelectManagers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
         await GetOrders();
     }
+    protected async Task OnKeyDown(KeyboardEventArgs e)
+    {
+
+        if (e.Key == "Enter")
+        {
+            await GetOrders();
+        }
+    }
+    protected async Task PagPrev()
+    {
+        if (current_page > 1)
+        {
+            current_page--;
+            await GetOrders();
+        }
+    }
+    protected async Task PagNext()
+    {
+        if (current_page < page_count.Count)
+        {
+            current_page++;
+            await GetOrders();
+        }
+    }
+    protected string s;
     protected async Task GetOrders()
     {
-        orderList = await Http.GetFromJsonAsync<List<order>>("api/Order");
+        load = true;
+        ordersFilter.current_page = current_page;
+        if (page_count.Count != 0 && (current_page < 1 || current_page > page_count.Count))
+            return;
+        ordersFilter.client_on_page = count_on_page;
+
+        if (SelectManagers.Count == 0)
+            ordersFilter.managers = noSelectManagers;
+        else
+            ordersFilter.managers = SelectManagers;
+        var response = await Http.PostAsJsonAsync("api/Order/GetOrders", ordersFilter);
+        string responseBody = await response.Content.ReadAsStringAsync();
+        s = responseBody;
+        Console.WriteLine(responseBody);
+        ordersReturnData = JsonConvert.DeserializeObject<OrdersReturnData>(responseBody);
+        
+        int total_page = Convert.ToInt32(Math.Ceiling(ordersReturnData.count / Convert.ToDouble(count_on_page)));
+        page_count = new();
+        for (int i = 1; i <= total_page; i++)
+            page_count.Add(i);
+        load = false;
     }
+
 
 }

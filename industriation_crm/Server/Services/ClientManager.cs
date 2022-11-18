@@ -1,5 +1,6 @@
 ﻿using industriation_crm.Server.Interfaces;
 using industriation_crm.Server.Models;
+using industriation_crm.Shared.FilterModels;
 using industriation_crm.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,6 +53,7 @@ namespace industriation_crm.Server.Services
             try
             {
                 List<client> clients = _dbContext.client.Include(c => c.contacts).ThenInclude(c => c.contact_phones).Include(c => c.user).Include(c => c.orders).ToList();
+                clients.ForEach(c => { c.orders = null; c.user!.clients = null;  });
                 return clients;
             }
             catch
