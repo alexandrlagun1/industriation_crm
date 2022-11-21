@@ -48,13 +48,23 @@ namespace industriation_crm.Server.Services
             }
         }
 
-        public List<client> GetClientDetails()
+        public ClientReturnData GetClientDetails(ClientFilter clientFilter)
         {
+            ClientReturnData ordersReturnData = new ClientReturnData();
             try
             {
-                List<client> clients = _dbContext.client.Include(c => c.contacts).ThenInclude(c => c.contact_phones).Include(c => c.user).Include(c => c.orders).ToList();
-                clients.ForEach(c => { c.orders = null; c.user!.clients = null;  });
-                return clients;
+                ordersReturnData.count = _dbContext.client.Where(c => c.org_inn.ToString().Contains(clientFilter.inn) && c.contacts.Where(co => co.main_contact == 1 && co.full_name.Contains(clientFilter.client)).FirstOrDefault() != null).Count();
+                ordersReturnData.clients = _dbContext.client.Where(c => c.org_inn.ToString().Contains(clientFilter.inn) && c.contacts.Where(co => co.main_contact == 1 && co.full_name.Contains(clientFilter.client)).FirstOrDefault() != null)
+                    .Include(c => c.user).Include(c => c.orders).Include(c=>c.contacts)
+                    .Skip(clientFilter.client_on_page * (clientFilter.current_page - 1)).Take(clientFilter.client_on_page).ToList();
+                
+                foreach(var c in ordersReturnData.clients)
+                {
+                    if(c.user != null)
+                        c.user!.clients = null;
+                    c.orders = null;
+                }
+                return ordersReturnData;
             }
             catch
             {

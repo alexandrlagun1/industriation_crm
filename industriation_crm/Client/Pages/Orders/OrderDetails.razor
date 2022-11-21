@@ -54,7 +54,7 @@ else
             <input type="date" @bind="ordersFilter.order_date_to"></input>
         </div>
         <br>
-        <button @onclick="GetOrders">Поиск</button>
+        <button @onclick="Search">Поиск</button>
 
 
         <div class="section-field">
@@ -118,16 +118,22 @@ else
     protected int current_page = 1;
     List<int> page_count = new List<int>();
     protected OrdersFilter ordersFilter = new();
+    protected OrdersReturnData ordersReturnData = new();
 
     protected order order = new();
     bool load = true;
     protected List<user> SelectManagers = new();
     protected List<user> noSelectManagers = new();
 
-    protected OrdersReturnData ordersReturnData = new();
+    
     protected override async Task OnInitializedAsync()
     {
         noSelectManagers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
+        await GetOrders();
+    }
+    protected async Task Search()
+    {
+        current_page = 1;
         await GetOrders();
     }
     protected async Task OnKeyDown(KeyboardEventArgs e)
@@ -161,7 +167,7 @@ else
         ordersFilter.current_page = current_page;
         if (page_count.Count != 0 && (current_page < 1 || current_page > page_count.Count))
             return;
-        ordersFilter.client_on_page = count_on_page;
+        ordersFilter.order_on_page = count_on_page;
 
         if (SelectManagers.Count == 0)
             ordersFilter.managers = noSelectManagers;
@@ -169,8 +175,6 @@ else
             ordersFilter.managers = SelectManagers;
         var response = await Http.PostAsJsonAsync("api/Order/GetOrders", ordersFilter);
         string responseBody = await response.Content.ReadAsStringAsync();
-        s = responseBody;
-        Console.WriteLine(responseBody);
         ordersReturnData = JsonConvert.DeserializeObject<OrdersReturnData>(responseBody);
         
         int total_page = Convert.ToInt32(Math.Ceiling(ordersReturnData.count / Convert.ToDouble(count_on_page)));

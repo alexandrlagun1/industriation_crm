@@ -13,7 +13,7 @@ namespace industriation_crm.Shared.FilterModels
         public string? client { get; set; } = "";
         public DateTime? order_date_from { get; set; }
         public DateTime? order_date_to { get; set; }
-        public int client_on_page { get; set; }
+        public int order_on_page { get; set; }
         public int current_page { get; set; }
         public string? order_id { get; set; }
     }

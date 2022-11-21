@@ -107,7 +107,7 @@ namespace industriation_crm.Server.Services
 
                     ordersReturnData.orders = _dbContext.order.Where(o => ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to)
                         .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o=>o.main_contact)
-                        .Skip(ordersFilter.client_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.client_on_page).ToList();
+                        .Skip(ordersFilter.order_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.order_on_page).ToList();
                 }
                 else
                 {
@@ -115,7 +115,7 @@ namespace industriation_crm.Server.Services
 
                     ordersReturnData.orders = _dbContext.order.Where(o => o.id == Convert.ToInt32(ordersFilter.order_id) && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to)
                         .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o => o.main_contact)
-                        .Skip(ordersFilter.client_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.client_on_page).ToList();
+                        .Skip(ordersFilter.order_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.order_on_page).ToList();
                 }
                 foreach(var o in ordersReturnData.orders)
                 {

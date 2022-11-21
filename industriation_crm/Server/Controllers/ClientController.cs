@@ -1,4 +1,5 @@
 ﻿using industriation_crm.Server.Interfaces;
+using industriation_crm.Shared.FilterModels;
 using industriation_crm.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,10 @@ namespace industriation_crm.Server.Controllers
         {
             _IClient = IClient;
         }
-        [HttpGet]
-        public async Task<List<client>> Get()
+        [HttpPost("GetClients")]
+        public async Task<ClientReturnData> GetClients([FromBody] ClientFilter clientFilter)
         {
-            List<client> clients = await Task.FromResult(_IClient.GetClientDetails());
-            return clients;
+            return await Task.FromResult(_IClient.GetClientDetails(clientFilter));
 
         }
         [HttpGet("{id}")]
