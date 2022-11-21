@@ -763,7 +763,6 @@ header {
 
 .lefside-bar-btn:hover {
 	background-color: #0099ff;
-	;
 	transition: background-color .2s;
 }
 
@@ -1185,6 +1184,19 @@ button.score {
 	background-color: #0099ff;
 }
 
+.btn-close {
+	padding: 0 !important;
+}
+
+.btn-close:focus {
+	box-shadow: none;
+}
+
+.btn-close {
+	right: 40px !important;
+	position: absolute !important;
+}
+
 .score, a.score {
 	border: none;
 	border-radius: 3px;
@@ -1392,6 +1404,108 @@ td.ind-col-lg-1 {
 	margin-left: 10px;
 	text-align: center;
 	max-width: 120px;
+}
+
+.custom-select {
+	height: 35px;
+	overflow: hidden;
+	background: #fff;
+	z-index: 2;
+	border: 1px solid #d9d9d9;
+	border-radius: 4px;
+	display: flex;
+	position: absolute;
+	flex-direction: column;
+	max-height: 500px;
+	overflow-y: scroll;
+	min-height: 35px;
+	min-width: 200px;
+	width: auto;
+}
+
+.custom-select::-webkit-scrollbar {
+	width: 0px;
+	/*width: 8px;*/
+}
+
+.custom-select::-webkit-scrollbar-track {
+	background-color: transparent;
+	border-radius: 10px;
+}
+
+.custom-select::-webkit-scrollbar-thumb {
+	background-color: #DFE3ED;
+	border-radius: 10px;
+}
+
+.custom-select::-webkit-scrollbar-thumb {
+	background-color: #eceef2;
+}
+
+.custom-select:hover {
+	height: auto;
+}
+
+.custom-select button {
+    padding: 5px;
+    border: none;
+    background-color: #fff;
+    color: #0099ff;
+    position: relative;
+}
+
+.custom-select button:hover {
+	background-color: #0099ff;
+	color: #fff;
+}
+
+.manager-field {
+	width: calc(100% - 210px);
+	border: 1px solid #d9d9d9;
+	min-height: 35px;
+	margin-left: 210px;
+	margin-bottom: 20px;
+	border-radius: 4px;
+	min-height: 35px;
+}
+
+.manager-field button {
+    border: none;
+    padding: 5px 20px 5px 10px;
+    color: #0099ff;
+    margin-right: 10px;
+	position: relative;
+	background-color: #fff;
+}
+
+.manager-field button img {
+    height: 15px;
+    width: 15px;
+    position: absolute;
+    top: calc(50% - 6px);
+    right: 2px;
+}
+
+.custom-input {
+	background-color: #0099ff15;
+	height: 35px;
+	padding: 5px;
+	color: #000;
+	position: relative;
+	border: none;
+	min-height: 35px;
+}
+
+.custom-input:focus {
+	min-height: 35px;
+	outline: none;
+	height: auto;
+}
+
+.custom-input img {
+	position: absolute;
+	right: 7px;
+	top: 7px;
 }
 
 /* ////////////////////////////////////////////////////////////////// */

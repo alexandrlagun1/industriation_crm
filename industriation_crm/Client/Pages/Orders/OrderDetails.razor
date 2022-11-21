@@ -9,40 +9,54 @@
 <hr />
 @if (load)
 {
-    <p><em>Loading...</em></p>
+    <div class="loading-block-ind">
+        <img src="https://industriation.ru/Catalog/view/theme/default/img/main_logo.svg" alt="" style="width: 350px;" class="blink">
+        <div style="margin-top: 10px; font-size: 18px; color: #333; font-weight: 600; width: 350px; text-align: center;">
+            <hr />
+            Подождите пожалуйста
+        </div>
+    </div>
 }
 else
 {
-    <div class="main-section">
-        Фильтр:
-        <div>
-            @foreach (var m in SelectManagers)
-            {
-                @m.name
-                <button @onclick="()=>{SelectManagers.Remove(m); noSelectManagers.Add(m);}">X</button>
-
-                <br />
-            }
+       <div class="main-section mb-20">
+        <div class="main-section-label">
+            Фильтр:
         </div>
-        _______________________
-        <div>
-            @foreach (var m in noSelectManagers)
-            {
-                @m.name
-                <button @onclick="()=>{noSelectManagers.Remove(m); SelectManagers.Add(m);}">+</button>
-
-                <br />
-            }
-        </div>
-        <br>
-        <div>
-            Номер заказа:
-            <input type="number" @bind="ordersFilter.order_id"></input>
-        </div>
-        <br>
-        <div>
-            Покупатель:
-            <input @bind="ordersFilter.client"></input>
+        <row-f>
+            <div class="custom-select mr-20">
+                <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
+                </input>
+                @foreach (var m in noSelectManagers.Where(m=>m.name.Contains(manager_search)))
+                {
+                    <button @onclick="()=>{noSelectManagers.Remove(m); SelectManagers.Add(m);}">
+                        <div class="name">@m.name</div>
+                    </button>
+                }
+            </div>
+            <div class="manager-field">
+                @foreach (var m in SelectManagers)
+                {
+                    <button @onclick="()=>{SelectManagers.Remove(m); noSelectManagers.Add(m);}">
+                        <div class="name">@m.name</div>
+                        <img src="./icons/delete-icon.svg" />
+                    </button>
+                }
+            </div>
+        </row-f>
+        <div class="section-field ind-col-lg-10">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label ind-col-lg-5">
+                    Номер заказа:
+                </div>
+                <input type="number" @bind="ordersFilter.order_id" class="main-input ind-col-lg-5"></input>
+            </div>
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label ind-col-lg-5">
+                    Покупатель:
+                </div>
+                <input @bind="ordersFilter.client" class="main-input ind-col-lg-5"></input>
+            </div>
         </div>
         <br>
         <div>
@@ -54,7 +68,7 @@ else
             <input type="date" @bind="ordersFilter.order_date_to"></input>
         </div>
         <br>
-        <button @onclick="Search">Поиск</button>
+        <button @onclick="GetOrders">Поиск</button>
 
 
         <div class="section-field">
@@ -114,6 +128,8 @@ else
     </div>
 }
 @code {
+    
+    protected string manager_search = "";
     protected int count_on_page = 50;
     protected int current_page = 1;
     List<int> page_count = new List<int>();
