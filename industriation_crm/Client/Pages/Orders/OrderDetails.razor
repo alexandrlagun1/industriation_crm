@@ -29,7 +29,7 @@ else
         </div>
         <row-f>
             <div class="custom-select mr-20">
-                <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
+                <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput" placeholder="Поиск менеджера">
                 </input>
                 @foreach (var m in noSelectManagers.Where(m => m.name.Contains(manager_search)))
                 {
@@ -61,18 +61,22 @@ else
                 </div>
                 <input @bind="ordersFilter.client" class="main-input ind-col-lg-5"></input>
             </div>
-        </div>
-        <br>
-        <div>
-            Дата заказа от:
-            <input type="date" @bind="ordersFilter.order_date_from"></input>
-        </div>
-        <div>
-            Дата заказа до:
-            <input type="date" @bind="ordersFilter.order_date_to"></input>
-        </div>
-        <br>
-        <button @onclick="GetOrders">Поиск</button>
+       </div>
+       <div class="section-field ind-col-lg-10">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label ind-col-lg-5">
+                    Дата заказа от:
+                </div>
+                <input type="date" @bind="ordersFilter.order_date_from" class="main-input ind-col-lg-5"></input>
+            </div>
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label ind-col-lg-5">
+                    Дата заказа до:
+                </div>
+                <input type="date" @bind="ordersFilter.order_date_to" class="main-input ind-col-lg-5"></input>
+            </div>
+       </div>
+        <button @onclick="GetOrders" class="score mb-20 mt-20">Поиск</button>
 
 
         <div class="section-field">

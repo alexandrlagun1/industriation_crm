@@ -1459,6 +1459,11 @@ td.ind-col-lg-1 {
 	color: #fff;
 }
 
+.custom-select button .name {
+	text-align: left;
+	font-size: 14px;
+}
+
 .manager-field {
 	width: calc(100% - 210px);
 	border: 1px solid #d9d9d9;
@@ -1487,17 +1492,17 @@ td.ind-col-lg-1 {
 }
 
 .custom-input {
-	background-color: #0099ff15;
+	background-color: #fff;
 	height: 35px;
-	padding: 5px;
+	padding: 0 5px;
 	color: #000;
 	position: relative;
 	border: none;
 	min-height: 35px;
+	font-size: 14px;
 }
 
 .custom-input:focus {
-	min-height: 35px;
 	outline: none;
 	height: auto;
 }
