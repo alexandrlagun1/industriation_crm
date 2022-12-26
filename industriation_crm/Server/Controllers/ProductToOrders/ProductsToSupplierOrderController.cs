@@ -13,10 +13,10 @@ namespace industriation_crm.Server.Controllers
         {
             _IProductToOrder = IProductToOrder;
         }
-        [HttpGet("{supplierOrderId}")]
-        public IActionResult Get(int supplierOrderId)
+        [HttpGet]
+        public IActionResult Get()
         {
-            List<product_to_order> ProductsOfSupplierOrder = _IProductToOrder.GetProductsOfSupplierOrder(supplierOrderId);
+            List<product_to_order> ProductsOfSupplierOrder = _IProductToOrder.GetProductsOfNoSupplierOrder();
             if (ProductsOfSupplierOrder != null)
             {
                 return Ok(ProductsOfSupplierOrder);

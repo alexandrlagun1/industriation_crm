@@ -1,70 +1,139 @@
 ﻿@page "/fetchsupplierordersdetails"
 @using industriation_crm.Shared.Models
+@using industriation_crm.Shared.FilterModels
 @inject HttpClient Http
+@using Newtonsoft.Json
 
-@*<AuthorizeView Roles="6">
-    <Authorized>*@
-<h1>Заказы поставщикам</h1>
+<AuthorizeView Roles="6">
 
+    <h1>Заказы поставщикам</h1>
+    <br />
 
-<br />
-@if (supplierOrderList == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div class="col-md-6">
-        <a href='/supplierorder/add' class="btn btn-primary" role="button">
-            <i class="fas fa-user-plus"></i>
-            Добавить заказ
-        </a>
+    <div class="main-section mb-20">
+        <div class="main-section-label">
+            Фильтр:
+        </div>
+        <div class="section-field ind-col-lg-10">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label ind-col-lg-5">
+                    Номер заказа:
+                </div>
+                <input type="number" @bind="supplierOrderFilter.supplier_order_id" class="main-input ind-col-lg-5"></input>
+            </div>
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label ind-col-lg-5">
+                    Поставщик:
+                </div>
+                <input @bind="supplierOrderFilter.supplier" class="main-input ind-col-lg-5"></input>
+            </div>
+        </div>
+        <br>
+        <div>
+            Дата заказа от:
+            <input type="date" @bind="supplierOrderFilter.order_date_from"></input>
+        </div>
+        <div>
+            Дата заказа до:
+            <input type="date" @bind="supplierOrderFilter.order_date_to"></input>
+        </div>
+        <br>
+        <button @onclick="GetOrders">Поиск</button>
+        <div class="section-field">
+            <table class="order-table ind-col-lg-10">
+                <thead class="ind-col-lg-10">
+                    <tr class="order-row ind-col-lg-10">
+                        <td class="ind-col-lg-2">Номер заказа</td>
+                        <td class="ind-col-lg-3">Специалист по снабжению</td>
+                        <td class="ind-col-lg-3">Поставщик</td>
+                        <td class="ind-col-lg-2">Действия</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var supplierOrder in ordersReturnData!.supplier_orders)
+                    {
+                        <tr class="order-row ind-col-lg-10">
+                            <td class="ind-col-lg-2">@supplierOrder?.id</td>
+                            <td class="ind-col-lg-3">@supplierOrder?.user?.name</td>
+                            <td class="ind-col-lg-3">@supplierOrder?.supplier?.org_name</td>
+                            <td class="ind-col-lg-2">
+                                <a href='/supplierorder/edit/@supplierOrder?.id' class="score" role="button">
+                                    Изменить
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+        <div class="section-field filter-pagination mt-20">
+            <div>
+                Страница:
+                <input class="pagination-input" type="number" min="1" @bind="current_page" @bind:event="oninput" @onkeydown="OnKeyDown">
+                из @page_count.Count()
+                <button class="score" @onclick="GetOrders">Перейти</button>
+            </div>
+            <div>
+                <button class="score" @onclick="PagPrev">Предыдущая</button>
+                <button class="score" @onclick="PagNext">Следующая</button>
+            </div>
+        </div>
     </div>
-    <table class="table table-striped align-middle table-bordered">
-        <thead class="table-success">
-            <tr>
-                <th>ID заказа</th>
-                <th>Наименование поставщика</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var supplierOrder in supplierOrderList)
-            {
-                <tr>
-                    <td>@supplierOrder.id</td>
-                    <td>@supplierOrder.supplier?.name</td>
-                    <td>
-                        <a href='/supplierorder/edit/@supplierOrder.id' class="btn btn-outline-dark" role="button">
-                            Изменить
-                        </a>
-                        <button class="btn btn-outline-dark" @onclick="()=>DeleteSupplierOrder(supplierOrder)">Удалить</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
 
-    </table>
-}
-@* </Authorized>
-    <NotAuthorized>
-        Доступ запрещен
-    </NotAuthorized>
-</AuthorizeView>*@
+</AuthorizeView>
 
 @code {
-    protected List<supplier_order> supplierOrderList = new();
+    protected SupplierOrderReturnData? ordersReturnData = new();
+    protected SupplierOrderFilter supplierOrderFilter = new();
+    List<int> page_count = new List<int>();
+    protected int count_on_page = 50;
+    protected int current_page = 1;
     protected override async Task OnInitializedAsync()
     {
-        await GetClient();
+        await GetOrders();
     }
-    protected async Task GetClient()
+    protected async Task GetOrders()
     {
-        supplierOrderList = await Http.GetFromJsonAsync<List<supplier_order>>("api/SupplierOrder");
+        supplierOrderFilter.current_page = current_page;
+        if (page_count.Count != 0 && (current_page < 1 || current_page > page_count.Count))
+            return;
+        supplierOrderFilter.order_on_page = count_on_page;
+
+        var response = await Http.PostAsJsonAsync("api/SupplierOrder/GetSupplierOrders", supplierOrderFilter);
+        string responseBody = await response.Content.ReadAsStringAsync();
+        ordersReturnData = JsonConvert.DeserializeObject<SupplierOrderReturnData>(responseBody);
+
+        int total_page = Convert.ToInt32(Math.Ceiling(ordersReturnData!.count / Convert.ToDouble(count_on_page)));
+        page_count = new();
+        for (int i = 1; i <= total_page; i++)
+            page_count.Add(i);
     }
     protected async Task DeleteSupplierOrder(supplier_order supplier_order)
     {
-        
         await Http.DeleteAsync($"api/SupplierOrder/{supplier_order.id}");
-        supplierOrderList.Remove(supplier_order);
+        ordersReturnData?.supplier_orders.Remove(supplier_order);
+    }
+    protected async Task PagPrev()
+    {
+        if (current_page > 1)
+        {
+            current_page--;
+            await GetOrders();
+        }
+    }
+    protected async Task PagNext()
+    {
+        if (current_page < page_count.Count)
+        {
+            current_page++;
+            await GetOrders();
+        }
+    }
+    protected async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await GetOrders();
+        }
     }
 }

@@ -15,18 +15,6 @@
                     <div class="row-f ind-col-lg-10">
                         <div class="main-title ind-col-lg-3">Добавление товаров</div>
                         <div class="ind-col-lg-7 row-f">
-                            @*<input class="main-input ind-col-lg-4" placeholder="Название, артикул" @bind="searchByName" @bind:event="oninput" @onkeyup="FilterByName">
-                            <div class="ind-col-lg-1"></div>
-                            <input class="main-input ind-col-lg-4" placeholder="Производитель" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                            <div>
-                                Наименование товара: <input @bind="productFilter.name"></input>&nbsp;
-                                Артикул: <input @bind="productFilter.article"></input>&nbsp;
-                                Цена от: <input @bind="productFilter.price_from"></input>&nbsp;
-                                Цена до: <input @bind="productFilter.price_to"></input>&nbsp;
-                            </div>
-                            <button @onclick="FindByFilter">Поиск</button>
-                            <button @onclick="CleanFilter">Очистить фильтр</button>
-                            *@
                             <div class="ind-col-lg-1 a-i-c">
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="CloseModal"></button>
                             </div>
@@ -35,25 +23,6 @@
                 </div>
             </div>
             <div class="modal-body">
-                @*@if (currentCategory != null && currentCategory.id != 0)
-                {
-                    List<category> categoryTree = GetCategoryTree(new List<category>(), currentCategory);
-                    categoryTree.Reverse();
-                    foreach (var category in categoryTree)
-                    {
-                        <button type="button" class="btn btn-primary btn-lg" @onclick="()=>GetProducts(category)">@category.name</button>
-                    }
-                    <br>
-                    @foreach (var category in categoriesList.Where(c => c.parent_id == currentCategory.id))
-                    {
-                        <button @onclick="()=>GetProducts(category)">@category.name</button>
-                        <br />
-                    }
-                }*@
-
-
-
-
                 <div class="main-section mb-20">
                     <div class="main-section-label">
                         Фильтр
@@ -105,12 +74,6 @@
                         <button class="close" @onclick="CleanFilter">Очистить фильтр</button>
                     </div>
                 </div>
-
-
-
-
-
-
 
                 <div class="section-field">
                     <table class="order-table ind-col-lg-10">

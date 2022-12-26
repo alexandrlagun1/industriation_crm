@@ -1,8 +1,12 @@
 ﻿@page "/fetchorderdetails"
 @using Newtonsoft.Json
+@using System.Security.Claims
 @using industriation_crm.Shared.Models
 @using industriation_crm.Shared.FilterModels
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
+@inject NavigationManager NavigationManager
+
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
 <div class="main-title">Заказы</div>
@@ -19,7 +23,7 @@
 }
 else
 {
-       <div class="main-section mb-20">
+    <div class="main-section mb-20">
         <div class="main-section-label">
             Фильтр:
         </div>
@@ -27,7 +31,7 @@ else
             <div class="custom-select mr-20">
                 <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
                 </input>
-                @foreach (var m in noSelectManagers.Where(m=>m.name.Contains(manager_search)))
+                @foreach (var m in noSelectManagers.Where(m => m.name.Contains(manager_search)))
                 {
                     <button @onclick="()=>{noSelectManagers.Remove(m); SelectManagers.Add(m);}">
                         <div class="name">@m.name</div>
@@ -77,10 +81,16 @@ else
                     <tr class="order-row ind-col-lg-10">
                         <td class="ind-col-lg-1">Номер заказа</td>
                         <td class="ind-col-lg-2">Покупатель</td>
-                        <td class="ind-col-lg-3">Контрагент</td>
-
+                        @if(role == 1){
+                            <td class="ind-col-lg-2">Контрагент</td>
+                        }
+                        else
+                        {
+                            <td class="ind-col-lg-2">Менеджер по снабжению</td>
+                        }
                         <td class="ind-col-lg-2">Менеджер</td>
                         <td class="ind-col-lg-1">Статус заказа</td>
+                        <td class="ind-col-lg-1">Этап</td>
                         <td class="ind-col-lg-1">Действия</td>
                     </tr>
                 </thead>
@@ -90,18 +100,28 @@ else
                         <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1">@order.id</td>
                             <td class="ind-col-lg-2">@order.main_contact.full_name</td>
-                            <td class="ind-col-lg-3">
-                                @if (@order.client?.client_type == 1)
-                                {
-                                    @order.client?.org_name
-                                }
-                                @if (@order.client?.client_type == 0)
-                                {
-                                    <div>---</div>
-                                }
-                            </td>
+                            @if (role == 1)
+                            {
+                                <td class="ind-col-lg-2">
+                                    @if (@order.client?.client_type == 1)
+                                    {
+                                        @order.client?.org_name
+                                    }
+                                    @if (@order.client?.client_type == 0)
+                                    {
+                                        <div>---</div>
+                                    }
+                                </td>
+                            }
+                            else
+                            {
+                                <td class="ind-col-lg-2">
+                                    @order?.supplier_manager?.name
+                                </td>
+                            }
                             <td class="ind-col-lg-2">@order.user?.name</td>
                             <td class="ind-col-lg-1">@order.order_status?.name</td>
+                            <td class="ind-col-lg-1">@order.stage?.name</td>
                             <td class="ind-col-lg-1">
                                 <a href='/order/edit/@order.id' class="score" role="button">
                                     Изменить
@@ -128,7 +148,7 @@ else
     </div>
 }
 @code {
-    
+
     protected string manager_search = "";
     protected int count_on_page = 50;
     protected int current_page = 1;
@@ -140,12 +160,18 @@ else
     bool load = true;
     protected List<user> SelectManagers = new();
     protected List<user> noSelectManagers = new();
+    protected int role { get; set; }
 
-    
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        role = Convert.ToInt32(authState.User.FindFirst(ClaimTypes.Role).Value);
         noSelectManagers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
         await GetOrders();
+    }
+    public void EditOrder(int order_id)
+    {
+        NavigationManager.NavigateTo($"/order/edit/{order_id}");
     }
     protected async Task Search()
     {
@@ -176,28 +202,33 @@ else
             await GetOrders();
         }
     }
-    protected string s;
     protected async Task GetOrders()
     {
-        load = true;
-        ordersFilter.current_page = current_page;
-        if (page_count.Count != 0 && (current_page < 1 || current_page > page_count.Count))
-            return;
-        ordersFilter.order_on_page = count_on_page;
+            load = true;
+            ordersFilter.current_page = current_page;
+            if (page_count.Count != 0 && (current_page < 1 || current_page > page_count.Count))
+                return;
+            ordersFilter.order_on_page = count_on_page;
+            if (role == 1)
+                ordersFilter.stage = 1;
+            else if (role == 6)
+                ordersFilter.stage = 2;
 
-        if (SelectManagers.Count == 0)
-            ordersFilter.managers = noSelectManagers;
-        else
-            ordersFilter.managers = SelectManagers;
-        var response = await Http.PostAsJsonAsync("api/Order/GetOrders", ordersFilter);
-        string responseBody = await response.Content.ReadAsStringAsync();
-        ordersReturnData = JsonConvert.DeserializeObject<OrdersReturnData>(responseBody);
+
+            if (SelectManagers.Count == 0)
+                ordersFilter.managers = noSelectManagers;
+            else
+                ordersFilter.managers = SelectManagers;
+            var response = await Http.PostAsJsonAsync("api/Order/GetOrders", ordersFilter);
+            string responseBody = await response.Content.ReadAsStringAsync();
+            ordersReturnData = JsonConvert.DeserializeObject<OrdersReturnData>(responseBody);
+
+            int total_page = Convert.ToInt32(Math.Ceiling(ordersReturnData.count / Convert.ToDouble(count_on_page)));
+            page_count = new();
+            for (int i = 1; i <= total_page; i++)
+                page_count.Add(i);
+            load = false;
         
-        int total_page = Convert.ToInt32(Math.Ceiling(ordersReturnData.count / Convert.ToDouble(count_on_page)));
-        page_count = new();
-        for (int i = 1; i <= total_page; i++)
-            page_count.Add(i);
-        load = false;
     }
 
 

@@ -2,10 +2,13 @@
 @page "/order/edit/{orderId:int}"
 @page "/order/add/{clientId:int}"
 @using System.Globalization
+@using industriation_crm.Server.DataTranslation
 @using industriation_crm.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject HubConnection HubConnection
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
@@ -13,435 +16,447 @@
 {
     <NewProductToOrder orderId="orderId" CloseModal="CloseAddProductModal" AddProductToproductToOrder="AddProductToProductToOrder"></NewProductToOrder>
 }
-<EditForm Model="@order" OnValidSubmit="SaveOrder">
-    <DataAnnotationsValidator />
-
-    <div class="main-title">@Title</div>
-    <hr class="custom-hr" />
-    <div class="main-section">
-        <div class="main-section-label">Менеджер</div>
-        <div class="section-field">
-            <InputSelect class="main-input ind-col-lg-3" @bind-Value="order.user_id">
-                @foreach (var m in managers)
-                {
-                    <option value="@m.id">@m.name</option>
-                }
-            </InputSelect>
-        </div>
-    </div>
-    <div class="main-section">
-        <div class="main-section-label">Контрагент</div>
-        <div class="contragent ind-col-lg-10">
-            <a href="/client/edit/@client.id" target="_blank" class="contragent">
-                @if (client?.client_type == 1)
-                    @client?.org_name
-                else
-                    @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
-
-                </a>
-                <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
-                    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
-                    <label class="@clientClass" for="btnradio1">Клиент</label>
-
-                    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" @onchange='@(() => { viewContacts = true; contactClass="contact contact--active"; clientClass="client";})'>
-                    <label class="@contactClass" for="btnradio2">Контактные лица</label>
-                    @* <input name="@index" type="radio" checked="@(parcel.Item as Entity_Spatial)" @onchange='@(() => { parcel.Item = new Entity_Spatial(); })' />Одноконтурный ЗУ*@
-                </div>
-            </div>
-        @if (viewContacts == false)
+@if (role == 1)
+{
+    <div>
+        <button @onclick="()=>ViewOrderManagement = false">Информация о заказе</button>
+        <button @onclick="()=>ViewOrderManagement = true">Управление заказом</button>
+        @if(order?.order_Pays?.Count() == 0)
         {
-            <div class="section-field">
-                <div class="ind-col-lg-5">
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Имя</div>
-                        <input type="text" class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Фамилия</div>
-                        <input type="text" class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Отчество</div>
-                        <input type="text" class="main-input" value="@order?.main_contact?.patronymic" @oninput="@((ChangeEventArgs e) => {order.main_contact.patronymic = e.Value.ToString();clientChange = true;})">
-                    </div>
-                </div>
-                <div class="ind-col-lg-5">
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">E-mail</div>
-                        <input type="email" class="main-input" value="@order?.main_contact?.email" @oninput="@((ChangeEventArgs e) => {order.main_contact.email = e.Value.ToString();clientChange = true;})">
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Номер телефона</div>
-                        <input type="tel" class="main-input" value="@order?.main_contact?.phone" @oninput="@((ChangeEventArgs e) => {order.main_contact.phone = e.Value.ToString();clientChange = true;})">
-                    </div>
-                </div>
-            </div>
-            @if (order?.main_contact?.contact_phones != null)
-            {
-                @foreach (var p in order?.main_contact?.contact_phones)
-                {
-                    <div class="section-field">
-                        <div class="ind-col-lg-5 input-field">
-                            <div class="input-label">Доп. телефон</div>
-                            <input type="tel" class="main-input" value="@p.phone" @oninput="@((ChangeEventArgs e) => {p.phone = e.Value.ToString();clientChange = true;})">
-                        </div>
-                    </div>
-                }
-            }
+            <button @onclick="OrderCancellation">Отменить заказ</button>
         }
         else
         {
-            <br />
-            <div class="section-field ind-col-lg-10">
-                <table class="order-table ind-col-lg-10">
-                    <thead class="table-success ind-col-lg-10">
-                        <tr class="order-row ind-col-lg-10">
-                            <td class="ind-col-lg-1">ID</td>
-                            <td class="ind-col-lg-3">Имя</td>
-                            <td class="ind-col-lg-6">Основной контакт</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var _contact in client.contacts)
-                        {
-                            <tr class="order-row ind-col-lg-10">
-                                <td class="ind-col-lg-1">@_contact.id</td>
-                                <td class="ind-col-lg-3">@_contact.name</td>
-                                <td class="ind-col-lg-6">
-                                    <input class="form-check-input" type="radio" @onchange="()=>ChangeMainContact(_contact)" name="maincontact" checked="@GetIsMain(_contact.id)">
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-
-                </table>
-            </div>
+            <button @onclick="OrderPayReturn">Оформить возврат</button>
         }
+        
     </div>
-    @if (client?.client_type == 1)
-    {
-        <div class="main-section">
-            <div class="main-section-label">Данные юридического лица</div>
-            <div class="section-field">
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">Полное наименование</div>
-                    <input type="text" class="main-input" @bind="client.org_name">
-                </div>
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">ИНН</div>
-                    <input type="text" class="main-input" @bind="client.org_inn">
-                </div>
-            </div>
-            <div class="section-field">
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">Адрес регистрации</div>
-                    <input type="text" class="main-input" @bind="client.org_address">
-                </div>
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">ОГРН</div>
-                    <input type="text" class="main-input" @bind="client.org_ogrn">
-                </div>
-            </div>
-        </div>
+}
 
-        <div class="main-section">
-            <div class="main-section-label">Банковские реквизиты</div>
-            <div class="section-field">
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">БИК</div>
-                    <input type="text" class="main-input" @bind="client.bank_bik">
-                </div>
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">Корреспондентский счет</div>
-                    <input type="text" class="main-input" @bind="client.bank_cor_schet">
-                </div>
-            </div>
-            <div class="section-field">
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">Наименование банка</div>
-                    <input type="text" class="main-input" @bind="client.bank_name">
-                </div>
-                <div class="ind-col-lg-5 input-field">
-                    <div class="input-label">Расчетный счет</div>
-                    <input type="text" class="main-input" @bind="client.bank_ras_schet">
-                </div>
-            </div>
-        </div>
+
+<EditForm Model="@order" OnValidSubmit="SaveOrder">
+    <DataAnnotationsValidator />
+
+    @if (ViewOrderManagement || role != 1)
+    {
+        <industriation_crm.Client.Pages.order_management.OrderManagementInfo order="order!"></industriation_crm.Client.Pages.order_management.OrderManagementInfo>
+        <div class="main-title">Управление заказом</div>
     }
-    <div class="main-section">
-        <div class="main-section-label">Состав заказа</div>
-        <div class="section-field">
-            <table class="order-table ind-col-lg-10">
-                <thead class="table-success ind-col-lg-10">
-                    <tr class="order-row ind-col-lg-10">
-                        <td class="ind-col-lg-1">ID продукта</td>
-                        <td class="ind-col-lg-3">Наименование</td>
-                        <td class="ind-col-lg-2">Срок доставки</td>
-                        <td class="ind-col-lg-1">Цена</td>
-                        <td class="ind-col-lg-1">Количество</td>
-                        <td class="ind-col-lg-1">Скидка</td>
-                        <td class="ind-col-lg-1">Стоимость</td>
-                    </tr>
-                </thead>
-                <tbody class="ind-col-lg-10">
-                    @if (order != null && order.product_To_Orders != null)
+    else
+    {
+        <div class="main-title">@Title</div>
+        <hr class="custom-hr" />
+        <div class="main-section">
+            <div class="main-section-label">Менеджер</div>
+            <div class="section-field">
+                <InputSelect class="main-input ind-col-lg-3" @bind-Value="order.user_id">
+                    @foreach (var m in managers)
                     {
-                        @foreach (var p in order!.product_To_Orders.OrderBy(p => p.product_postition))
-                        {
-                            <tr class="order-row" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
-                                <td class="ind-col-lg-1" id="model">
-                                    <img src="./icons/drag.png" alt="" class="drag">
-                                    @p?.product?.id
-                                </td>
-                                <td class="ind-col-lg-3">
-                                    <a href="" class="table-link">
-                                        @p?.product?.name
-                                        
-                                        <div class="table-link-modal">
-                                            <div class="ind-col-lg-2">
-                                                <img src='@("https://industriation.ru/image/"+p.product.image)' alt="" class="table-modal-img">
-                                            </div>
-                                            <div class="ind-col-lg-8">
-                                                <div class="table-modal-title">
-                                                    @p?.product?.name
-                                                </div>
-                                                <div class="table-modal-price">
-                                                    @p._product_price
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td class="ind-col-lg-2">
-                                    <div class="ind-col-lg-3">
-                                        <input type="number" class="table-input">
-                                    </div>
-                                    <div class="ind-col-lg-7">
-                                        <select name="" id="" class="table-input">
-                                            @foreach (var delivery_period_type in delivery_Period_Types!)
-                                            {
-                                                <option value="@delivery_period_type.id">@delivery_period_type.name</option>
-                                            }
-                                        </select>
-                                    </div>
-                                </td>
-                                <td class="ind-col-lg-1">
-                                    <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">@p._product_price</button>
-                                    @if (p.showPriceModal)
-                                    {
-                                        <div class="price-modal" tabindex="0">
-                                            <div class="input-label mb-10">Цена</div>
-                                            <div class="row-f ind-col-lg-10">
-                                                <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" />
-                                            </div>
-                                            <div class="input-label mt-10">Дополнительная скидка</div>
-                                            <div class="row-f">
-                                                <div class="ind-col-lg-5 discount-input">
-                                                    <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" />P
-                                                </div>
-                                                <div class="ind-col-lg-5 discount-input">
-                                                    <input type="number" class="main-input" @bind="@p.percent_discount" />%
-                                                    <p>@p._product_price_with_discount</p>
-                                                </div>
-                                            </div>
-                                            <div class="discount-buttons mt-10">
-                                                <button class="score" @onclick="() => p.showPriceModal = false">Закрыть</button>
-                                            </div>
-                                        </div>
-                                    }
-                                </td>
-                                
-                                <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" /></td>
-                                <td class="ind-col-lg-1">@p?._discount_total_price</td>
-                                <td class="ind-col-lg-1">
-                                    @p?._total_price
-                                    <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
-                                        <img src="./icons/delete-icon.svg" class="delete-button">
-                                    </button>
-                                </td>
-                            </tr>
-                        }
+                        <option value="@m.id">@m.name</option>
                     }
-                </tbody>
-            </table>
+                </InputSelect>
+            </div>
         </div>
-        <div class="section-field a-i-c mt-20">
-            <div class="section-field ind-col-lg-10">
-            @if (order.product_To_Orders == null || order.product_To_Orders.Count == 0)
+        <div class="main-section">
+            <div class="main-section-label">Контрагент</div>
+            <div class="contragent ind-col-lg-10">
+                <a href="/client/edit/@client.id" target="_blank" class="contragent">
+                    @if (client?.client_type == 1)
+                        @client?.org_name
+                    else
+                        @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
+
+
+                    </a>
+                    <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
+                        <label class="@clientClass" for="btnradio1">Клиент</label>
+
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" @onchange='@(() => { viewContacts = true; contactClass="contact contact--active"; clientClass="client";})'>
+                        <label class="@contactClass" for="btnradio2">Контактные лица</label>
+                        @* <input name="@index" type="radio" checked="@(parcel.Item as Entity_Spatial)" @onchange='@(() => { parcel.Item = new Entity_Spatial(); })' />Одноконтурный ЗУ*@
+                    </div>
+                </div>
+                @if (viewContacts == false)
             {
-                <p align="center" class="ind-col-lg-10">Товары в заказе отсутствуют</p>
+                <div class="section-field">
+                    <div class="ind-col-lg-5">
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Имя</div>
+                            <input type="text" class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Фамилия</div>
+                            <input type="text" class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Отчество</div>
+                            <input type="text" class="main-input" value="@order?.main_contact?.patronymic" @oninput="@((ChangeEventArgs e) => {order.main_contact.patronymic = e.Value.ToString();clientChange = true;})">
+                        </div>
+                    </div>
+                    <div class="ind-col-lg-5">
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">E-mail</div>
+                            <input type="email" class="main-input" value="@order?.main_contact?.email" @oninput="@((ChangeEventArgs e) => {order.main_contact.email = e.Value.ToString();clientChange = true;})">
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Номер телефона</div>
+                            <input type="tel" class="main-input" value="@order?.main_contact?.phone" @oninput="@((ChangeEventArgs e) => {order.main_contact.phone = e.Value.ToString();clientChange = true;})">
+                        </div>
+                    </div>
+                </div>
+                @if (order?.main_contact?.contact_phones != null)
+                {
+                    @foreach (var p in order?.main_contact?.contact_phones)
+                    {
+                        <div class="section-field">
+                            <div class="ind-col-lg-5 input-field">
+                                <div class="input-label">Доп. телефон</div>
+                                <input type="tel" class="main-input" value="@p.phone" @oninput="@((ChangeEventArgs e) => {p.phone = e.Value.ToString();clientChange = true;})">
+                            </div>
+                        </div>
+                    }
+                }
             }
             else
             {
-                <div class="ind-col-lg-4"></div>
-                <div class="ind-col-lg-2 ta-right mr-20">
-                    <label>Разовая скидка</label>
-                </div>
-                <div class="ind-col-lg-2 a-i-c">
-                    <input class="main-input ind-col-lg-6" id="ex1" type="number" @bind="@order._ruble_discount">
-                    <div class="ind-col-lg-1">&nbsp; ₽</div> 
-                </div>
-                <div class="ind-col-lg-2 a-i-c">
-                    <input class="main-input ind-col-lg-6" id="ex2" type="number" @bind="@order._percent_discount">
-                    <div class="ind-col-lg-1">&nbsp; %</div>
-                </div>
+                <br />
+                <div class="section-field ind-col-lg-10">
+                    <table class="order-table ind-col-lg-10">
+                        <thead class="table-success ind-col-lg-10">
+                            <tr class="order-row ind-col-lg-10">
+                                <td class="ind-col-lg-1">ID</td>
+                                <td class="ind-col-lg-3">Имя</td>
+                                <td class="ind-col-lg-6">Основной контакт</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var _contact in client.contacts)
+                            {
+                                <tr class="order-row ind-col-lg-10">
+                                    <td class="ind-col-lg-1">@_contact.id</td>
+                                    <td class="ind-col-lg-3">@_contact.name</td>
+                                    <td class="ind-col-lg-6">
+                                        <input class="form-check-input" type="radio" @onchange="()=>ChangeMainContact(_contact)" name="maincontact" checked="@GetIsMain(_contact.id)">
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
 
+                    </table>
+                </div>
             }
         </div>
-        </div>
-        <hr class="custom-hr" />
-        <button type="button" class="add-item" @onclick="()=>OpenProductAddModel=true">Добавить позицию</button>
-        <div class="section-field ind-col-lg-10">
-            <div class="ind-col-lg-10">
-                <div class="ind-col-lg-10 row-f">
-                    <div class="ind-col-lg-7"></div>
-                    <div class="ind-col-lg-3 row-f">
-                        <div class="ind-col-lg-7" style="text-align: right;">
-                            Стоимость товаров:
-                        </div>
-                        <div class="ind-col-lg-3" style="text-align: right;">
-                            @order._total_price
-                        </div>
-                    </div>
-                </div>
-                <div class="ind-col-lg-10 row-f">
-                    <div class="ind-col-lg-7"></div>
-                    <div class="ind-col-lg-3 row-f">
-                        <div class="ind-col-lg-7" style="text-align: right;">
-                            Стоимость доставки:
-                        </div>
-                        <div class="ind-col-lg-3" style="text-align: right;">
-                            @order.delivery._price
-                        </div>
-                    </div>
-                </div>
-                <div class="ind-col-lg-10 row-f">
-                    <div class="ind-col-lg-7"></div>
-                    <div class="ind-col-lg-3 row-f">
-                        <div class="ind-col-lg-7" style="text-align: right;">
-                            Итог:
-                        </div>
-                        <div class="ind-col-lg-3" style="text-align: right;">
-                            @order.products_with_delivery_price
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row-f">
-        <div class="main-section ind-col-lg-5">
-            <div class="main-section-label">Отгрузка и доставка</div>
-            <div class="section-field">
-                <div class="ind-col-lg-10">
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Тип доставки</div>
-                        <select type="text" class="main-input" value="@order.delivery?.delivery_type?.id" @onchange="ChangeDeliveryType">
-                            @foreach (var delivery_type in delivery_Types!)
-                            {
-                                <option value="@delivery_type.id">@delivery_type.name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Зафиксированная дата отгрузки на момент оплаты</div>
-                        <input type="date" class="main-input" @bind="@order.delivery.shipment_date">
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Стоимость</div>
-                        <input type="number" step="0.01" class="main-input" @bind="order.delivery._price">
-                    </div>
-                    
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">ФИО Получателя</div>
-                        <input type="text" class="main-input" @bind="@order.delivery.recipient_name">
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Телефон Получателя</div>
-                        <input type="tel" class="main-input" @bind="@order.delivery.recipient_phone">
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Адрес получателя</div>
-                        <textarea type="text" class="main-input" @bind="@order.delivery.address" />
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="ind-col-lg-5 background-for-comment">
-            <div class="main-section ind-col-lg-10">
-                <div class="main-section-label">Комментарии к заказу</div>
-                <div class="section-field">
-                    <div class="ind-col-lg-10 flex">
-                        <textarea type="text" class="main-input" @bind="order.comments"></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="main-section ind-col-lg-5">
-        <div class="main-section-label">Оплата</div>
-        <div class="section-field">
-            <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
-        </div>
-        <div class="input-field">
-            <div class="input-label">К оплате:</div>
-            <label>@order._price_summ</label>
-        </div>
-        <hr class="custom-hr" />
-
-        @foreach (var p in order?.order_Pays!.Where(o => o.isRemove == false))
+        @if (client?.client_type == 1)
         {
-            <div class="payment-field ind-col-lg-10">
-                <div class="input-field">
-                    <div class="input-label">
-                        Статус
+            <div class="main-section">
+                <div class="main-section-label">Данные юридического лица</div>
+                <div class="section-field">
+                    <div class="ind-col-lg-5 input-field">
+                        <div class="input-label">Полное наименование</div>
+                        <input type="text" class="main-input" @bind="client.org_name">
                     </div>
-                    <select class="main-input" value="@p.pay_status_id" @onchange="(e)=>ChangePayStatus(e, p)">
-                        @foreach (var pay_status in pay_Statuses!)
+                    <div class="ind-col-lg-5 input-field">
+                        <div class="input-label">ИНН</div>
+                        <input type="text" class="main-input" @bind="client.org_inn">
+                    </div>
+                </div>
+                <div class="section-field">
+                    <div class="ind-col-lg-5 input-field">
+                        <div class="input-label">Адрес регистрации</div>
+                        <input type="text" class="main-input" @bind="client.org_address">
+                    </div>
+                    <div class="ind-col-lg-5 input-field">
+                        <div class="input-label">ОГРН</div>
+                        <input type="text" class="main-input" @bind="client.org_ogrn">
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-section">
+                <div class="main-section-label">Банковские реквизиты</div>
+                <div class="section-field">
+                    <div class="ind-col-lg-5 input-field">
+                        <div class="input-label">БИК</div>
+                        <input type="text" class="main-input" @bind="client.bank_bik">
+                    </div>
+                    <div class="ind-col-lg-5 input-field">
+                        <div class="input-label">Корреспондентский счет</div>
+                        <input type="text" class="main-input" @bind="client.bank_cor_schet">
+                    </div>
+                </div>
+                <div class="section-field">
+                    <div class="ind-col-lg-5 input-field">
+                        <div class="input-label">Наименование банка</div>
+                        <input type="text" class="main-input" @bind="client.bank_name">
+                    </div>
+                    <div class="ind-col-lg-5 input-field">
+                        <div class="input-label">Расчетный счет</div>
+                        <input type="text" class="main-input" @bind="client.bank_ras_schet">
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="main-section">
+            <div class="main-section-label">Состав заказа</div>
+            <div class="section-field">
+                <table class="order-table ind-col-lg-10">
+                    <thead class="table-success ind-col-lg-10">
+                        <tr class="order-row ind-col-lg-10">
+                            <td class="ind-col-lg-1">ID продукта</td>
+                            <td class="ind-col-lg-3">Наименование</td>
+                            <td class="ind-col-lg-2">Срок доставки</td>
+                            <td class="ind-col-lg-1">Цена</td>
+                            <td class="ind-col-lg-1">Количество</td>
+                            <td class="ind-col-lg-1">Скидка</td>
+                            <td class="ind-col-lg-1">Стоимость</td>
+                        </tr>
+                    </thead>
+                    <tbody class="ind-col-lg-10">
+                        @if (order != null && order.product_To_Orders != null)
                         {
-                            <option value="@pay_status.id">@pay_status.name</option>
+                            @foreach (var p in order!.product_To_Orders.OrderBy(p => p.product_postition))
+                            {
+                                <tr class="order-row">
+                                    <td class="ind-col-lg-1" id="model">
+                                        <img src="./icons/drag.png" alt="" class="drag" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
+                                        @p?.product?.id
+                                    </td>
+                                    <td class="ind-col-lg-3">
+                                        <a href="" class="table-link">
+                                            @p?.product?.name
+
+                                            <div class="table-link-modal">
+                                                <div class="ind-col-lg-2">
+                                                    <img src='@("https://industriation.ru/image/"+p.product.image)' alt="" class="table-modal-img">
+                                                </div>
+                                                <div class="ind-col-lg-8">
+                                                    <div class="table-modal-title">
+                                                        @p?.product?.name
+                                                    </div>
+                                                    <div class="table-modal-price">
+                                                        @p._product_price
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </td>
+                                    <td class="ind-col-lg-2">
+                                        <div class="ind-col-lg-3">
+                                            <input type="number" class="table-input" @bind="p.delivery_period">
+                                        </div>
+                                        <div class="ind-col-lg-7">
+                                            <select name="" id="" class="table-input" @bind="p.delivery_period_type_id">
+                                                @foreach (var delivery_period_type in delivery_Period_Types!)
+                                                {
+                                                    <option value="@delivery_period_type.id">@delivery_period_type.name</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td class="ind-col-lg-1">
+                                        <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">@p._product_price</button>
+                                        @if (p.showPriceModal)
+                                        {
+                                            <div class="price-modal" tabindex="0">
+                                                <div class="input-label mb-10">Цена</div>
+                                                <div class="row-f ind-col-lg-10">
+                                                    <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" />
+                                                </div>
+                                                <div class="input-label mt-10">Дополнительная скидка</div>
+                                                <div class="row-f">
+                                                    <div class="ind-col-lg-5 discount-input">
+                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" />P
+                                                    </div>
+                                                    <div class="ind-col-lg-5 discount-input">
+                                                        <input type="number" class="main-input" @bind="@p.percent_discount" />%
+                                                        <p>@p._product_price_with_discount</p>
+                                                    </div>
+                                                </div>
+                                                <div class="discount-buttons mt-10">
+                                                    <button class="score" @onclick="() => p.showPriceModal = false">Закрыть</button>
+                                                </div>
+                                            </div>
+                                        }
+                                    </td>
+
+                                    <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" /></td>
+                                    <td class="ind-col-lg-1">@p?._discount_total_price</td>
+                                    <td class="ind-col-lg-1">
+                                        @p?._total_price
+                                        <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
+                                            <img src="./icons/delete-icon.svg" class="delete-button">
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
                         }
-                    </select>
-                </div>
-                <div class="input-field">
-                    <div class="input-label">
-                        Дата оплаты
-                    </div>
-                    <input type="date" class="main-input" @bind="@p.date">
-                </div>
-                <div class="input-field">
-                    <div class="input-label">
-                        Сумма
-                    </div>
-                    @if (p.pay_status_id != 2)
+                    </tbody>
+                </table>
+            </div>
+            <div class="section-field a-i-c mt-20">
+                <div class="section-field ind-col-lg-10">
+                    @if (order.product_To_Orders == null || order.product_To_Orders.Count == 0)
                     {
-                        <input type="number" step="0.1" class="main-input" @bind-value="@p.price">
+                        <p align="center" class="ind-col-lg-10">Товары в заказе отсутствуют</p>
                     }
                     else
                     {
-                        <label>@p.price</label>
+                        <div class="ind-col-lg-4"></div>
+                        <div class="ind-col-lg-2 ta-right mr-20">
+                            <label>Разовая скидка</label>
+                        </div>
+                        <div class="ind-col-lg-2 a-i-c">
+                            <input class="main-input ind-col-lg-6" id="ex1" type="number" @bind="@order._ruble_discount">
+                            <div class="ind-col-lg-1">&nbsp; ₽</div>
+                        </div>
+                        <div class="ind-col-lg-2 a-i-c">
+                            <input class="main-input ind-col-lg-6" id="ex2" type="number" @bind="@order._percent_discount">
+                            <div class="ind-col-lg-1">&nbsp; %</div>
+                        </div>
+
                     }
                 </div>
-                <button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>
             </div>
-        }
-    </div>
+            <hr class="custom-hr" />
+            <button type="button" class="add-item" @onclick="()=>OpenProductAddModel=true">Добавить позицию</button>
+            <div class="section-field ind-col-lg-10">
+                <div class="ind-col-lg-10">
+                    <div class="ind-col-lg-10 row-f">
+                        <div class="ind-col-lg-7"></div>
+                        <div class="ind-col-lg-3 row-f">
+                            <div class="ind-col-lg-7" style="text-align: right;">
+                                Стоимость товаров:
+                            </div>
+                            <div class="ind-col-lg-3" style="text-align: right;">
+                                @order._total_price
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ind-col-lg-10 row-f">
+                        <div class="ind-col-lg-7"></div>
+                        <div class="ind-col-lg-3 row-f">
+                            <div class="ind-col-lg-7" style="text-align: right;">
+                                Стоимость доставки:
+                            </div>
+                            <div class="ind-col-lg-3" style="text-align: right;">
+                                @order.delivery._price
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ind-col-lg-10 row-f">
+                        <div class="ind-col-lg-7"></div>
+                        <div class="ind-col-lg-3 row-f">
+                            <div class="ind-col-lg-7" style="text-align: right;">
+                                Итог:
+                            </div>
+                            <div class="ind-col-lg-3" style="text-align: right;">
+                                @order.products_with_delivery_price
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row-f">
+            <div class="main-section ind-col-lg-5">
+                <div class="main-section-label">Отгрузка и доставка</div>
+                <div class="section-field">
+                    <div class="ind-col-lg-10">
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Тип доставки</div>
+                            <select type="text" class="main-input" value="@order.delivery?.delivery_type?.id" @onchange="ChangeDeliveryType">
+                                @foreach (var delivery_type in delivery_Types!)
+                                {
+                                    <option value="@delivery_type.id">@delivery_type.name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Зафиксированная дата отгрузки на момент оплаты</div>
+                            <input type="date" class="main-input" @bind="@order.delivery.shipment_date">
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Стоимость</div>
+                            <input type="number" step="0.01" class="main-input" @bind="order.delivery._price">
+                        </div>
+
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">ФИО Получателя</div>
+                            <input type="text" class="main-input" @bind="@order.delivery.recipient_name">
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Телефон Получателя</div>
+                            <input type="tel" class="main-input" @bind="@order.delivery.recipient_phone">
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Адрес получателя</div>
+                            <textarea type="text" class="main-input" @bind="@order.delivery.address" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ind-col-lg-5 background-for-comment">
+                <div class="main-section ind-col-lg-10">
+                    <div class="main-section-label">Комментарии к заказу</div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-10 flex">
+                            <textarea type="text" class="main-input" @bind="order.comments"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-section ind-col-lg-5">
+            <div class="main-section-label">Оплата</div>
+            <div class="section-field">
+                <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
+            </div>
+            <div class="input-field">
+                <div class="input-label">К оплате:</div>
+                <label>@order._price_summ</label>
+            </div>
+            <hr class="custom-hr" />
+
+            @foreach (var p in order?.order_Pays!.Where(o => o.isRemove == false))
+            {
+                <div class="payment-field ind-col-lg-10">
+                    <div class="input-field">
+                        <div class="input-label">
+                            Дата оплаты
+                        </div>
+                        <input type="date" class="main-input" @bind="@p.date">
+                    </div>
+                    <div class="input-field">
+                        <div class="input-label">
+                            Сумма
+                        </div>
+                        <label>@p.price</label>
+                    </div>
+                    <button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>
+                </div>
+            }
+        </div>
+    }
     <div class="bottom-buttons ind-col-lg-10">
         <button type="submit" class="save">Сохранить</button>
         <button class="close" @onclick="Cancel">Закрыть</button>
-        @if (order?.order_status_id == 1)
+        @if (order?.stage_id == 1)
         {
-            <button class="score">Выставить счет</button>
+            <button class="score" type="button" @onclick="Bill">Передать в снабжение</button>
+        }
+        @if (role == 6 && (order.supplier_manager_id == null || order.supplier_manager_id == user_id))
+        {
+            <button class="score" type="button" @onclick="CreateSupplierOrder">Сформировать заказ поставщику</button>
+            <button class="close" type="button" @onclick="ReturnOrderToManager">На пересогласование</button>
         }
     </div>
 </EditForm>
 
 
 @code {
-    //Изменение классов модалки скидки
-
-    //Изменение классов контакта и клиента
+    protected bool ViewOrderManagement = false;
     protected string clientClass = "client client--active";
     protected string contactClass = "contact";
     protected bool showPriceModal = false;
@@ -454,21 +469,41 @@
 
     protected order? order = new();
     protected List<user>? managers = new();
-    protected List<product_to_order> RemoveProductToOrdersList = new();
+    protected List<product_to_order>? RemoveProductToOrdersList = new();
     protected client? client = new();
     protected List<delivery_type>? delivery_Types = new();
-    protected List<pay_status>? pay_Statuses = new();
-    protected List<delivery_period_type> delivery_Period_Types = new();
+    protected List<delivery_period_type>? delivery_Period_Types = new();
 
     protected bool OpenProductAddModel = false;
     protected bool clientChange = false;
     protected bool viewContacts = false;
-
-
+    protected int role { get; set; }
+    protected int? user_id { get; set; }
 
 
     //Методы Drag&Drop
     protected product_to_order drag_product_to_order { get; set; }
+
+    //Методы инициализвции
+    protected override async Task OnInitializedAsync()
+    {
+        HubConnection.On<string>("UpdateStatus", async status =>
+        {
+            if (orderId != 0)
+            {
+                await SendUserNotification($"По заказу {order?.id} прошла оплата", order.user_id);
+                order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
+            }
+            StateHasChanged();
+        });
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        role = Convert.ToInt32(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role).Value);
+        user_id = authState.User.Claims.Where(_ => _.Type == "userid").Select(_ => Convert.ToInt32(_.Value)).First();
+
+        await GetClientsManagers();
+
+
+    }
 
     protected void OnDragStart(product_to_order _product_to_order)
     {
@@ -482,20 +517,25 @@
         drag_product_to_order = null;
     }
 
-    //Методы инициализвции
-    protected override async Task OnInitializedAsync()
+    protected async Task ReturnOrderToManager()
     {
-        HubConnection.On<string>("UpdateStatus", async status =>
-        {
-            if (orderId != 0)
-            {
-               order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
+        order!.stage_id = 1;
+        order!.order_status_id = 4;
+        await CreateOrderHistory("Заказ отправлен на пересогласование с клиентом");
+        await SendUserNotification($"Заказ {order.id} отправлен на пересогласование с клиентом", order.user_id);
+        await SaveOrder();
 
-            }
-            StateHasChanged();
-        });
-        await GetClientsManagers();
     }
+    protected async Task CreateSupplierOrder()
+    {
+        if (order?.product_To_Orders?.Where(p => p.is_add_to_supplier_order == true).FirstOrDefault() != null)
+        {
+            Guid guid = Guid.NewGuid();
+            order_translation.orders_data.Add(guid, order);
+            NavigationManager.NavigateTo($"/supplierorder/add/{guid.ToString()}");
+        }
+    }
+
     protected async Task GetClientsManagers()
     {
         if (clientId != 0)
@@ -503,18 +543,17 @@
             client = await Http.GetFromJsonAsync<client>($"api/Client/{clientId}");
             if (orderId == 0)
             {
-                order.user_id = client.user_id;
+                order!.user_id = client!.user_id;
             }
         }
 
         managers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
         if (orderId == 0 && clientId == 0)
         {
-            order.user_id = managers[0].id;
+            order!.user_id = managers![0].id;
         }
 
         delivery_Types = await Http.GetFromJsonAsync<List<delivery_type>>("api/DeliveryType");
-        pay_Statuses = await Http.GetFromJsonAsync<List<pay_status>>("api/PayStatus");
         delivery_Period_Types = await Http.GetFromJsonAsync<List<delivery_period_type>>("api/DeliveryPeriodType");
     }
     protected override async Task OnParametersSetAsync()
@@ -527,7 +566,7 @@
         }
         else
         {
-            SetMainContact();
+            await SetMainContact();
         }
     }
 
@@ -554,18 +593,31 @@
     }
 
     //Методы сохранения заказа
-    public async Task Bill()
+    protected async Task Bill()
     {
-        order.order_status_id = 3; //Потом поменять на 2
+        order.stage_id = 2;
         if (order.id != 0)
         {
-            await Http.PutAsJsonAsync("api/Order/bill", order);
+            if (order.order_status_id == 4)
+                order.order_status_id = 3;
+            await Http.PutAsJsonAsync("api/Order", order);
+            await CreateOrderHistory("Заказ переведен на стадию снабжения");
+            if (order.supplier_manager_id != null)
+                await SendUserNotification($"Заказ {order.id} переведен на стадию снабжения", order.supplier_manager_id);
         }
-        Cancel();
+    }
+    protected async Task OrderCancellation()
+    {   
+        order.order_status_id = 7;
+        await Http.PutAsJsonAsync("api/Order", order);
+    }
+    protected async Task OrderPayReturn()
+    {
+        order.order_status_id = 8;
+        await Http.PutAsJsonAsync("api/Order", order);
     }
     protected async Task SaveOrder()
     {
-
         if (order?.id != 0)
         {
             await Http.PutAsJsonAsync("api/Order", order);
@@ -574,8 +626,12 @@
         {
             order.order_status_id = 1;
             order.client_id = clientId;
+            order.order_date = DateTime.Now;
+            order.stage_id = 1;
+
             var response = await Http.PostAsJsonAsync("api/Order", order);
             orderId = await response.Content.ReadFromJsonAsync<int>();
+            await CreateOrderHistory("Заказ клинта сформирован");
 
         }
 
@@ -593,24 +649,20 @@
             }
             await Http.PutAsJsonAsync("api/ProductToOrder/update_products_to_order", order.product_To_Orders.Where(p => p.id != 0));
         }
-
-        //Изменение данных клиентов
-        if (clientChange)
-        {
-            //Добавить создание нового клиента
-
-            //await Http.PutAsJsonAsync("api/Client", client);
-            //await Http.PutAsJsonAsync("api/Contact", order.main_contact);
-
-        }
-        Cancel();
     }
     public void Cancel()
     {
         NavigationManager.NavigateTo("/fetchorderdetails");
     }
 
-
+    protected async Task CreateOrderHistory(string text)
+    {
+        order_history order_history = new order_history();
+        order_history.date = DateTime.Now;
+        order_history.text = text;
+        order_history.order_id = orderId;
+        await Http.PostAsJsonAsync("api/OrderHistory", order_history);
+    }
 
     //Методы для работы с товарами в заказе
     protected void CloseAddProductModal()
@@ -626,6 +678,7 @@
             product_To_Order.order_ruble_discount = order._ruble_discount;
         if (order.ruble_discount != null)
             product_To_Order.order_percent_discount = order._percent_discount;
+        product_To_Order.delivery_period_type_id = 1;
 
         order.product_To_Orders.Add(product_To_Order);
         int? last_position = order.product_To_Orders.OrderByDescending(p => p.product_postition)?.FirstOrDefault()?.product_postition;
@@ -645,6 +698,15 @@
         }
     }
 
+    protected async Task SendUserNotification(string text, int? user_id)
+    {
+        user_notifications user_notifications = new user_notifications();
+        user_notifications.text = text;
+        user_notifications.date = DateTime.Now;
+        user_notifications.user_id = user_id;
+        await Http.PostAsJsonAsync<user_notifications>("api/usernotifications", user_notifications);
+    }
+
     //Методы для доставки
     protected void ChangeDeliveryType(ChangeEventArgs e)
     {
@@ -654,21 +716,10 @@
         order.delivery.delivery_type_id = delivery_type.id;
     }
 
-    //Методы для работы с оплатой заказа
-    protected void ChangePayStatus(ChangeEventArgs e, order_pay order_Pay)
-    {
-        int pay_status = Convert.ToInt32(e.Value);
-        if (pay_status == 2)
-            order._price_summ -= order_Pay.price;
-
-
-        order_Pay.pay_status_id = pay_status;
-    }
     protected void AddNewOrderPay()
     {
         order_pay order_Pay = new order_pay();
         order_Pay.price = order._price_summ;
-        order_Pay.pay_status_id = 1;
         order.order_Pays.Add(order_Pay);
     }
     protected void RemoveOrderPay(order_pay order_Pay)

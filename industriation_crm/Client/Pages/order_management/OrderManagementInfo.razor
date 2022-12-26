@@ -1,0 +1,204 @@
+﻿@inject HttpClient Http
+
+Управление заказом @order.id
+<br />
+<button type="button" @onclick="()=>viewOrderData=false">Задачи заказа</button>
+<button type="button" @onclick="()=>viewOrderData=true">Данные заказа</button>
+<br />
+Этап заказа: @order?.stage?.name
+<br />
+@if (viewOrderData)
+{
+    <div class="section-field">
+        <table class="order-table ind-col-lg-10">
+            <thead class="table-success ind-col-lg-10">
+                <tr class="order-row ind-col-lg-10">
+                    <td class="ind-col-lg-1">ID продукта</td>
+                    <td class="ind-col-lg-2">Наименование</td>
+                    <td class="ind-col-lg-2">Срок доставки</td>
+                    <td class="ind-col-lg-1">Цена</td>
+                    <td class="ind-col-lg-1">Количество</td>
+                    <td class="ind-col-lg-1">Скидка</td>
+                    <td class="ind-col-lg-1">Стоимость</td>
+                    <td class="ind-col-lg-1"><input type="checkbox" @onchange="(e)=>checkAllProducts(e)"></input></td>
+
+                </tr>
+            </thead>
+            <tbody class="ind-col-lg-10">
+                @if (order != null && order.product_To_Orders != null)
+                {
+                    @foreach (var p in order!.product_To_Orders.OrderBy(p => p.product_postition))
+                    {
+                        <tr class="order-row">
+                            <td class="ind-col-lg-1" id="model">
+                                @p?.product?.id
+                            </td>
+                            <td class="ind-col-lg-2">
+                                <a href="" class="table-link">
+                                    @p?.product?.name
+
+                                    <div class="table-link-modal">
+                                        <div class="ind-col-lg-2">
+                                            <img src='@("https://industriation.ru/image/"+p.product.image)' alt="" class="table-modal-img">
+                                        </div>
+                                        <div class="ind-col-lg-8">
+                                            <div class="table-modal-title">
+                                                @p?.product?.name
+                                            </div>
+                                            <div class="table-modal-price">
+                                                @p._product_price
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </td>
+                            <td class="ind-col-lg-2">
+                                @if (p.delivery_period != null)
+                                {
+                                    <div>
+                                        @p.delivery_period
+                                        @switch (p.delivery_period_type_id)
+                                        {
+                                            case 1:
+                                                <div> дней</div>
+                                                break;
+                                            case 2:
+                                                <div> недели</div>
+                                                break;
+                                            case 3:
+                                                <div> месяца</div>
+                                                break;
+                                        }
+                                    </div>
+                                }
+                            </td>
+                            <td class="ind-col-lg-1">
+                                @p._product_price_with_discount
+                            </td>
+
+                            <td class="ind-col-lg-1">@p._count</td>
+                            <td class="ind-col-lg-1">@p?._discount_total_price</td>
+                            <td class="ind-col-lg-1">
+                                @p?._total_price
+                            </td>
+                            <td class="ind-col-lg-1">
+                                @if (p.supplier_order_id == null)
+                                {
+                                    <input type="checkbox" @bind="p.is_add_to_supplier_order">
+                                }
+                                else
+                                {
+                                    <div>Заказ поставщика №@p.supplier_order_id</div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div>
+        История заказа:
+        <br>
+        @foreach (var h in order.order_Histories)
+        {
+            <div>@h.date</div>
+            <div>@h.text</div>
+            <br>
+        }
+    </div>
+    <div>
+        Заметки:
+        <textarea @bind="order.notes"></textarea>
+        <br />
+        <button @onclick="openCreatetaskModal" type="button">Создать задачу</button>
+        <br />
+        @if (viewCreateTask)
+        {
+            <div class="modal" tabindex="-1" style="display:block" role="dialog">
+                <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                    <div class="modal-content b-s">
+                        <div class="modal-body">
+                            Исполнитель:
+                            <select @bind="newTask.executor_id">
+                                @foreach (var e in executors)
+                                {
+                                    <option value="@e.id">@e.name</option>
+                                }
+                            </select>
+                            <br>
+                            Задача:
+                            <textarea @bind="newTask.text"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="()=>viewCreateTask = false">Закрыть</button>
+                            <button type="button" class="btn btn-primary" @onclick="createTask">Создать</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div>
+        <div>
+            <b>Актуальные задачи:</b>
+            @foreach (var task in order.tasks.Where(t => t.complete == 0))
+            {
+                <div>От кого: @task.creator.name</div>
+                <div>Исполнитель: @task.executor.name</div>
+                <div>Задача: @task.text</div>
+                <button @onclick="()=>task.complete=1">Выполнить</button>
+            }
+        </div>
+        <br>
+        <div>
+            <b>Завершенные задачи:</b>
+            @foreach (var task in order.tasks.Where(t => t.complete == 1))
+            {
+                <div>От кого: @task.creator.name</div>
+                <div>Исполнитель: @task.executor.name</div>
+                <div>Задача: @task.text</div>
+            }
+        </div>
+    </div>
+
+}
+@code {
+    [Parameter]
+    public int? orderId { get; set; }
+    [Parameter]
+    public order? order { get; set; }
+    protected bool viewOrderData = false;
+    protected bool viewCreateTask = false;
+
+    protected task newTask { get; set; }
+    protected List<user> executors = new();
+    protected override async Task OnInitializedAsync()
+    {
+        if(orderId != null)
+            order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
+        executors.Add(order?.user!);
+    }
+    protected async Task checkAllProducts(ChangeEventArgs e)
+    {
+        order.product_To_Orders?.Where(p => p.supplier_order_id == null).ToList().ForEach(p => p.is_add_to_supplier_order = Convert.ToBoolean(e.Value));
+    }
+    protected void openCreatetaskModal()
+    {
+        newTask = new();
+        newTask.executor_id = order.user_id;
+        viewCreateTask = true;
+    }
+    protected void createTask()
+    {
+        newTask.complete = 0;
+        newTask.creator_id = order.user_id;
+        newTask.order_id = order.id;
+        newTask.executor = executors.Where(e => e.id == newTask.executor_id).First();
+        newTask.creator = order.user;
+        order.tasks.Add(newTask);
+    }
+}

@@ -5,6 +5,12 @@
 
 <AuthorizeView>
     <Authorized>
+        
+        <button @onclick="()=>viewNotifications=true" class="oi oi-bell"></button>
+        @if (viewNotifications)
+        {
+            <industriation_crm.Client.Pages.UserNotifications.UserNotifications CloseModal="CloseModal"></industriation_crm.Client.Pages.UserNotifications.UserNotifications>
+        }
         <a href="" class="auth-link">@context.User.Identity?.Name</a>
         <button type="button" @onclick="Logout" class="nav-link btn btn-link">Выйти</button>
     </Authorized>
@@ -14,6 +20,22 @@
 </AuthorizeView>
 
 @code {
+    protected bool viewNotifications = false;
+    protected void CloseModal()
+    {
+        viewNotifications = false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        //HubConnection.On<string>("UpdateStatus", async status =>
+        //{
+        //    if (orderId != 0)
+        //    {
+        //        order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
+        //    }
+        //    StateHasChanged();
+        //});
+    }
     private async Task Logout()
     {
         var response = await Http.GetAsync("api/Auth");

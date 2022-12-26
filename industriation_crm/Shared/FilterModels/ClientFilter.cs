@@ -13,6 +13,7 @@ namespace industriation_crm.Shared.FilterModels
         public string? inn { get; set; } = "";
         public int current_page { get; set; }
         public int client_on_page { get; set; }
+        public int role { get; set; }
     }
     public class ClientReturnData
     {

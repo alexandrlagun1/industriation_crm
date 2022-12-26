@@ -1,8 +1,11 @@
 ﻿@page "/fetchclientdetails"
 @using Newtonsoft.Json
+@using System.Security.Claims
 @using industriation_crm.Shared.FilterModels
 @using industriation_crm.Shared.Models
 @inject HttpClient Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
 <div class="main-title">Клиенты</div>
@@ -13,85 +16,103 @@
 }
 else
 {
-    <div class="section-field">
-        <a class="score" type="button" href='/Client/add' role="button">
-            Добавить клиента
-        </a>
-    </div>
-    <div class="main-section">
-        <div>
-            ФИО клиента:
-            <input @bind="clientFilter.client"></input>
-        </div>
-        <br>
-        <div>
-            ИНН:
-            <input type="number" @bind="clientFilter.inn"></input>
-        </div>
-        <br>
-        <button @onclick="Search">Поиск</button>
-
+    @if (viewAddClient)
+    {
+        <AddClient returnToFetchUsers="ReturnToFetchClient"></AddClient>
+    }
+    else
+    {
         <div class="section-field">
-            <table class="order-table ind-col-lg-10">
-                <thead class="ind-col-lg-10">
-                    <tr class="order-row ind-col-lg-10">
-                        <td class="ind-col-lg-1">ID</td>
-                        <td class="ind-col-lg-3">ФИО</td>
-                        <td class="ind-col-lg-2">Тип клиента</td>
-                        <td class="ind-col-lg-2">Закрепленный менеджер</td>
-                        <td class="ind-col-lg-2">Действия</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var _client in clientList)
-                    {
-                        <tr class="order-row ind-col-lg-10">
-                            <td class="ind-col-lg-1">@_client.id</td>
-                            <td class="ind-col-lg-3">@_client.main_contact?.full_name</td>
-                            <td class="ind-col-lg-2">
-                                @if (_client.client_type == 0)
-                                {
-                                    <i>Физическое лицо</i>
-                                }
-                                else if (_client.client_type == 1)
-                                {
-                                    <i>Юридическое лицо</i>
-                                }
-                            </td>
-                            <td class="ind-col-lg-2">@_client.user?.name</td>
-                            <td class="ind-col-lg-2">
-                                <div class="ind-col-lg-5">
-                                    <a class="score" type="button" href='/client/edit/@_client.id'>
-                                        Изменить
-                                    </a>
-                                </div>
-                                <div class="ind-col-lg-5">
-                                    <button type="button" class="close" role="button" @onclick="()=>RemoveClient(_client)">
-                                        Удалить
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
+            <a class="score" type="button" @onclick="()=>viewAddClient=true">
+                Добавить клиента
+            </a>
+        </div>
+        <div class="main-section">
+            <div>
+                ФИО клиента:
+                <input @bind="clientFilter.client"></input>
+            </div>
+            <br>
+            <div>
+                ИНН:
+                <input type="number" @bind="clientFilter.inn"></input>
+            </div>
+            <br>
+            <button @onclick="Search">Поиск</button>
 
-            </table>
-        </div>
-        <div class="section-field filter-pagination mt-20">
-            <div>
-                Страница:
-                <input class="pagination-input" type="number" min="1" @bind="current_page" @bind:event="oninput" @onkeydown="OnKeyDown">
-                из @page_count.Count()
-                <button class="score" @onclick="GetClient">Перейти</button>
+            <div class="section-field">
+                <table class="order-table ind-col-lg-10">
+                    <thead class="ind-col-lg-10">
+                        <tr class="order-row ind-col-lg-10">
+                            <td class="ind-col-lg-1">ID</td>
+                            <td class="ind-col-lg-3">ФИО</td>
+                            <td class="ind-col-lg-2">Тип клиента</td>
+                            <td class="ind-col-lg-2">Закрепленный менеджер</td>
+                            <td class="ind-col-lg-2">Действия</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var _client in clientList)
+                        {
+                            <tr class="order-row ind-col-lg-10">
+                                <td class="ind-col-lg-1">@_client.id</td>
+                                <td class="ind-col-lg-3">@_client.contacts.Where(c=>c.main_contact==1).FirstOrDefault()?.full_name</td>
+                                <td class="ind-col-lg-2">
+                                    @if (_client.client_type == 0)
+                                    {
+                                        <i>Физическое лицо</i>
+                                    }
+                                    else if (_client.client_type == 1)
+                                    {
+                                        <i>Юридическое лицо</i>
+                                    }
+                                </td>
+                                <td class="ind-col-lg-2">@_client.user?.name</td>
+                                <td class="ind-col-lg-2">
+                                    @if (SelectOrderClient == null)
+                                    {
+                                        <div class="ind-col-lg-10">
+                                            <a class="score" type="button" href='/client/edit/@_client.id'>
+                                                Изменить
+                                            </a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="ind-col-lg-10">
+                                            <button class="score" type="button" @onclick="()=>SelectOrderClient(_client)">
+                                                Выбрать
+                                            </button>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
             </div>
-            <div>
-                <button class="score" @onclick="PagPrev">Предыдущая</button>
-                <button class="score" @onclick="PagNext">Следующая</button>
+            <div class="section-field filter-pagination mt-20">
+                <div>
+                    Страница:
+                    <input class="pagination-input" type="number" min="1" @bind="current_page" @bind:event="oninput" @onkeydown="OnKeyDown">
+                    из @page_count.Count()
+                    <button class="score" @onclick="GetClient">Перейти</button>
+                </div>
+                <div>
+                    <button class="score" @onclick="PagPrev">Предыдущая</button>
+                    <button class="score" @onclick="PagNext">Следующая</button>
+                </div>
             </div>
         </div>
-    </div>
+    }
+
 }
 @code {
+    [Parameter]
+    public Action<client> SelectOrderClient { get; set; }
+
+    protected bool viewAddClient = false;
     protected int count_on_page = 3;
     protected int current_page = 1;
     List<int> page_count = new List<int>();
@@ -99,8 +120,11 @@ else
     protected ClientReturnData clientReturnData = new();
 
     protected List<client> clientList = new();
+    protected int role { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        role = Convert.ToInt32(authState.User.FindFirst(ClaimTypes.Role).Value);
         await GetClient();
     }
     protected async Task Search()
@@ -138,6 +162,7 @@ else
         if (page_count.Count != 0 && (current_page < 1 || current_page > page_count.Count))
             return;
         clientFilter.client_on_page = count_on_page;
+        clientFilter.role = role;
 
         var response = await Http.PostAsJsonAsync("api/Client/GetClients", clientFilter);
         string responseBody = await response.Content.ReadAsStringAsync();
@@ -149,16 +174,19 @@ else
         for (int i = 1; i <= total_page; i++)
             page_count.Add(i);
 
-        foreach(var c in clientList)
-        {
-            var main_contact = c.contacts.Where(c => c.main_contact == 1).FirstOrDefault();
-            if (main_contact != null)
-                c.main_contact = main_contact;
-        }
+
     }
     protected async Task RemoveClient(client client)
     {
         await Http.DeleteAsync("api/Client/" + client.id);
         clientList.Remove(client);
+    }
+    protected async void ReturnToFetchClient(client client)
+    {
+        viewAddClient = false;
+        if (client != null)
+            await GetClient();
+        StateHasChanged();
+
     }
 }

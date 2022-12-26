@@ -3,82 +3,90 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
-<h1>Добавить продукт</h1>
+<AuthorizeView Roles="6">
+<div class="modal" tabindex="-1" style="display:block" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content b-s">
+            <div class="modal-header">
+                <div class="container">
+                    <div class="row-f ind-col-lg-10">
+                        <div class="main-title ind-col-lg-3">Добавление товаров</div>
+                        <div class="ind-col-lg-7 row-f">
+                            <div class="ind-col-lg-1 a-i-c">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="CloseModal"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
 
-<br />
-@if (orderToProductList == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    @foreach (int id in orderToProductList.GroupBy(o => o.order_id).OrderBy(o=>o.Key).Select(o => o.Key))
-    {
-        <label for="Name" class="form-label">Заказ №@id</label>
-        <table class="table table-striped align-middle table-bordered">
-            <thead class="table-success">
-                <tr>
-                    <th>ID продукта</th>
-                    <th>Наименование</th>
-                    <th>Колличество</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var p in orderToProductList.Where(o => o.order_id == id))
+
+                @foreach (int id in noSupleirOrderProducts!.GroupBy(o => o!.order_id).OrderBy(o => o!.Key).Select(o => o!.Key))
                 {
-                    <tr>
-                        <td>@p.product.id</td>
-                        <td>@p.product.name</td>
-                        <td>@p.count</td>
-                        <td>
-                            <button class="btn btn-primary" @onclick="()=>AddProduct(p.id)">
-                                Добавить
-                            </button>
-                        </td>
-                    </tr>
+                    <label class="form-label">Заказ №@id</label>
+                    <div class="section-field">
+                        <table class="order-table ind-col-lg-10">
+                            <thead class="ind-col-lg-10">
+                                <tr class="order-row ind-col-lg-10">
+                                    <td class="ind-col-lg-2">Артикул</td>
+                                    <td class="ind-col-lg-5">Наименование</td>
+                                    <td class="ind-col-lg-1">Колличество</td>
+                                    <td class="ind-col-lg-2"></td>
+                                </tr>
+                            </thead>
+                            <tbody class="ind-col-lg-10">
+                                @foreach (var p in noSupleirOrderProducts.Where(o => o.order_id == id))
+                                {
+                                    if (productsInSuplierOrder.Where(pr => pr.id == p.id).FirstOrDefault() == null || p.id_delete_from_supplier_order == true)
+                                    {
+                                        <tr class="order-row">
+                                            <td class="ind-col-lg-2">@p.product.id</td>
+                                            <td class="ind-col-lg-5">@p.product.name</td>
+                                            <td class="ind-col-lg-1">@p.count</td>
+                                            <td class="ind-col-lg-2">
+                                                <button class="add-item" @onclick="()=>AddProduct(p)">
+                                                    Добавить
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 }
-            </tbody>
-        </table>
-    }
-    <div class="form-group">
-        <button type="button" class="btn btn-primary" @onclick="Save">Сохранить</button>
-        <button class="btn btn-light" @onclick="Cancel">Закрыть</button>
+            </div>
+        </div>
     </div>
-}
+</div>
+</AuthorizeView>
 @code {
     [Parameter]
     public int supplierOrderId { get; set; }
+    [Parameter]
+    public Action CloseModal { get; set; }
+    [Parameter]
+    public List<product_to_order>? productsInSuplierOrder { get; set; }
 
-    protected List<product_to_order> orderToProductList = new();
-    protected List<product_to_order> addOrderToProductList = new();
+    protected List<product_to_order>? noSupleirOrderProducts { get; set; } = new();
 
-    
+
 
     protected override async Task OnInitializedAsync()
     {
-        await GetProducts();
+        noSupleirOrderProducts = await Http.GetFromJsonAsync<List<product_to_order>>("api/ProductsToSupplierOrder");
     }
-    protected async Task GetProducts()
+    protected override async Task OnParametersSetAsync()
     {
-        orderToProductList = await Http.GetFromJsonAsync<List<product_to_order>>("api/AddProductOfOrderToSupplierOrder");
+        noSupleirOrderProducts!.AddRange(productsInSuplierOrder!.Where(p => p.id_delete_from_supplier_order == true).ToList());
+
     }
-    protected async Task AddProduct(int id)
+    protected async Task AddProduct(product_to_order product_To_Order)
     {
-        product_to_order product_To_Order = orderToProductList.Where(o => o.id == id).FirstOrDefault();
-        orderToProductList.Remove(product_To_Order);
-        addOrderToProductList.Add(product_To_Order);
-    }
-    protected async Task Save()
-    {
-        foreach(var p in addOrderToProductList)
-        {
-            p.supplier_order_id = supplierOrderId;
-        }
-        await Http.PutAsJsonAsync("api/AddProductOfOrderToSupplierOrder", addOrderToProductList);
-        Cancel();
-    }
-    public void Cancel()
-    {
-        NavigationManager.NavigateTo("/supplierorder/edit/"+supplierOrderId);
+        if (product_To_Order.supplier_order_id != 0 && product_To_Order.supplier_order_id != null)
+            product_To_Order.id_delete_from_supplier_order = false;
+        else
+            productsInSuplierOrder!.Add(product_To_Order);
     }
 }

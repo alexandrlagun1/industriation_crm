@@ -7,20 +7,19 @@ using System.Threading.Tasks;
 
 namespace industriation_crm.Shared.FilterModels
 {
-    public class OrdersFilter
+    public class SupplierOrderReturnData
     {
-        public List<user?>? managers { get; set; } = new();
-        public string? client { get; set; } = "";
+        public List<supplier_order> supplier_orders { get; set; } = new();
+        public int count { get; set; }
+    }
+    public class SupplierOrderFilter
+    {
+        public string? supplier { get; set; } = "";
+        public string? status = "";
         public DateTime? order_date_from { get; set; }
         public DateTime? order_date_to { get; set; }
         public int order_on_page { get; set; }
         public int current_page { get; set; }
-        public int? order_id { get; set; }
-        public int stage { get; set; }
-    }
-    public class OrdersReturnData
-    {
-        public int count { get; set; }
-        public List<order> orders { get; set; } = new();
+        public int? supplier_order_id { get; set; }
     }
 }

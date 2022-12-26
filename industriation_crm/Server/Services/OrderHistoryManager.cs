@@ -5,24 +5,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace industriation_crm.Server.Services
 {
-    public class PayStatusManager : IPayStatus
+    public class OrderHistoryManager : IOrderHistory
     {
         readonly DatabaseContext _dbContext = new();
-        public PayStatusManager(DatabaseContext dbContext)
+        public OrderHistoryManager(DatabaseContext dbContext)
         {
             _dbContext = dbContext;
         }
-        public List<pay_status> GetPayStatusDetails()
+        public void AddOrderHistory(order_history order_history)
         {
             try
             {
-                return _dbContext.pay_status.ToList();
+                _dbContext.order_history.Add(order_history);
+                _dbContext.SaveChanges();
             }
             catch
             {
                 throw;
             }
         }
-
     }
 }

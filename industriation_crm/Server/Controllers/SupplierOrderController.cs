@@ -1,4 +1,5 @@
 ﻿using industriation_crm.Server.Interfaces;
+using industriation_crm.Shared.FilterModels;
 using industriation_crm.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,7 @@ namespace industriation_crm.Server.Controllers
         {
             _ISupplierOrder = ISupplierOrder;
         }
-        [HttpGet]
-        public async Task<List<supplier_order>> Get()
-        {
-            return await Task.FromResult(_ISupplierOrder.GetSupplierOrderDetails());
-        }
+
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
@@ -45,6 +42,11 @@ namespace industriation_crm.Server.Controllers
         public void Post(supplier_order supplier_order)
         {
             _ISupplierOrder.AddSupplierOrder(supplier_order);
+        }
+        [HttpPost("GetSupplierOrders")]
+        public async Task<SupplierOrderReturnData> GetSupplierOrders([FromBody] SupplierOrderFilter ordersFilter)
+        {
+            return await Task.FromResult(_ISupplierOrder.GetSupplierOrderDetails(ordersFilter));
         }
     }
 }

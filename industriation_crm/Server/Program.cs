@@ -32,11 +32,12 @@ builder.Services.AddScoped<IRoles, RolesManager>();
 builder.Services.AddScoped<IProduct, ProductManager>();
 builder.Services.AddScoped<IOrder, OrderManager>();
 builder.Services.AddScoped<IProductToOrder, ProductToOrderManager>();
-builder.Services.AddScoped<ISupplier, SupplierManager>();
 builder.Services.AddScoped<ISupplierOrder, SupplierOrderManager>();
 builder.Services.AddScoped<IDeliveryType, DeliveryTypeManager>();
-builder.Services.AddScoped<IPayStatus, PayStatusManager>();
 builder.Services.AddScoped<IDeliveryPeriodType, DeliveryPeriodTypeManager>();
+builder.Services.AddScoped<IOrderHistory, OrderHistoryManager>();
+builder.Services.AddScoped<IUserNotifications, UserNotificationsManager>();
+builder.Services.AddScoped<ITask, TaskManager>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);

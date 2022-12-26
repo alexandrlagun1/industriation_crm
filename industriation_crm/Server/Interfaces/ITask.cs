@@ -2,8 +2,8 @@
 
 namespace industriation_crm.Server.Interfaces
 {
-    public interface IPayStatus
+    public interface ITask
     {
-        public List<pay_status> GetPayStatusDetails();
+        public List<task> GetUserTasks(int user_id);
     }
 }

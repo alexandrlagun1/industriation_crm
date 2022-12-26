@@ -1,7 +1,8 @@
 ﻿@inherits LayoutComponentBase
-
+@using industriation_crm.Client.Pages.Auth
 <link rel="stylesheet" href="bootstrap 2.0.css" />
-
+<AuthorizeView>
+    <Authorized>
 <header>
     <div class="row-f ind-col-lg-10">
         <div class="header-image ind-col-lg-1-5">
@@ -16,14 +17,28 @@
 </header>
 <div class="g-container-w">
     <div class="row-f ind-col-lg-10 fullpage-height">
-        <div class="leftside-bar ind-col-lg-1-5">
-            <NavMenu />
-        </div>
+        
+            
+                <div class="leftside-bar ind-col-lg-1-5">
+                    <NavMenu />
+                </div>
 
-        <main class="ind-col-lg-8-5">
-            <div class="main-block ind-col-lg-10">
-                @Body
-            </div>
-        </main>
+                <main class="ind-col-lg-8-5">
+                    <div class="main-block ind-col-lg-10">
+                        @Body
+                    </div>
+                </main>
+            
+            
+        
     </div>
 </div>
+    </Authorized>
+    <NotAuthorized>
+        <Login></Login>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    [Inject]
+    AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+}

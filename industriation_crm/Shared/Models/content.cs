@@ -16,6 +16,44 @@ namespace industriation_crm.Shared.Models
         public virtual roles? roles { get; set; }
         public virtual List<client>? clients { get; set; }
     }
+    public class user_notifications
+    {
+        [Key]
+        public int id { get; set; }
+        public DateTime? date { get; set; }
+        public int? user_id { get; set; }
+        public string? text { get; set; }
+    }
+    public class task
+    {
+        [Key]
+        public int id { get; set; }
+        public string text { get; set; }
+        public int complete { get; set; }
+        public int? creator_id { get; set; }
+        public int? executor_id { get; set; }
+        public DateTime? date { get; set; } = DateTime.Now;
+        public int order_id { get; set; }
+        [ForeignKey("creator_id")]
+        public user? creator { get; set; }
+        [ForeignKey("executor_id")]
+        public user? executor { get; set; }
+    }
+    public class stage
+    {
+        [Key]
+        public int id { get; set; }
+        public string name { get; set; }
+    }
+    public class order_history
+    {
+        [Key]
+        public int id { get; set; }
+        public string text { get; set; }
+        public DateTime date { get; set; }
+        public int order_id { get; set; }
+
+    }
     public class roles
     {
         [Key]
@@ -41,13 +79,13 @@ namespace industriation_crm.Shared.Models
     }
     public class client
     {
-
         [Key]
         public int id { get; set; }
         public int? client_type { get; set; }
         public int? user_id { get; set; }
         public string? org_name { get; set; }
         public string? org_address { get; set; }
+        public int is_supplier { get; set; }
         public long? org_inn { get; set; }
         public long? org_kpp { get; set; }
         public long? org_ogrn { get; set; }
@@ -55,6 +93,7 @@ namespace industriation_crm.Shared.Models
         public long? bank_cor_schet { get; set; }
         public long? bank_ras_schet { get; set; }
         public string? bank_name { get; set; }
+        public DateTime? add_date { get; set; } = DateTime.Now;
 
         [ForeignKey("client_id")]
         public List<contact>? contacts { get; set; }
@@ -64,9 +103,6 @@ namespace industriation_crm.Shared.Models
 
         public List<order>? orders { get; set; }
 
-        [NotMapped]
-        public contact? main_contact { get; set; } = new();
-
     }
     public class category
     {
@@ -75,13 +111,19 @@ namespace industriation_crm.Shared.Models
         public string? name { get; set; }
         public int parent_id { get; set; }
     }
+    public class pay_status
+    {
+        [Key]
+        public int id { get; set; }
+        public string? name { get; set; }
+    }
     public class product
     {
         [Key]
         public int id { get; set; }
         public string? name { get; set; }
         public double? price { get; set; }
-        public int? category_id { get; set; } 
+        public int? category_id { get; set; }
         public int? external_id { get; set; }
         public string? image { get; set; }
         public string? article { get; set; }
@@ -99,7 +141,22 @@ namespace industriation_crm.Shared.Models
         public int? percent_discount { get; set; }
         public double? ruble_discount { get; set; }
         public double? price_summ { get; set; }
-        public DateTime? order_date { get; set; }
+        public DateTime? order_date { get; set; } = DateTime.Now;
+        public string? notes { get; set; }
+        public int? stage_id { get; set; }
+        public int? pay_status_id { get; set; }
+        public int? supplier_manager_id { get; set; }
+        [ForeignKey("supplier_manager_id")]
+        public user? supplier_manager { get; set; }
+
+        [ForeignKey("pay_status_id")]
+        public pay_status? pay_status { get; set; }
+        [ForeignKey("stage_id")]
+        public stage? stage { get; set; }
+        [ForeignKey("order_id")]
+        public List<order_history> order_Histories { get; set; } = new();
+        [ForeignKey("order_id")]
+        public List<task> tasks { get; set; } = new();
 
         [NotMapped]
         public int? _percent_discount
@@ -177,12 +234,15 @@ namespace industriation_crm.Shared.Models
         {
             get
             {
-                return product_To_Orders?.Select(p => p._total_price).Sum();
+                if (product_To_Orders == null)
+                    return null;
+                else
+                    return product_To_Orders?.Select(p => p._total_price).Sum();
             }
         }
         public double? current_pay_summ { get; set; }
 
-        
+
         [NotMapped]
         public double? _current_pay_summ
         {
@@ -190,7 +250,7 @@ namespace industriation_crm.Shared.Models
             {
                 if (order_Pays != null && order_Pays.Count != 0)
                 {
-                    current_pay_summ = order_Pays.Where(o => o.pay_status_id == 2 && o.isRemove == false).Select(o => o.price).Sum();
+                    current_pay_summ = order_Pays.Where(o => o.isRemove == false).Select(o => o.price).Sum();
                     return current_pay_summ;
                 }
                 current_pay_summ = 0;
@@ -223,25 +283,26 @@ namespace industriation_crm.Shared.Models
     }
     public class product_to_order
     {
+        [NotMapped]
+        public bool id_delete_from_supplier_order { get; set; }
+        [NotMapped]
+        public bool is_add_to_supplier_order { get; set; }
+        [NotMapped]
+        public bool showPriceModal = false;
         [Key]
         public int id { get; set; }
         public int? count { get; set; }
-
-        [NotMapped]
-        public bool showPriceModal = false;
         public int? product_id { get; set; }
         public int? order_id { get; set; }
         public int? supplier_order_id { get; set; }
-
         public double? product_price { get; set; }
-
-        //public double? total_price { get; set; } = 0;
         public int? product_postition { get; set; } = 0;
         public int? delivery_period { get; set; }
         public int? delivery_period_type_id { get; set; }
         public double? ruble_discount { get; set; }
-        public int percent_discount { get; set; }
-
+        public int? percent_discount { get; set; }
+        public int? supplier_delivery_period { get; set; }
+        public double? supplier_price { get; set; }
         [ForeignKey("product_id")]
         public product? product { get; set; }
 
@@ -296,7 +357,7 @@ namespace industriation_crm.Shared.Models
 
         private double? _order_percent_discount;
         [NotMapped]
-        public double? order_percent_discount 
+        public double? order_percent_discount
         {
             get
             {
@@ -319,7 +380,7 @@ namespace industriation_crm.Shared.Models
         {
             get
             {
-                double result = Math.Round(Convert.ToDouble(order_ruble_discount + (total_price / 100 * order_percent_discount)),2);
+                double result = Math.Round(Convert.ToDouble(order_ruble_discount + (total_price / 100 * order_percent_discount)), 2);
                 return result;
             }
         }
@@ -334,7 +395,7 @@ namespace industriation_crm.Shared.Models
                 if (percent_discount == null)
                     percent_discount = 0;
                 double result = Convert.ToDouble(product_price - (product_price / 100 * percent_discount) - ruble_discount);
-                return Math.Round(result,2);
+                return Math.Round(result, 2);
             }
         }
 
@@ -370,27 +431,21 @@ namespace industriation_crm.Shared.Models
         }
 
     }
-    public class supplier
-    {
-        [Key]
-        public int id { get; set; }
-        public string? name { get; set; }
-        public List<supplier_order>? supplier_Orders { get; set; }
-    }
+
     public class supplier_order
     {
         [Key]
         public int id { get; set; }
         public int? supplier_id { get; set; }
         public int? user_id { get; set; }
-
-        [ForeignKey("supplier_id")]
-        public supplier? supplier { get; set; }
+        public DateTime? date { get; set; } = DateTime.Now;
 
         [ForeignKey("user_id")]
         public user? user { get; set; }
 
-        public List<product_to_order>? product_to_orders { get; set; }
+        [ForeignKey("supplier_id")]
+        public client? supplier { get; set; } = new();
+        public List<product_to_order>? product_to_orders { get; set; } = new();
     }
     public class delivery
     {
@@ -439,23 +494,13 @@ namespace industriation_crm.Shared.Models
         public int id { get; set; }
         public double? price { get; set; }
         public int? order_id { get; set; }
-        public int? pay_status_id { get; set; }
         public DateTime? date { get; set; }
-
-        [ForeignKey("pay_status_id")]
-        public pay_status? pay_Status { get; set; }
-
         [ForeignKey("order_id")]
         public order? order { get; set; }
         [NotMapped]
         public bool isRemove { get; set; }
     }
-    public class pay_status
-    {
-        [Key]
-        public int id { get; set; }
-        public string? name { get; set; }
-    }
+
     public class delivery_period_type
     {
         [Key]

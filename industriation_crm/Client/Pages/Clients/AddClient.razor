@@ -1,8 +1,11 @@
 ﻿@page "/client/add"
 @page "/client/edit/{clientId:int}"
+@using System.Security.Claims
 @using industriation_crm.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
 <Alert type="@allert_type" text="@allert_text" CloseAlert="()=>allert_type = null"></Alert>
@@ -12,29 +15,30 @@
     <DataAnnotationsValidator />
     <div class="main-title">@Title</div>
     <hr />
-
-    <div class="main-section">
-        <div class="main-section-label">Основные данные</div>
-        <div class="section-field">
-            <div class="ind-col-lg-5 input-field">
-                <div class="input-label">Закрепленный менеджер</div>
-                <InputSelect class="main-input" @bind-Value="client.user_id">
-                    @foreach (var m in managers)
-                    {
-                        <option value="@m.id">@m.name</option>
-                    }
-                </InputSelect>
-            </div>
-            <div class="ind-col-lg-5 input-field">
-                <div class="input-label">Тип клиента</div>
-                <InputSelect class="main-input" @bind-Value="client.client_type">
-                    <option value="0">Физическое лицо</option>
-                    <option value="1">Юридическое лицо</option>
-                </InputSelect>
+    @if (role == 1)
+    {
+        <div class="main-section">
+            <div class="main-section-label">Основные данные</div>
+            <div class="section-field">
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Закрепленный менеджер</div>
+                    <InputSelect class="main-input" @bind-Value="client.user_id">
+                        @foreach (var m in managers)
+                        {
+                            <option value="@m.id">@m.name</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Тип клиента</div>
+                    <InputSelect class="main-input" @bind-Value="client.client_type">
+                        <option value="0">Физическое лицо</option>
+                        <option value="1">Юридическое лицо</option>
+                    </InputSelect>
+                </div>
             </div>
         </div>
-    </div>
-
+    }
     <div class="main-section">
         <div class="main-section-label">Клиент</div>
         <div class="section-field">
@@ -141,7 +145,7 @@
                             </tr>
                         </thead>
                         <tbody class="ind-col-lg-10">
-                            @foreach (var c in contacts.Where(c=>c.is_active == 1))
+                            @foreach (var c in contacts.Where(c => c.is_active == 1))
                             {
                                 <tr class="order-row ind-col-lg-10">
                                     <td class="ind-col-lg-1">@c.id</td>
@@ -187,8 +191,11 @@
 </EditForm>
 @code {
     [Parameter]
+    public Action<client>? returnToFetchUsers { get; set; }
+    [Parameter]
     public int clientId { get; set; }
-    protected string Title = "Новый клиент";
+
+    protected string Title = "Новый контрагент";
     protected client? client = new();
 
     List<contact> contacts = new();
@@ -202,6 +209,7 @@
     protected contact main_contact = new();
     protected int? main_contact_id { get; set; }
 
+    protected int? role;
     //Методы для определения main contact
     protected void ChangeMainContact(contact _main_contact)
     {
@@ -223,12 +231,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        managers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
-        if (clientId == 0)
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        role = Convert.ToInt32(authState.User.FindFirst(ClaimTypes.Role).Value);
+        if (role == 1)
         {
-            client.user_id = managers[0].id;
-            client.client_type = 0;
+            managers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
+            if (clientId == 0)
+            {
+                client.user_id = managers[0].id;
+            }
         }
+        if (clientId == 0)
+            client.client_type = 1;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -243,9 +257,16 @@
                 main_contact_id = main_contact.id;
 
             if (client.client_type == 1)
-                Title = $"Клиент {client.org_name}";
+            {
+                if (role == 6)
+                    Title = $"Поставщик {client.org_name}";
+                else
+                    Title = $"Клиент {client.org_name}";
+            }
             else
+            {
                 Title = $"Клиент {client.contacts.Where(c => c.main_contact == 1).FirstOrDefault()?.full_name}";
+            }
         }
 
     }
@@ -258,6 +279,10 @@
         }
         else
         {
+            if (role == 6)
+                client.is_supplier = 1;
+            else
+                client.is_supplier = 0;
             var clientResponse = await Http.PostAsJsonAsync("api/Client", client);
             clientId = await clientResponse.Content.ReadFromJsonAsync<int>();
             client.id = clientId;
@@ -275,13 +300,7 @@
         }
 
     }
-    //protected async Task AddContact(contact _contact)
-    //{
-    //    _contact.client_id = clientId;
-    //    contacts.Add(_contact);
-    //    ChangeContacts.Add(_contact);
-    //    //await Http.PutAsJsonAsync("api/Contact/", contact);
-    //}
+
     protected async Task RemoveContact(contact _contact)
     {
         if (main_contact_id == _contact.id)
@@ -298,7 +317,15 @@
     }
     public void Cancel()
     {
-        NavigationManager.NavigateTo("/fetchclientdetails");
+        if (returnToFetchUsers != null)
+        {
+            if (client?.id != null)
+                returnToFetchUsers.Invoke(client);
+            else
+                returnToFetchUsers.Invoke(null);
+    }
+        else
+            NavigationManager.NavigateTo("/fetchclientdetails");
     }
 
     //Проверка дублей изменяемых контактов

@@ -5,7 +5,6 @@ using industriation_crm.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-
 namespace industriation_crm.Server.Controllers._1C
 {
     public class Pay
@@ -35,16 +34,15 @@ namespace industriation_crm.Server.Controllers._1C
                 return Ok(order);
             }
             return NotFound();
-            
+
         }
         [HttpPost]
-        public async void CreatePayment([FromBody]Pay pay)
+        public async void CreatePayment([FromBody] Pay pay)
         {
             order order = _IOrder.GetOrderData(Convert.ToInt32(pay.orderId));
             order_pay order_Pay = new order_pay();
-            order_Pay.price =Convert.ToDouble(pay.paySumm);
-            order_Pay.pay_status_id = 2;
-            order.order_Pays.Add(order_Pay);
+            order_Pay.price = Convert.ToDouble(pay.paySumm);
+            order.order_Pays?.Add(order_Pay);
             _IOrder.UpdateOrderDetails(order);
             await this.hubContext.Clients.All.UpdateStatus("1");
         }

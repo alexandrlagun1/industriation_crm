@@ -1,4 +1,5 @@
 ﻿using AutoMapper.Internal;
+using industriation_crm.Server.Controllers._1C;
 using industriation_crm.Server.Interfaces;
 using industriation_crm.Server.Models;
 using industriation_crm.Shared.FilterModels;
@@ -47,6 +48,17 @@ namespace industriation_crm.Server.Services
                 _dbContext.Entry(order).State = EntityState.Modified;
                 if (order.delivery_id != 0)
                     _dbContext.Entry(order.delivery!).State = EntityState.Modified;
+                foreach(var task in order.tasks)
+                {
+                    if(task.id != 0)
+                    _dbContext.Entry(task).State = EntityState.Modified;
+                    else
+                    {
+                        task.creator = null;
+                        task.executor = null;
+                        _dbContext.task.Add(task);
+                    }
+                }
                 foreach (var pay in order.order_Pays)
                 {
                     if (pay.id != 0)
@@ -75,7 +87,7 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                order? order = _dbContext.order.Include(o => o.order_Pays).ThenInclude(p => p.pay_Status).Include(o => o.delivery).ThenInclude(d => d.delivery_type).Include(o => o.user).Include(o => o.client).ThenInclude(c => c.contacts).ThenInclude(c => c.contact_phones).Include(o => o.order_status).Include(o => o.product_To_Orders).ThenInclude(o => o.product).Include(o => o.main_contact).FirstOrDefault(u => u.id == id);
+                order? order = _dbContext.order.Include(o=>o.tasks).Include(o => o.order_Pays).Include(o => o.delivery).ThenInclude(d => d.delivery_type).Include(o => o.user).Include(o => o.client).ThenInclude(c => c.contacts).ThenInclude(c => c.contact_phones).Include(o => o.order_status).Include(o => o.product_To_Orders).ThenInclude(o => o.product).Include(o => o.main_contact).Include(o=>o.order_Histories).Include(o => o.stage).FirstOrDefault(u => u.id == id);
                 order.product_To_Orders.ForEach((p) => { p.order_percent_discount = order._percent_discount; p.order_ruble_discount = order._ruble_discount; });
                 if (order != null)
                 {
@@ -101,20 +113,22 @@ namespace industriation_crm.Server.Services
                 ordersFilter.order_date_to = DateTime.MaxValue;
             try
             {
-                if (ordersFilter.order_id == null || ordersFilter.order_id == "")
+                if (ordersFilter.order_id == null)
                 {
-                    ordersReturnData.count = _dbContext.order.Where(o => ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to).Count();
+                    ordersReturnData.count = _dbContext.order.Where(o => o.stage_id >= ordersFilter.stage && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to).Count();
 
-                    ordersReturnData.orders = _dbContext.order.Where(o => ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to)
-                        .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o=>o.main_contact)
+                    ordersReturnData.orders = _dbContext.order.Where(o =>o.stage_id>=ordersFilter.stage && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to)
+                        .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o=>o.main_contact).Include(o=>o.stage).Include(o=>o.supplier_manager)
+                        .OrderByDescending(o=>o.order_date)
                         .Skip(ordersFilter.order_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.order_on_page).ToList();
                 }
                 else
                 {
-                    ordersReturnData.count = _dbContext.order.Where(o => o.id == Convert.ToInt32(ordersFilter.order_id) && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to).Count();
+                    ordersReturnData.count = _dbContext.order.Where(o => o.stage_id >= ordersFilter.stage && o.id == ordersFilter.order_id && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to).Count();
 
-                    ordersReturnData.orders = _dbContext.order.Where(o => o.id == Convert.ToInt32(ordersFilter.order_id) && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to)
-                        .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o => o.main_contact)
+                    ordersReturnData.orders = _dbContext.order.Where(o => o.stage_id >= ordersFilter.stage && o.id == ordersFilter.order_id && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to)
+                        .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o => o.main_contact).Include(o => o.stage).Include(o => o.supplier_manager)
+                        .OrderByDescending(o => o.order_date)
                         .Skip(ordersFilter.order_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.order_on_page).ToList();
                 }
                 foreach(var o in ordersReturnData.orders)
