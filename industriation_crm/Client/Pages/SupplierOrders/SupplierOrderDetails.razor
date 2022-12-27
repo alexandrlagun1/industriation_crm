@@ -6,8 +6,8 @@
 
 <AuthorizeView Roles="6">
 
-    <h1>Заказы поставщикам</h1>
-    <br />
+    <div class="main-title">Заказы поставщикам</div>
+    <hr />
 
     <div class="main-section mb-20">
         <div class="main-section-label">
@@ -27,17 +27,21 @@
                 <input @bind="supplierOrderFilter.supplier" class="main-input ind-col-lg-5"></input>
             </div>
         </div>
-        <br>
-        <div>
-            Дата заказа от:
-            <input type="date" @bind="supplierOrderFilter.order_date_from"></input>
+        <div class="section-field ind-col-lg-10">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label ind-col-lg-5">
+                    Дата заказа от:
+                </div>
+                <input type="date" @bind="supplierOrderFilter.order_date_from" class="main-input ind-col-lg-5"></input>
+            </div>
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label ind-col-lg-5">
+                    Дата заказа до:
+                </div>
+                <input type="date" @bind="supplierOrderFilter.order_date_to" class="main-input ind-col-lg-5"></input>
+            </div>
         </div>
-        <div>
-            Дата заказа до:
-            <input type="date" @bind="supplierOrderFilter.order_date_to"></input>
-        </div>
-        <br>
-        <button @onclick="GetOrders">Поиск</button>
+        <button @onclick="GetOrders" class="score mt-20 mb-20">Поиск</button>
         <div class="section-field">
             <table class="order-table ind-col-lg-10">
                 <thead class="ind-col-lg-10">

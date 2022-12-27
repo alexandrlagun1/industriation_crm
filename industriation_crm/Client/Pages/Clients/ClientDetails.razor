@@ -28,17 +28,19 @@ else
             </a>
         </div>
         <div class="main-section">
-            <div>
-                ФИО клиента:
-                <input @bind="clientFilter.client"></input>
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label ind-col-lg-5">
+                    ФИО клиента:
+                </div>
+                <input type="text" class="main-input ind-col-lg-5" @bind="clientFilter.client">
             </div>
-            <br>
-            <div>
-                ИНН:
-                <input type="number" @bind="clientFilter.inn"></input>
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label ind-col-lg-5">
+                    ИНН:
+                </div>
+                <input type="number" class="main-input ind-col-lg-5" @bind="clientFilter.inn">
             </div>
-            <br>
-            <button @onclick="Search">Поиск</button>
+            <button @onclick="Search" class="score mt-20 mb-20">Поиск</button>
 
             <div class="section-field">
                 <table class="order-table ind-col-lg-10">

@@ -6,13 +6,13 @@
 <AuthorizeView>
     <Authorized>
         
-        <button @onclick="()=>viewNotifications=true" class="oi oi-bell"></button>
+        <button @onclick="()=>viewNotifications=true" class="oi oi-bell header-notification header-notification-alert"></button>
         @if (viewNotifications)
         {
             <industriation_crm.Client.Pages.UserNotifications.UserNotifications CloseModal="CloseModal"></industriation_crm.Client.Pages.UserNotifications.UserNotifications>
         }
         <a href="" class="auth-link">@context.User.Identity?.Name</a>
-        <button type="button" @onclick="Logout" class="nav-link btn btn-link">Выйти</button>
+        <button type="button" @onclick="Logout" class="nav-link btn btn-link auth-button">Выход</button>
     </Authorized>
     <NotAuthorized>
         <a href="/login" class="auth-link">Войти</a>

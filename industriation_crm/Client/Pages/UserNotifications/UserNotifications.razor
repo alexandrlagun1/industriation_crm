@@ -2,8 +2,8 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="modal" tabindex="-1" style="display:block" role="dialog">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content b-s">
+    <div class="modal-notification modal-xl modal-dialog-scrollable">
+        <div class="modal-notification-content">
             <div class="modal-header">
                 <div class="container">
                     <div class="row-f ind-col-lg-10">
@@ -17,11 +17,23 @@
                 </div>
             </div>
             <div class="modal-body">
-                <button @onclick="()=>ViewTasks = false">Уведомления</button>
-                <button @onclick="()=>ViewTasks = true">Задачи</button>
+                <div class="button-bar mb-20">
+                    <button @onclick="()=>ViewTasks = false" class="score">Уведомления</button>
+                    <button @onclick="()=>ViewTasks = true" class="score">Задачи</button>
+                </div>
                 @if (ViewTasks == false)
                 {
-                    <div class="section-field">
+                        @foreach (var n in user_Notifications!)
+                        {
+                        <div class="modal-actual-task">
+                            <div class="order-info-date">
+                                @n.date
+                            </div>
+                            @n.text
+                        </div>
+                        }
+
+@*
                         <table class="order-table ind-col-lg-10">
                             <thead class="ind-col-lg-10">
                                 <tr class="order-row ind-col-lg-10">
@@ -38,12 +50,51 @@
                                     </tr>
                                 }
                             </tbody>
-                        </table>
-                    </div>
+                        </table>*@
                 }
                 else
                 {
-                    <div class="section-field">
+
+                    @foreach (var t in user_tasks!)
+                    {
+                        @if (t.complete == 1)
+                        {
+                            <div class="modal-done-task">
+                                <div class="order-info-date">
+                                    @t.date
+                                </div>
+                                <div>
+                                    <b>Заказ:</b> @t.order_id
+                                </div>
+                                <div>
+                                    <b>От кого:</b> @t.order_id
+                                </div>
+                                <div>
+                                    <b>Текст:</b> @t.text
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="modal-actual-task">
+                                <div class="order-info-date">
+                                    @t.date
+                                </div>
+                                <div>
+                                    <b>Заказ:</b> @t.order_id
+                                </div>
+                                <div>
+                                    <b>От кого:</b> @t.order_id
+                                </div>
+                                <div>
+                                    <b>Текст:</b> @t.text
+                                </div>
+                            </div>
+                        }
+                    }
+
+
+                    @*<div class="section-field">
                         <table class="order-table ind-col-lg-10">
                             <thead class="ind-col-lg-10">
                                 <tr class="order-row ind-col-lg-10">
@@ -51,7 +102,7 @@
                                     <td class="ind-col-lg-1">Статус</td>
                                     <td class="ind-col-lg-1">Дата</td>
                                     <td class="ind-col-lg-1">Заказ</td>
-                                    <td class="ind-col-lg-4">Текст</td>
+                                    <td class="ind-col-lg-5">Текст</td>
                                 </tr>
                             </thead>
                             <tbody class="ind-col-lg-10">
@@ -71,12 +122,12 @@
                                         </td>
                                         <td class="ind-col-lg-1">@t.date</td>
                                         <td class="ind-col-lg-1">@t.order_id</td>
-                                        <td class="ind-col-lg-4">@t.text</td>
+                                        <td class="ind-col-lg-5">@t.text</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
-                    </div>
+                    </div>*@
                 }
 
             </div>

@@ -1,14 +1,13 @@
 ﻿@inject HttpClient Http
-
-Управление заказом @order.id
-<br />
-<button type="button" @onclick="()=>viewOrderData=false">Задачи заказа</button>
+<div class="main-title">Управление заказом @order.id</div>
+<hr />
+<div class="main-section">
+@*<button type="button" @onclick="()=>viewOrderData=false">Задачи заказа</button>
 <button type="button" @onclick="()=>viewOrderData=true">Данные заказа</button>
-<br />
-Этап заказа: @order?.stage?.name
-<br />
-@if (viewOrderData)
-{
+<br />*@
+<h2>Этап заказа: @order?.stage?.name</h2>
+@*@if (viewOrderData)
+{*@
     <div class="section-field">
         <table class="order-table ind-col-lg-10">
             <thead class="table-success ind-col-lg-10">
@@ -60,13 +59,13 @@
                                         @switch (p.delivery_period_type_id)
                                         {
                                             case 1:
-                                                <div> дней</div>
+                                                <span> дней</span>
                                                 break;
                                             case 2:
-                                                <div> недели</div>
+                                                <span> недели</span>
                                                 break;
                                             case 3:
-                                                <div> месяца</div>
+                                                <span> месяца</span>
                                                 break;
                                         }
                                     </div>
@@ -97,75 +96,83 @@
             </tbody>
         </table>
     </div>
-}
+@*}
 else
-{
-    <div>
-        История заказа:
-        <br>
-        @foreach (var h in order.order_Histories)
-        {
-            <div>@h.date</div>
-            <div>@h.text</div>
-            <br>
-        }
+{*@
+    <div class="main-section">
+        <div class="main-section-label">История заказа:</div>
+        <div class="order-info">
+            @foreach (var h in order.order_Histories)
+            {
+                <div class="order-info-line">
+                    <div class="order-info-date">@h.date</div>
+                    <div>@h.text</div>
+                </div>
+            }
+        </div>
     </div>
-    <div>
-        Заметки:
-        <textarea @bind="order.notes"></textarea>
-        <br />
-        <button @onclick="openCreatetaskModal" type="button">Создать задачу</button>
-        <br />
-        @if (viewCreateTask)
-        {
-            <div class="modal" tabindex="-1" style="display:block" role="dialog">
-                <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                    <div class="modal-content b-s">
-                        <div class="modal-body">
-                            Исполнитель:
-                            <select @bind="newTask.executor_id">
-                                @foreach (var e in executors)
-                                {
-                                    <option value="@e.id">@e.name</option>
-                                }
-                            </select>
-                            <br>
-                            Задача:
-                            <textarea @bind="newTask.text"></textarea>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="()=>viewCreateTask = false">Закрыть</button>
-                            <button type="button" class="btn btn-primary" @onclick="createTask">Создать</button>
+    <div class="row-f ind-col-10 mt-20" style="justify-content: space-between">
+        <div class="main-section ind-col-lg-4-8">
+            <div class="main-section-label">Задачи:</div>
+                <button @onclick="openCreatetaskModal" type="button" class="save task-create">Создать задачу</button>
+                @if (viewCreateTask)
+                {
+                    <div class="modal" tabindex="-1" style="display:block" role="dialog">
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content b-s">
+                                <div class="modal-body">
+                                    Исполнитель:
+                                    <select @bind="newTask.executor_id">
+                                        @foreach (var e in executors)
+                                        {
+                                            <option value="@e.id">@e.name</option>
+                                        }
+                                    </select>
+                                    <br>
+                                    Задача:
+                                    <br>
+                                    <textarea @bind="newTask.text" class="notes-textarea main-input" placeholder="Введите текст задачи"></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="close" data-dismiss="modal" @onclick="()=>viewCreateTask = false">Закрыть</button>
+                                    <button type="button" class="score" @onclick="createTask">Создать</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                }
+                <div>
+                    <b>Актуальные задачи:</b>
+                    @foreach (var task in order.tasks.Where(t => t.complete == 0))
+                    {
+                        <div class="actual-task mt-10">
+                            <div><b>От кого:</b> @task.creator.name</div>
+                            <div><b>Исполнитель:</b> @task.executor.name</div>
+                            <div><b>Задача:</b> @task.text</div>
+                            <button @onclick="()=>task.complete=1" class="score task-btn">Выполнить</button>
+                        </div>
+                    }
                 </div>
-            </div>
-        }
-    </div>
-    <div>
-        <div>
-            <b>Актуальные задачи:</b>
-            @foreach (var task in order.tasks.Where(t => t.complete == 0))
-            {
-                <div>От кого: @task.creator.name</div>
-                <div>Исполнитель: @task.executor.name</div>
-                <div>Задача: @task.text</div>
-                <button @onclick="()=>task.complete=1">Выполнить</button>
-            }
+                <hr>
+                <div>
+                    <b>Завершенные задачи:</b>
+                    @foreach (var task in order.tasks.Where(t => t.complete == 1))
+                    {
+                        <div class="done-task mt-10">
+                            <div><b>От кого:</b> @task.creator.name</div>
+                            <div><b>Исполнитель:</b> @task.executor.name</div>
+                            <div><b>Задача:</b> @task.text</div>
+                        </div>
+                    }
+                </div>
         </div>
-        <br>
-        <div>
-            <b>Завершенные задачи:</b>
-            @foreach (var task in order.tasks.Where(t => t.complete == 1))
-            {
-                <div>От кого: @task.creator.name</div>
-                <div>Исполнитель: @task.executor.name</div>
-                <div>Задача: @task.text</div>
-            }
+            <div class="main-section ind-col-lg-4-8">
+                <div class="main-section-label">Заметки:</div>
+                <textarea @bind="order.notes" class="main-input notes-textarea" placeholder="Введите текст вашей заметки"></textarea>
         </div>
     </div>
-
-}
+@*}*@
+</div>
 @code {
     [Parameter]
     public int? orderId { get; set; }
@@ -200,5 +207,6 @@ else
         newTask.executor = executors.Where(e => e.id == newTask.executor_id).First();
         newTask.creator = order.user;
         order.tasks.Add(newTask);
+        viewCreateTask = false;
     }
 }

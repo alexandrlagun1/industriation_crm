@@ -18,16 +18,16 @@
 }
 @if (role == 1)
 {
-    <div>
-        <button @onclick="()=>ViewOrderManagement = false">Информация о заказе</button>
-        <button @onclick="()=>ViewOrderManagement = true">Управление заказом</button>
+    <div class="buttons-bar mb-10">
+        <button @onclick="()=>ViewOrderManagement = false" class="score">Информация о заказе</button>
+        <button @onclick="()=>ViewOrderManagement = true" class="score">Управление заказом</button>
         @if(order?.order_Pays?.Count() == 0)
         {
-            <button @onclick="OrderCancellation">Отменить заказ</button>
+            <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
         }
         else
         {
-            <button @onclick="OrderPayReturn">Оформить возврат</button>
+            <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
         }
         
     </div>
