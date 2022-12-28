@@ -1806,4 +1806,23 @@ td.ind-col-lg-1 {
 	margin: 20px 0;
 	padding: 15px 10px 10px 10px;
 }
+
+.close-btn-disabled {
+	pointer-events: none;
+	cursor: not-allowed;
+	background-color: #c3000030;
+	user-select: none;
+}
+
+.input-disabled,
+.select-disabled,
+.textarea-disabled,
+.button-disabled {
+	user-select: none;
+	opacity: .7;
+	pointer-events: none;
+	background-color: #eee;
+	color: #959595;
+}
+
 	/* ////////////////////////////////////////////////////////////////// */
