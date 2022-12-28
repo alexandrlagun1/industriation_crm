@@ -236,10 +236,6 @@
         if (role == 1)
         {
             managers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
-            if (clientId == 0)
-            {
-                client.user_id = managers[0].id;
-            }
         }
         if (clientId == 0)
             client.client_type = 1;
@@ -272,6 +268,8 @@
     }
     protected async Task SaveClient()
     {
+        if(client?.user_id == null)
+            client.user_id = managers[0].id;
         if (clientId != 0)
         {
             await Http.PutAsJsonAsync("api/Client", client);

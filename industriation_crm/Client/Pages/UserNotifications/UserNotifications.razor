@@ -32,25 +32,6 @@
                             @n.text
                         </div>
                         }
-
-@*
-                        <table class="order-table ind-col-lg-10">
-                            <thead class="ind-col-lg-10">
-                                <tr class="order-row ind-col-lg-10">
-                                    <td class="ind-col-lg-2">Дата</td>
-                                    <td class="ind-col-lg-8">Текст</td>
-                                </tr>
-                            </thead>
-                            <tbody class="ind-col-lg-10">
-                                @foreach (var n in user_Notifications!)
-                                {
-                                    <tr class="order-row">
-                                        <td class="ind-col-lg-2">@n.date</td>
-                                        <td class="ind-col-lg-8">@n.text</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>*@
                 }
                 else
                 {
@@ -92,42 +73,6 @@
                             </div>
                         }
                     }
-
-
-                    @*<div class="section-field">
-                        <table class="order-table ind-col-lg-10">
-                            <thead class="ind-col-lg-10">
-                                <tr class="order-row ind-col-lg-10">
-                                    <td class="ind-col-lg-2">От кого</td>
-                                    <td class="ind-col-lg-1">Статус</td>
-                                    <td class="ind-col-lg-1">Дата</td>
-                                    <td class="ind-col-lg-1">Заказ</td>
-                                    <td class="ind-col-lg-5">Текст</td>
-                                </tr>
-                            </thead>
-                            <tbody class="ind-col-lg-10">
-                                @foreach (var t in user_tasks!)
-                                {
-                                    <tr class="order-row">
-                                        <td class="ind-col-lg-2">@t.creator?.name</td>
-                                        <td class="ind-col-lg-1">
-                                            @if (t.complete == 1)
-                                            {
-                                                <b>Выполнена</b>
-                                            }
-                                            else
-                                            {
-                                                <b>Активна</b>
-                                            }
-                                        </td>
-                                        <td class="ind-col-lg-1">@t.date</td>
-                                        <td class="ind-col-lg-1">@t.order_id</td>
-                                        <td class="ind-col-lg-5">@t.text</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>*@
                 }
 
             </div>

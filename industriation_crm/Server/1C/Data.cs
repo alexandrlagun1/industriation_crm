@@ -6,6 +6,7 @@
         public string? inn { get; set; }
         public string? kpp { get; set; }
         public string? ogrn { get; set; }
+
     }
     public class _1CProduct
     {
