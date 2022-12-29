@@ -1,4 +1,5 @@
 using industriation_crm.Server.Interfaces;
+using industriation_crm.Server.Middleware;
 using industriation_crm.Server.Models;
 using industriation_crm.Server.Services;
 using industriation_crm.Server.SignalRNotification;
@@ -38,10 +39,12 @@ builder.Services.AddScoped<IDeliveryPeriodType, DeliveryPeriodTypeManager>();
 builder.Services.AddScoped<IOrderHistory, OrderHistoryManager>();
 builder.Services.AddScoped<IUserNotifications, UserNotificationsManager>();
 builder.Services.AddScoped<ITask, TaskManager>();
+builder.Services.AddScoped<ICallHistory, CallHistoryManager>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddRazorPages();
+
 
 //Авторизация
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -86,6 +89,8 @@ app.UseRouting();
 app.UseCors("CorsSpecs");
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ApiKeyMiddleware>();
 
 app.MapRazorPages();
 app.MapControllers();

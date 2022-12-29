@@ -136,25 +136,25 @@
                                                 </tr>
                                             </table>
                                             @*<div>Колличество: @p.count</div><br>
-                                            <div>Цена: @p._product_price_with_discount</div><br>
-                                            <div>
-                                                Срок доставки: @p.delivery_period
-                                                @switch (p.delivery_period_type_id)
-                                                {
-                                                    case 1:
-                                                        <div> дней</div>
-                                                        break;
-                                                    case 2:
-                                                        <div> недели</div>
-                                                        break;
-                                                    case 3:
-                                                        <div> месяца</div>
-                                                        break;
-                                                }
+                                <div>Цена: @p._product_price_with_discount</div><br>
+                                <div>
+                                Срок доставки: @p.delivery_period
+                                @switch (p.delivery_period_type_id)
+                                {
+                                case 1:
+                                <div> дней</div>
+                                break;
+                                case 2:
+                                <div> недели</div>
+                                break;
+                                case 3:
+                                <div> месяца</div>
+                                break;
+                                }
 
-                                            </div><br>
-                                            <div>Скидка: @p?._discount_total_price</div><br>
-                                            <div>Стоимость: @p?._total_price</div><br>*@
+                                </div><br>
+                                <div>Скидка: @p?._discount_total_price</div><br>
+                                <div>Стоимость: @p?._total_price</div><br>*@
                                         </td>
                                         <td class="ind-col-lg-2">
                                             <div class="ind-col-lg-3">
@@ -251,16 +251,17 @@
     }
     protected async Task SendTo1C()
     {
-        if (supplier_order?.product_to_orders?.Where(o => o.order.order_status_id != 3).FirstOrDefault() != null)
-        {
-            //Оповестить пользователя о ошибке валидации 
-            return;
-        }
-        else
-        {
-            //Отправка в 1с
+        //if (supplier_order?.product_to_orders?.Where(o => o.order?.order_status_id != 3).FirstOrDefault() != null)
+        //{
+        //    //Оповестить пользователя о ошибке валидации
+        //    return;
+        //}
+        //else
+        //{
+        supplier_order?.product_to_orders?.ForEach(p => p.order = null);
+        await Http.PostAsJsonAsync("api/_1C/CreateSupplierOrder", supplier_order);
             Cancel();
-        }
+        //}
     }
     protected async Task SaveOrder()
     {

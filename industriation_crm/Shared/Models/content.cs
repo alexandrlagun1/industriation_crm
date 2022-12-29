@@ -77,6 +77,17 @@ namespace industriation_crm.Shared.Models
         public client? client { get; set; }
         public List<contact_phone>? contact_phones { get; set; } = new();
     }
+    public class call_history
+    {
+        [Key]
+        public int id { get; set; }
+        public string? from_number { get; set; }
+        public string? to_number { get; set; }
+        public string? duration { get; set; }
+        public string? status { get; set; }
+        public string? call_id { get; set; }
+        public string? type { get; set; }
+    }
     public class client
     {
         [Key]

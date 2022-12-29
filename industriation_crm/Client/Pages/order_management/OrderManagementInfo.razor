@@ -182,6 +182,8 @@
         if (orderId != null)
             order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
         executors.Add(order?.user!);
+        if(order?.supplier_manager != null)
+            executors.Add(order?.supplier_manager!);
     }
     protected async Task checkAllProducts(ChangeEventArgs e)
     {

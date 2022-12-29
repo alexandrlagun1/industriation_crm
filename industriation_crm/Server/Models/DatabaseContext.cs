@@ -22,6 +22,7 @@ namespace industriation_crm.Server.Models
         public DbSet<delivery_period_type> delivery_period_type { get; set; }
         public DbSet<contact_phone> contact_phone { get; set; }
         public DbSet<order_history> order_history { get; set; }
+        public DbSet<call_history> call_history { get; set; }
         public DbSet<stage> stage { get; set; }
         public DbSet<user_notifications> user_notifications { get; set; }
         public DatabaseContext()
