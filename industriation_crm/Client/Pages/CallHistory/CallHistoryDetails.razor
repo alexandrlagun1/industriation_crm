@@ -1,0 +1,216 @@
+﻿@page "/fetchcallhistorydetails"
+@using Newtonsoft.Json
+@using industriation_crm.Shared.FilterModels
+@inject HttpClient Http
+
+<div class="main-title">Звонки</div>
+
+<div class="main-section">
+    <div class="main-section-label">
+        Фильтр:
+    </div>
+    <row-f>
+        <div class="custom-select mr-20">
+            <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
+            </input>
+            @foreach (var m in noSelectManagers!.Where(m => m.name.Contains(manager_search)))
+            {
+                <button @onclick="()=>{noSelectManagers!.Remove(m); SelectManagers.Add(m);}">
+                    <div class="name">@m.name</div>
+                </button>
+            }
+        </div>
+        <div class="manager-field">
+            @foreach (var m in SelectManagers)
+            {
+                <button @onclick="()=>{SelectManagers.Remove(m); noSelectManagers!.Add(m);}">
+                    <div class="name">@m.name</div>
+                    <img src="./icons/delete-icon.svg" />
+                </button>
+            }
+        </div>
+    </row-f>
+    <div class="section-field ind-col-lg-10">
+        <div class="ind-col-lg-5 input-field">
+            <div class="input-label ind-col-lg-5">
+                Тип:
+            </div>
+            <select name="" id="" class="table-input" @bind="callHistoryFilter.type">
+                <option value="">Любые</option>
+                <option value="in">Входящие</option>
+                <option value="out">Исходящие</option>
+            </select>
+        </div>
+        <div class="ind-col-lg-5 input-field">
+            <div class="input-label ind-col-lg-5">
+                Телефон клиента:
+            </div>
+            <input type="text" class="main-input ind-col-lg-5" @bind="callHistoryFilter.phone">
+        </div>
+    </div>
+    <div class="section-field ind-col-lg-10">
+        <div class="ind-col-lg-5 input-field">
+            <div class="input-label ind-col-lg-5">
+                Дата заказа от:
+            </div>
+            <input type="date" @bind="callHistoryFilter.call_date_from" class="main-input ind-col-lg-5"></input>
+        </div>
+        <div class="ind-col-lg-5 input-field">
+            <div class="input-label ind-col-lg-5">
+                Дата заказа до:
+            </div>
+            <input type="date" @bind="callHistoryFilter.call_date_to" class="main-input ind-col-lg-5"></input>
+        </div>
+    </div>
+    <button @onclick="FindByFilter" class="score mb-20 mt-20">Поиск</button>
+
+    <div class="section-field">
+
+        <table class="order-table ind-col-lg-10">
+            <thead class="ind-col-lg-10">
+                <tr class="order-row ind-col-lg-10">
+                    <td class="ind-col-lg-1">Дата и время</td>
+                    <td class="ind-col-lg-2">Менеджер</td>
+                    <td class="ind-col-lg-1">Телефон</td>
+                    <td class="ind-col-lg-2">Клиент</td>
+                    <td class="ind-col-lg-1">Тип</td>
+                    <td class="ind-col-lg-1">Результат</td>
+                    <td class="ind-col-lg-1">Длительность</td>
+                    <td class="ind-col-lg-1">Запись</td>
+                </tr>
+            </thead>
+            <tbody class="ind-col-lg-10">
+                @foreach (var call in call_Histories!)
+                {
+                    <tr class="order-row ind-col-lg-10">
+                        <td class="ind-col-lg-1">@call.date_time</td>
+                        <td class="ind-col-lg-2">
+                            @call.user?.name
+                        </td>
+                        <td class="ind-col-lg-1">@call.client_number</td>
+                        <td class="ind-col-lg-2">
+                            <a href="/client/edit/@call.contact?.client_id">
+                                @call.contact?.full_name
+                            </a>
+                        </td>
+                        <td class="ind-col-lg-1">
+                            @if (call.type?.ToLower() == "in")
+                            {
+                                <div>Входящий</div>
+                            }
+                            else if (call.type?.ToLower() == "out")
+                            {
+                                <div>Исходящий</div>
+                            }
+                        </td>
+                        <td class="ind-col-lg-1">
+                            @if (call.status?.ToLower() == "success")
+                            {
+                                <div>Принят</div>
+                            }
+                            else if (call.status?.ToLower() == "missed")
+                            {
+                                <div>Не отвечено</div>
+                            }
+                            else if (call.status?.ToLower() == "noanswer")
+                            {
+                                <div>Занято</div>
+                            }
+                            else
+                            {
+                                <div>Ошибка</div>
+                            }
+                        </td>
+                        <td class="ind-col-lg-1">@call.duration</td>
+                        <td class="ind-col-lg-1">
+                            @if (call.record != null)
+                            {
+                                <video controls autoplay>
+                                    <source src="@call.record" type="audio/mp3">
+                                </video>
+                            }
+                            else
+                            {
+                                <div>---</div>
+                            }
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+    <div class="section-field filter-pagination mt-20">
+        <div>
+            Страница:
+            <input class="pagination-input" type="number" min="1" @bind="current_page" @bind:event="oninput" @onkeydown="OnKeyDown">
+            из @page_count.Count()
+            <button class="score" @onclick="FindByFilter">Перейти</button>
+        </div>
+        <div>
+            <button class="score" @onclick="PagPrev">Предыдущая</button>
+            <button class="score" @onclick="PagNext">Следующая</button>
+        </div>
+    </div>
+</div>
+@code {
+    protected CallHistoryFilter callHistoryFilter = new();
+    protected List<call_history>? call_Histories = new();
+    protected List<user> SelectManagers = new();
+    protected List<user>? noSelectManagers = new();
+
+    List<int> page_count = new List<int>();
+    protected int count_on_page = 50;
+    protected int current_page = 1;
+
+    protected string manager_search = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        noSelectManagers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
+        await FindByFilter();
+    }
+    protected async Task FindByFilter()
+    {
+        callHistoryFilter.current_page = current_page;
+        if (page_count.Count != 0 && (current_page < 1 || current_page > page_count.Count))
+            return;
+        callHistoryFilter.calls_on_page = count_on_page;
+
+        if (SelectManagers.Count == 0)
+            callHistoryFilter.managers = noSelectManagers!;
+        else
+            callHistoryFilter.managers = SelectManagers!;
+
+        var response = await Http.PostAsJsonAsync("api/CallHistory", callHistoryFilter);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        CallHistoryReturnData? callHistoryReturnData = JsonConvert.DeserializeObject<CallHistoryReturnData>(responseBody);
+        call_Histories = callHistoryReturnData?.call_historyes;
+        StateHasChanged();
+    }
+
+    protected async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await FindByFilter();
+        }
+    }
+    protected async Task PagPrev()
+    {
+        if (current_page > 1)
+        {
+            current_page--;
+            await FindByFilter();
+        }
+    }
+    protected async Task PagNext()
+    {
+        if (current_page < page_count.Count)
+        {
+            current_page++;
+            await FindByFilter();
+        }
+    }
+}

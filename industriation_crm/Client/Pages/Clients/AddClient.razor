@@ -1,4 +1,5 @@
 ﻿@page "/client/add"
+@page "/client/add/{phone}"
 @page "/client/edit/{clientId:int}"
 @using System.Security.Claims
 @using industriation_crm.Shared.Models
@@ -191,6 +192,8 @@
 </EditForm>
 @code {
     [Parameter]
+    public string? phone { get; set; }
+    [Parameter]
     public Action<client>? returnToFetchUsers { get; set; }
     [Parameter]
     public int clientId { get; set; }
@@ -200,7 +203,6 @@
 
     List<contact> contacts = new();
     List<user> managers = new();
-    protected List<roles> roles = new();
 
     protected int? allert_type = null;
     protected string? allert_text = null;
@@ -237,17 +239,22 @@
         {
             managers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
         }
-        else if(role == 1)
-        {
-            managers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
-        }
-        else
         if (clientId == 0)
             client.client_type = 1;
     }
 
     protected override async Task OnParametersSetAsync()
     {
+        if(phone != null)
+        {
+            main_contact = new();
+            client = new();
+            main_contact_id = 0;
+            contacts = new();
+
+            main_contact.phone = phone;
+            StateHasChanged();
+        }
         if (clientId != 0)
         {
 

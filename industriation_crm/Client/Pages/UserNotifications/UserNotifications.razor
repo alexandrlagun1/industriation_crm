@@ -1,4 +1,5 @@
-﻿@inject HttpClient Http
+﻿@using System.Security.Claims
+@inject HttpClient Http
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="modal" tabindex="-1" style="display:block" role="dialog">
@@ -88,7 +89,7 @@
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        int userId = authState.User.Claims.Where(_ => _.Type == "userid").Select(_ => Convert.ToInt32(_.Value)).First();
+        int userId = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
         user_Notifications = await Http.GetFromJsonAsync<List<user_notifications>>("api/usernotifications/" + userId);
         user_tasks = await Http.GetFromJsonAsync<List<task>>("api/Task/" + userId);
     }

@@ -2,6 +2,7 @@
 @page "/order/edit/{orderId:int}"
 @page "/order/add/{clientId:int}"
 @using System.Globalization
+@using System.Security.Claims
 @using industriation_crm.Server.DataTranslation
 @using industriation_crm.Shared.Models
 @inject HttpClient Http
@@ -21,7 +22,7 @@
     <div class="buttons-bar mb-10">
         <button @onclick="()=>ViewOrderManagement = false" class="score">Информация о заказе</button>
         <button @onclick="()=>ViewOrderManagement = true" class="score">Управление заказом</button>
-        @if(order?.order_Pays?.Count() == 0)
+        @if (order?.order_Pays?.Count() == 0)
         {
             <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
         }
@@ -29,7 +30,7 @@
         {
 
 
-            @if(order?.stage_id == 2)
+            @if (order?.stage_id == 2)
             {
                 <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
                 <style type="text/css">
@@ -41,6 +42,7 @@
                         pointer-events: none;
                         background-color: #eee;
                     }
+
                     .main-section button,
                     .add-payment {
                         opacity: .7;
@@ -48,11 +50,13 @@
                         user-select: none;
                     }
                 </style>
-            } else {
+            }
+            else
+            {
                 <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
             }
         }
-        
+
     </div>
 }
 
@@ -88,7 +92,6 @@
                     else
                         @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
 
-
                     </a>
                     <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
@@ -96,7 +99,6 @@
 
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" @onchange='@(() => { viewContacts = true; contactClass="contact contact--active"; clientClass="client";})'>
                         <label class="@contactClass" for="btnradio2">Контактные лица</label>
-                        @* <input name="@index" type="radio" checked="@(parcel.Item as Entity_Spatial)" @onchange='@(() => { parcel.Item = new Entity_Spatial(); })' />Одноконтурный ЗУ*@
                     </div>
                 </div>
                 @if (viewContacts == false)
@@ -520,7 +522,7 @@
         });
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         role = Convert.ToInt32(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role).Value);
-        user_id = authState.User.Claims.Where(_ => _.Type == "userid").Select(_ => Convert.ToInt32(_.Value)).First();
+        user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
 
         await GetClientsManagers();
 
@@ -629,7 +631,7 @@
         }
     }
     protected async Task OrderCancellation()
-    {   
+    {
         order.order_status_id = 7;
         await Http.PutAsJsonAsync("api/Order", order);
     }

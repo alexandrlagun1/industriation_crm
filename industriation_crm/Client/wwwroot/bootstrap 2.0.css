@@ -1825,4 +1825,46 @@ td.ind-col-lg-1 {
 	color: #959595;
 }
 
+.call-modal-block {
+	display: flex;
+	flex-direction: column-reverse;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	height: auto;
+	max-width: 350px;
+	width: 100%;
+	z-index: 100;
+}
+
+.call-modal {
+	background-color: #fff;
+	border: 1px solid #000;
+	border-radius: 4px;
+	width: 100%;
+	padding: 5px;
+}
+
+.call-modal:not(:first-child){
+	margin-bottom: 15px;
+}
+
+.call-modal .buttons button {
+	background: none;
+	border: 1px solid #000;
+	border-radius: 4px;
+	width: 70px;
+}
+
+.call-modal .buttons button:not(:last-child){
+	margin-right: 5px;
+}
+
+.call-modal .buttons button:last-child {
+	float: right;
+}
+
+
+
+
 	/* ////////////////////////////////////////////////////////////////// */

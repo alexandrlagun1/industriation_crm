@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using System.Security.Claims
 @using industriation_crm.Shared
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
@@ -24,7 +25,7 @@
         var user = authState.User;
         if (user.Identity.IsAuthenticated)
         {
-            userid = user.Claims.Where(_ => _.Type == "userid").FirstOrDefault().Value;
+            userid = user.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
         }
         //HubConnection.On<string>("UpdateStatus", status =>
         //{

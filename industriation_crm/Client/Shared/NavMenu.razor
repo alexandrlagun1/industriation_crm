@@ -1,15 +1,6 @@
 ﻿@inject HubConnection HubConnection
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
-@*<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Industriation CRM</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
-*@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="leftside-bar-btn">
@@ -33,6 +24,12 @@
         <div class="leftside-bar-btn">
             <div class="lefside-bar-btn">
                 <a class="leftsidebar-link" href="fetchorderdetails">Заказы</a>
+                <img src="./icons/order.svg" alt="" class="icon">
+            </div>
+        </div>
+        <div class="leftside-bar-btn">
+            <div class="lefside-bar-btn">
+                <a class="leftsidebar-link" href="fetchcallhistorydetails">Звонки</a>
                 <img src="./icons/order.svg" alt="" class="icon">
             </div>
         </div>

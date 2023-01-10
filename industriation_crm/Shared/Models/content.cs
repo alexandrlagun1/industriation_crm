@@ -11,6 +11,8 @@ namespace industriation_crm.Shared.Models
         public int? role_id { get; set; }
         public string? password { get; set; }
         public string? login { get; set; }
+        public string? phone { get; set; }
+        public string? megafon_login { get; set; }
 
         [ForeignKey("role_id")]
         public virtual roles? roles { get; set; }
@@ -81,12 +83,20 @@ namespace industriation_crm.Shared.Models
     {
         [Key]
         public int id { get; set; }
-        public string? from_number { get; set; }
-        public string? to_number { get; set; }
+        public string? client_number { get; set; }
+        public string? manager_number { get; set; }
         public string? duration { get; set; }
         public string? status { get; set; }
         public string? call_id { get; set; }
         public string? type { get; set; }
+        public string? record { get; set; }
+        public int? contact_id { get; set; }
+        public int? user_id { get; set; }
+        [ForeignKey("user_id")]
+        public user? user { get; set; }
+        [ForeignKey("contact_id")]
+        public contact? contact { get; set; }
+        public DateTime? date_time { get; set; }
     }
     public class client
     {

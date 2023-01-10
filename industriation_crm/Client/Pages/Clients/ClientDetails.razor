@@ -47,8 +47,9 @@ else
                     <thead class="ind-col-lg-10">
                         <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1">ID</td>
-                            <td class="ind-col-lg-3">ФИО</td>
-                            <td class="ind-col-lg-2">Тип клиента</td>
+                            <td class="ind-col-lg-2">Организация</td>
+                            <td class="ind-col-lg-2">ФИО</td>
+                            <td class="ind-col-lg-1">Тип клиента</td>
                             <td class="ind-col-lg-2">Закрепленный менеджер</td>
                             <td class="ind-col-lg-2">Действия</td>
                         </tr>
@@ -58,8 +59,9 @@ else
                         {
                             <tr class="order-row ind-col-lg-10">
                                 <td class="ind-col-lg-1">@_client.id</td>
-                                <td class="ind-col-lg-3">@_client.contacts.Where(c=>c.main_contact==1).FirstOrDefault()?.full_name</td>
-                                <td class="ind-col-lg-2">
+                                <td class="ind-col-lg-2">@_client.org_name</td>
+                                <td class="ind-col-lg-2">@_client.contacts.Where(c=>c.main_contact==1).FirstOrDefault()?.full_name</td>
+                                <td class="ind-col-lg-1">
                                     @if (_client.client_type == 0)
                                     {
                                         <i>Физическое лицо</i>
@@ -115,7 +117,7 @@ else
     public Action<client> SelectOrderClient { get; set; }
 
     protected bool viewAddClient = false;
-    protected int count_on_page = 3;
+    protected int count_on_page = 50;
     protected int current_page = 1;
     List<int> page_count = new List<int>();
     protected ClientFilter clientFilter = new();

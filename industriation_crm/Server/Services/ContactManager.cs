@@ -21,7 +21,7 @@ namespace industriation_crm.Server.Services
             {
                 contact.is_active = 1;
                 _dbContext.contact.Add(contact);
-                
+
                 _dbContext.SaveChanges();
                 return contact;
             }
@@ -35,7 +35,7 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                contact? contact = _dbContext.contact.Include(c=>c.contact_phones).Where(c => c.id == id).Include(c => c.client).FirstOrDefault();
+                contact? contact = _dbContext.contact.Include(c => c.contact_phones).Where(c => c.id == id).Include(c => c.client).FirstOrDefault();
                 if (contact != null)
                 {
                     return contact;
@@ -142,6 +142,19 @@ namespace industriation_crm.Server.Services
                 {
                     throw;
                 }
+            }
+        }
+
+        public contact? GetContactDataByPhone(string phone)
+        {
+            try
+            {
+                contact? contact = _dbContext.contact.Where(c=>c.phone == phone).Include(c => c.client).FirstOrDefault();
+                return contact;
+            }
+            catch
+            {
+                throw;
             }
         }
     }

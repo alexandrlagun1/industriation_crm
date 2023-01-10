@@ -28,7 +28,7 @@ namespace industriation_crm.Server.Controllers
 
             var claims = new List<Claim>
     {
-        new Claim("userid", user.id.ToString()),
+        new Claim(ClaimTypes.NameIdentifier, user.id.ToString()),
         new Claim(ClaimTypes.Email, user.login)
     };
 
@@ -56,7 +56,7 @@ namespace industriation_crm.Server.Controllers
         {
 
             int userId = HttpContext.User.Claims
-            .Where(_ => _.Type == "userid")
+            .Where(_ => _.Type == ClaimTypes.NameIdentifier)
             .Select(_ => Convert.ToInt32(_.Value))
             .First();
 

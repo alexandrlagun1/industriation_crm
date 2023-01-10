@@ -191,10 +191,10 @@ else
 
         var response = await Http.PostAsJsonAsync("api/Product/FindByFilter", productFilter);
         var responseBody = await response.Content.ReadAsStringAsync();
-        ProductReturnData productReturnData = JsonConvert.DeserializeObject<ProductReturnData>(responseBody);
-        productList = productReturnData.products;
+        ProductReturnData? productReturnData = JsonConvert.DeserializeObject<ProductReturnData>(responseBody);
+        productList = productReturnData?.products;
 
-        int total_page = Convert.ToInt32(Math.Ceiling(productReturnData.count / Convert.ToDouble(count_on_page)));
+        int total_page = Convert.ToInt32(Math.Ceiling(productReturnData!.count / Convert.ToDouble(count_on_page)));
         
         page_count = new();
         for (int i = 1; i <= total_page; i++)

@@ -116,6 +116,19 @@ namespace industriation_crm.Server.Services
                 throw;
             }
         }
+
+        public user? GetUserDataByPhone(string phone)
+        {
+            try
+            {
+                user? user = _dbContext.user.Where(u => u.phone == phone).FirstOrDefault();
+                return user;
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }
 

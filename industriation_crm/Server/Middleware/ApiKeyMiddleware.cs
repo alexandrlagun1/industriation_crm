@@ -11,6 +11,8 @@
         }
         public async Task InvokeAsync(HttpContext context)
         {
+            if (context.Request.Path.Value!.Contains("api"))
+            {
                 if (!context.Request.Headers.TryGetValue(APIKEY, out
                         var extractedApiKey))
                 {
@@ -26,7 +28,8 @@
                     await context.Response.WriteAsync("Unauthorized client");
                     return;
                 }
-                await _next(context);
+            }
+            await _next(context);
         }
     }
 }
