@@ -1186,11 +1186,16 @@ a.close {
 	font-size: 14px;
 }
 
-	.close:hover {
-		background-color: #f54040;
-		transition: background-color .2s;
-		color: #fff;
-	}
+.dadata {
+	margin-left: 10px;
+	background-color: #ef4741;
+}
+
+.close:hover {
+	background-color: #f54040;
+	transition: background-color .2s;
+	color: #fff;
+}
 
 button.score {
 	background-color: #0099ff;

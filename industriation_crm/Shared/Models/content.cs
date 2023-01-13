@@ -102,7 +102,7 @@ namespace industriation_crm.Shared.Models
     {
         [Key]
         public int id { get; set; }
-        public int? client_type { get; set; }
+        public int? client_type { get; set; } = 1;
         public int? user_id { get; set; }
         public string? org_name { get; set; }
         public string? org_address { get; set; }
