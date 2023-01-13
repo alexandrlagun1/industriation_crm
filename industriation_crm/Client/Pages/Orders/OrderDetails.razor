@@ -29,7 +29,7 @@ else
         </div>
         <row-f>
             <div class="custom-select mr-20">
-                <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
+                <input type="text" class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
                 </input>
                 @foreach (var m in noSelectManagers.Where(m => m.name.Contains(manager_search)))
                 {
@@ -59,7 +59,7 @@ else
                 <div class="input-label ind-col-lg-5">
                     Покупатель:
                 </div>
-                <input @bind="ordersFilter.client" class="main-input ind-col-lg-5"></input>
+                <input type="text" @bind="ordersFilter.client" class="main-input ind-col-lg-5"></input>
             </div>
         </div>
         <div class="section-field ind-col-lg-10">
@@ -91,7 +91,7 @@ else
                             <td class="ind-col-lg-2">Менеджер по снабжению</td>
                         }
                         <td class="ind-col-lg-2">Менеджер</td>
-                        <td class="ind-col-lg-1">Статус заказа</td>
+                        <td class="ind-col-lg-1">Этап заказа</td>
                         <td class="ind-col-lg-1">Этап</td>
                         <td class="ind-col-lg-1">Действия</td>
                     </tr>
