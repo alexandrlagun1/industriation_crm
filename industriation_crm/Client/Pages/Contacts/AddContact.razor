@@ -13,35 +13,35 @@
         <div class="mb-3">
             <div class="ind-col-lg-5 input-field">
                 <div class="input-label">Имя</div>
-                <InputText class="main-input" @bind-Value="contact.name" />
+                <InputText type="text" class="main-input" @bind-Value="contact.name" />
                 <ValidationMessage For="@(() => contact.name)" />
             </div>
         </div>
         <div class="mb-3">
             <div class="ind-col-lg-5 input-field">
                 <div class="input-label">Фамилия</div>
-                <InputText class="main-input" @bind-Value="contact.surname" />
+                <InputText type="text" class="main-input" @bind-Value="contact.surname" />
                 <ValidationMessage For="@(() => contact.surname)" />
             </div>
         </div>
         <div class="mb-3">
             <div class="ind-col-lg-5 input-field">
                 <div class="input-label">Отчество</div>
-                <InputText class="main-input" @bind-Value="contact.patronymic" />
+                <InputText type="text" class="main-input" @bind-Value="contact.patronymic" />
                 <ValidationMessage For="@(() => contact.patronymic)" />
             </div>
         </div>
         <div class="mb-3">
             <div class="ind-col-lg-5 input-field">
                 <div class="input-label">Email</div>
-                <InputText class="main-input" @bind-Value="contact.email" />
+                <InputText type="email" class="main-input" @bind-Value="contact.email" />
                 <ValidationMessage For="@(() => contact.email)" />
             </div>
         </div>
         <div class="mb-3">
             <div class="ind-col-lg-5 input-field">
                 <div class="input-label">Телефон</div>
-                <InputText class="main-input" @bind-Value="contact.phone" />
+                <InputText type="tel" class="main-input" @bind-Value="contact.phone" />
                 <ValidationMessage For="@(() => contact.phone)" />
             </div>
         </div>
@@ -52,7 +52,7 @@
             <div class="mb-3">
                 <label for="Name" class="form-label">Доп. телефон</label>
                 <div class="col-md-4">
-                    <InputText class="form-control" @bind-Value="phone.phone" />
+                    <InputText type="tel" class="form-control" @bind-Value="phone.phone" />
                     <button type="button" class="btn btn-danger float-end" @onclick="()=>phone.isRemove = true"><span class=" oi oi-trash" aria-hidden="true"></span></button>
                 </div>
                 <ValidationMessage For="@(() => phone.phone)" />

@@ -48,7 +48,7 @@
                             <div class="input-label">
                                 Наименование товара:
                             </div>
-                            <input class="main-input" @bind="productFilter.name" />
+                            <input type="text" class="main-input" @bind="productFilter.name" />
                         </div>
                         <div class="ind-col-lg-2-5 pad-0-10-0-0">
                             <div class="input-label">
@@ -60,13 +60,13 @@
                             <div class="input-label">
                                 Цена от:
                             </div>
-                            <input class="main-input" @bind="productFilter.price_from" />
+                            <input type="number" class="main-input" @bind="productFilter.price_from" />
                         </div>
                         <div class="ind-col-lg-2-5 pad-0-10-0-0">
                             <div class="input-label">
                                 Цена до:
                             </div>
-                            <input class="main-input" @bind="productFilter.price_to" />
+                            <input type="number" class="main-input" @bind="productFilter.price_to" />
                         </div>
                     </div>
                     <div class="section-field pad-0-5">
