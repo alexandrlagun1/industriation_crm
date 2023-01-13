@@ -1667,6 +1667,10 @@ td.ind-col-lg-1 {
 	width: 100%;
 }
 
+.table-inside:last-child {
+	margin-top: auto;
+}
+
 .tr-inside {
 	width: 100%
 }
@@ -1883,6 +1887,10 @@ td.ind-col-lg-1 {
 	width: 30px;
 }
 
+.del-input {
+	max-width: 50px;
+	margin-right: 10px;
+}
 
 
 
