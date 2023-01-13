@@ -39,39 +39,48 @@ namespace industriation_crm.Server.Controllers.Megafon
                 urlEncoded.Headers.Add("X-API-KEY", "34258b4d-4561-4c81-bc79-8b437c741300");
                 var answer = await client.PostAsync("https://vats555687.megapbx.ru/crmapi/v1/makecall", urlEncoded);
             }
-            
+
             return Ok();
         }
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] megafon_info _info)
         {
             var user = _IUser.GetUserDataByPhone(_info.telnum!);
-            var contact = _IContact.GetContactDataByPhone(_info.phone!);
-            if (contact != null)
-            {
-                contact!.client!.contacts = null;
-                contact!.client!.user = null;
-                _info.contact = contact;
-            }
+            contact contact = _IContact.GetContactDataByPhone(_info.phone!);
+            _info.contact = contact;
             if (_info.cmd == "history")
             {
                 call_history call_History = new call_history();
                 call_History.client_number = _info.phone;
-                call_History.manager_number = _info.telnum;
+                if (_info.telnum == null)
+                    call_History.manager_number = "79381023900";
+                else
+                    call_History.manager_number = _info.telnum;
                 call_History.call_id = _info.callid;
                 call_History.duration = _info.duration;
                 call_History.status = _info.status;
                 call_History.type = _info.type;
                 call_History.date_time = DateTime.Now;
                 call_History.record = _info.link;
-                call_History.user_id = user?.id;
+                if (user == null)
+                    call_History.user_id = 22;
+                else
+                    call_History.user_id = user?.id;
+                //call_History.user = user;
+
                 call_History.contact_id = contact?.id;
+                //call_History.contact = contact;
                 _ICallHistory.AddCallHistory(call_History);
             }
             if (_info.cmd == "event")
             {
+                if (contact != null && contact?.client != null)
+                {
+                    _info.contact.client.user = null;
+                    _info.contact.client.contacts = null;
+                }
                 _info.date_time = DateTime.Now;
-                
+
                 if (user != null)
                     await this.hubContext.Clients.User(user.id.ToString()).MegafonCall(_info);
             }

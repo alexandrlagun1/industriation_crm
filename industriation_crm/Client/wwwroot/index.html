@@ -10,6 +10,19 @@
     <link href="css/app.css" rel="stylesheet" />
     <link href="industriation_crm.Client.styles.css" rel="stylesheet" />
     <link rel="stylesheet" href="bootstrap 2.0.css" />
+    <script>
+        window.downloadFileFromStream = async (fileName, contentStreamReference) => {
+            const arrayBuffer = await contentStreamReference.arrayBuffer();
+            const blob = new Blob([arrayBuffer]);
+            const url = URL.createObjectURL(blob);
+            const anchorElement = document.createElement('a');
+            anchorElement.href = url;
+            anchorElement.download = fileName ?? '';
+            anchorElement.click();
+            anchorElement.remove();
+            URL.revokeObjectURL(url);
+        }
+    </script>
 </head>
 
 <body>
@@ -29,6 +42,7 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script src="js/print_froms.js"></script>
 </body>
 
 </html>

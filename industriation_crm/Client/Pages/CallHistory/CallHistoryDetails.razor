@@ -125,7 +125,7 @@
                         <td class="ind-col-lg-1">
                             @if (call.record != null)
                             {
-                                <video controls autoplay>
+                                <video controls>
                                     <source src="@call.record" type="audio/mp3">
                                 </video>
                             }
@@ -186,7 +186,12 @@
         var response = await Http.PostAsJsonAsync("api/CallHistory", callHistoryFilter);
         var responseBody = await response.Content.ReadAsStringAsync();
         CallHistoryReturnData? callHistoryReturnData = JsonConvert.DeserializeObject<CallHistoryReturnData>(responseBody);
-        call_Histories = callHistoryReturnData?.call_historyes;
+        call_Histories = callHistoryReturnData.call_historyes;
+
+        int total_page = Convert.ToInt32(Math.Ceiling(callHistoryReturnData.count / Convert.ToDouble(count_on_page)));
+        page_count = new();
+        for (int i = 1; i <= total_page; i++)
+            page_count.Add(i);
         StateHasChanged();
     }
 

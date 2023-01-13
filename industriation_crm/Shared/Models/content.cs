@@ -148,6 +148,7 @@ namespace industriation_crm.Shared.Models
         public int? external_id { get; set; }
         public string? image { get; set; }
         public string? article { get; set; }
+        public string? unit { get; set; }
     }
     public class order
     {
@@ -166,6 +167,8 @@ namespace industriation_crm.Shared.Models
         public string? notes { get; set; }
         public int? stage_id { get; set; }
         public int? pay_status_id { get; set; }
+        public int? pay_conditions { get; set; } = 1;
+        public int? pay_predoplata_percent { get; set; } = 50;
         public int? supplier_manager_id { get; set; }
         [ForeignKey("supplier_manager_id")]
         public user? supplier_manager { get; set; }
@@ -473,7 +476,7 @@ namespace industriation_crm.Shared.Models
         [Key]
         public int id { get; set; }
         public DateTime? shipment_date { get; set; }
-        public int? delivery_type_id { get; set; }
+        public int? delivery_type_id { get; set; } = 1;
         public string? recipient_name { get; set; }
         public string? recipient_phone { get; set; }
         public int? order_id { get; set; }

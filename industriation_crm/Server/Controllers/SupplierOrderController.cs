@@ -39,9 +39,9 @@ namespace industriation_crm.Server.Controllers
         }
 
         [HttpPost]
-        public void Post(supplier_order supplier_order)
+        public int Post(supplier_order supplier_order)
         {
-            _ISupplierOrder.AddSupplierOrder(supplier_order);
+            return _ISupplierOrder.AddSupplierOrder(supplier_order);
         }
         [HttpPost("GetSupplierOrders")]
         public async Task<SupplierOrderReturnData> GetSupplierOrders([FromBody] SupplierOrderFilter ordersFilter)

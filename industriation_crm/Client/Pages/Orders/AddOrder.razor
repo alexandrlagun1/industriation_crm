@@ -5,11 +5,12 @@
 @using System.Security.Claims
 @using industriation_crm.Server.DataTranslation
 @using industriation_crm.Shared.Models
+@using industriation_crm.Client.PrintForms
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject HubConnection HubConnection
 @inject AuthenticationStateProvider AuthenticationStateProvider
-
+@inject IJSRuntime JSRuntime
 
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
@@ -71,6 +72,13 @@
     else
     {
         <div class="main-title">@Title</div>
+
+        <div>
+            Печатные формы
+            <button @onclick='()=>GetOrderPrintForm("1")'>Счет</button>
+            <button @onclick='()=>GetOrderPrintForm("0")'>Счет без печати</button>
+        </div>
+
         <hr class="custom-hr" />
         <div class="main-section">
             <div class="main-section-label">Менеджер</div>
@@ -91,6 +99,10 @@
                         @client?.org_name
                     else
                         @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
+
+
+
+
 
                     </a>
                     <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
@@ -227,7 +239,7 @@
                 <table class="order-table ind-col-lg-10">
                     <thead class="table-success ind-col-lg-10">
                         <tr class="order-row ind-col-lg-10">
-                            <td class="ind-col-lg-1">ID продукта</td>
+                            <td class="ind-col-lg-1">Артикул продукта</td>
                             <td class="ind-col-lg-3">Наименование</td>
                             <td class="ind-col-lg-2">Срок доставки</td>
                             <td class="ind-col-lg-1">Цена</td>
@@ -244,10 +256,10 @@
                                 <tr class="order-row">
                                     <td class="ind-col-lg-1" id="model">
                                         <img src="./icons/drag.png" alt="" class="drag" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
-                                        @p?.product?.id
+                                        @p?.product?.article
                                     </td>
                                     <td class="ind-col-lg-3">
-                                        <a href="" class="table-link">
+                                        <a href="/product/edit/@p.product.id" class="table-link">
                                             @p?.product?.name
 
                                             <div class="table-link-modal">
@@ -438,6 +450,20 @@
                 <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
             </div>
             <div class="input-field">
+                <div class="input-label">Условия оплаты</div>
+                <select type="text" class="main-input" @bind="@order.pay_conditions">
+                    <option value="1">Предоплата</option>
+                    <option value="2">Постоплата</option>
+                </select>
+            </div>
+            @if (order.pay_conditions == 1)
+            {
+                <div class="input-field">
+                    <div class="input-label">Предоплата:</div>
+                    <input class="main-input" @bind="@order.pay_predoplata_percent"></input>%
+                </div>
+            }
+            <div class="input-field">
                 <div class="input-label">К оплате:</div>
                 <label>@order._price_summ</label>
             </div>
@@ -504,8 +530,6 @@
     protected int role { get; set; }
     protected int? user_id { get; set; }
 
-
-    //Методы Drag&Drop
     protected product_to_order drag_product_to_order { get; set; }
 
     //Методы инициализвции
@@ -525,9 +549,33 @@
         user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
 
         await GetClientsManagers();
-
-
     }
+    protected override async Task OnParametersSetAsync()
+    {
+        if (orderId != 0)
+        {
+            Title = $"Изменить заказ {orderId}";
+            order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
+            client = order.client;
+        }
+        else
+        {
+            await SetMainContact();
+        }
+    }
+    //Печатные формы
+    protected async Task GetOrderPrintForm(string pch)
+    {
+        order_print_form order_Print_From = order_converter.ConvertOrderPrintForm(order, pch);
+
+        var response = await Http.PostAsJsonAsync($"api/PrintForms", order_Print_From);
+        var fileStream = await response.Content.ReadAsStreamAsync();
+
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+        await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"Счет на оплату {order?.id} от {order?.order_date?.ToString("dd.MM.yyyy")}.pdf", streamRef);
+    }
+
+    //Методы Drag&Drop
 
     protected void OnDragStart(product_to_order _product_to_order)
     {
@@ -580,19 +628,7 @@
         delivery_Types = await Http.GetFromJsonAsync<List<delivery_type>>("api/DeliveryType");
         delivery_Period_Types = await Http.GetFromJsonAsync<List<delivery_period_type>>("api/DeliveryPeriodType");
     }
-    protected override async Task OnParametersSetAsync()
-    {
-        if (orderId != 0)
-        {
-            Title = $"Изменить заказ {orderId}";
-            order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
-            client = order.client;
-        }
-        else
-        {
-            await SetMainContact();
-        }
-    }
+
 
     //Методы для определения main contact
     protected void ChangeMainContact(contact _main_contact)
@@ -655,8 +691,8 @@
 
             var response = await Http.PostAsJsonAsync("api/Order", order);
             orderId = await response.Content.ReadFromJsonAsync<int>();
-            await CreateOrderHistory("Заказ клинта сформирован");
-
+            await OnParametersSetAsync();
+            await CreateOrderHistory("Заказ клиента сформирован");
         }
 
         //Сохранение и удаление продуктов из заказа

@@ -293,7 +293,9 @@
         else
         {
             supplier_order.user_id = user_id;
-            await Http.PostAsJsonAsync("api/SupplierOrder", supplier_order);
+            var response = await Http.PostAsJsonAsync("api/SupplierOrder", supplier_order);
+            supplierOrderId = await response.Content.ReadFromJsonAsync<int>();
+            await OnParametersSetAsync();
         }
     }
     public void Cancel()

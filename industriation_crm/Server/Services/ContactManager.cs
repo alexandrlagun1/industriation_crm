@@ -149,7 +149,7 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                contact? contact = _dbContext.contact.Where(c=>c.phone == phone).Include(c => c.client).FirstOrDefault();
+                contact? contact = _dbContext.contact.Where(c => c.phone == phone).Include(c => c.client).FirstOrDefault();
                 return contact;
             }
             catch

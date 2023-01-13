@@ -13,7 +13,7 @@ namespace industriation_crm.Server.Services
         {
             _dbContext = dbContext;
         }
-        public void AddSupplierOrder(supplier_order supplier_order)
+        public int AddSupplierOrder(supplier_order supplier_order)
         {
             try
             {
@@ -30,6 +30,7 @@ namespace industriation_crm.Server.Services
                     _dbContext.Entry(p).State = EntityState.Modified;
                 }
                 _dbContext.SaveChanges();
+                return supplier_order.id;
             }
             catch
             {

@@ -33,7 +33,9 @@
                             @foreach (var m in megafon_Infos.OrderByDescending(meg => meg.date_time))
                             {
                                 <div class="call-modal">
-                                    @m.date_time <br />
+                                    <div class="call-date">
+                                        @m.date_time
+                                    </div>
                                     @if (m.type == "INCOMING")
                                     {
                                         if (m.contact == null)
@@ -57,11 +59,14 @@
                                         }
                                     }
                                     <div class="buttons">
-                                        <button type="button" @onclick="()=>OpenClient(m)">Клиент</button>
-                                        <button type="button" @onclick="()=>CallToClient(m.phone!)">Звонок</button>
-                                        <button type="button" @onclick="()=>RemoveCall(m)">Х</button>
+                                        <button class="score" type="button" @onclick="()=>OpenClient(m)">Клиент</button>
+                                        @if (m.type == "CANCELLED")
+                                        {
+                                            <button type="button" @onclick="()=>CallToClient(m.phone!)">Звонок</button>
+                                        }
+                                        <button class="close" type="button" @onclick="()=>RemoveCall(m)">Х</button>
+                                        </div>
                                     </div>
-                                </div>
                             }
                         </div>
                         @Body
@@ -104,7 +109,7 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
-        await Http.GetFromJsonAsync<order>($"api/Megafon?user_id={user_id}&phone={phone}");
+        await Http.GetAsync($"api/Megafon?user_id={user_id}&phone={phone}");
     }
     protected void RemoveCall(megafon_info megafon_info)
     {
