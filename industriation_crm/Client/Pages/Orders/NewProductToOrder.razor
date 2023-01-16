@@ -13,8 +13,8 @@
 
                 <div class="container">
                     <div class="row-f ind-col-lg-10">
-                        <div class="main-title ind-col-lg-3">Добавление товаров</div>
-                        <div class="ind-col-lg-7 row-f">
+                        <div class="main-title ind-col-lg-9">Добавление товаров</div>
+                        <div class="ind-col-lg-1 row-f">
                             <div class="ind-col-lg-1 a-i-c">
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="CloseModal"></button>
                             </div>
@@ -96,7 +96,10 @@
                                         <td class="ind-col-lg-1"><input class="main-input" type="number" @bind-value="p.count"></input></td>
                                         <td class="ind-col-lg-1">
                                             <button class="add-item" @onclick="()=>AddProduct(p)">
-                                                Добавить
+                                                <div class="hidden-md">Изменить</div>
+                                                <div class="hidden-lg ind-col-md-10">
+                                                    <img src="./icons/add-white.svg" class="h20-w20">
+                                                </div>
                                             </button>
                                         </td>
                                     </tr>

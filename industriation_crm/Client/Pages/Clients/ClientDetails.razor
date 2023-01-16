@@ -28,17 +28,17 @@ else
             </a>
         </div>
         <div class="main-section">
-            <div class="ind-col-lg-5 input-field">
+            <div class="ind-col-lg-5 ind-col-md-7 input-field">
                 <div class="input-label ind-col-lg-5">
                     ФИО клиента:
                 </div>
-                <input type="text" class="main-input ind-col-lg-5" @bind="clientFilter.client">
+                <input type="text" class="main-input ind-col-lg-5 ind-col-md-7" @bind="clientFilter.client">
             </div>
-            <div class="ind-col-lg-5 input-field">
+            <div class="ind-col-lg-5 ind-col-md-7 input-field">
                 <div class="input-label ind-col-lg-5">
                     ИНН:
                 </div>
-                <input type="number" class="main-input ind-col-lg-5" @bind="clientFilter.inn">
+                <input type="number" class="main-input ind-col-lg-5 ind-col-md-7" @bind="clientFilter.inn">
             </div>
             <button @onclick="Search" class="score mt-20 mb-20">Поиск</button>
 
@@ -49,9 +49,9 @@ else
                             <td class="ind-col-lg-1">ID</td>
                             <td class="ind-col-lg-2">Организация</td>
                             <td class="ind-col-lg-2">ФИО</td>
-                            <td class="ind-col-lg-1">Тип клиента</td>
+                            <td class="ind-col-lg-2">Тип клиента</td>
                             <td class="ind-col-lg-2">Закрепленный менеджер</td>
-                            <td class="ind-col-lg-2">Действия</td>
+                            <td class="ind-col-lg-1">Действия</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,7 +61,7 @@ else
                                 <td class="ind-col-lg-1">@_client.id</td>
                                 <td class="ind-col-lg-2">@_client.org_name</td>
                                 <td class="ind-col-lg-2">@_client.contacts.Where(c=>c.main_contact==1).FirstOrDefault()?.full_name</td>
-                                <td class="ind-col-lg-1">
+                                <td class="ind-col-lg-2">
                                     @if (_client.client_type == 0)
                                     {
                                         <i>Физическое лицо</i>
@@ -72,12 +72,15 @@ else
                                     }
                                 </td>
                                 <td class="ind-col-lg-2">@_client.user?.name</td>
-                                <td class="ind-col-lg-2">
+                                <td class="ind-col-lg-1">
                                     @if (SelectOrderClient == null)
                                     {
                                         <div class="ind-col-lg-10">
                                             <a class="score" type="button" href='/client/edit/@_client.id'>
-                                                Изменить
+                                                <div class="hidden-md">Изменить</div>
+                                                <div class="hidden-lg ind-col-md-10">
+                                                    <img src="./icons/edit.svg" class="h20-w20">
+                                                </div>
                                             </a>
                                         </div>
                                     }
@@ -97,13 +100,13 @@ else
                 </table>
             </div>
             <div class="section-field filter-pagination mt-20">
-                <div>
+                <div class="ind-col-lg-6">
                     Страница:
                     <input class="pagination-input" type="number" min="1" @bind="current_page" @bind:event="oninput" @onkeydown="OnKeyDown">
                     из @page_count.Count()
                     <button class="score" @onclick="GetClient">Перейти</button>
                 </div>
-                <div>
+                <div class="ind-col-lg-4">
                     <button class="score" @onclick="PagPrev">Предыдущая</button>
                     <button class="score" @onclick="PagNext">Следующая</button>
                 </div>

@@ -125,9 +125,12 @@
                         <td class="ind-col-lg-1">
                             @if (call.record != null)
                             {
-                                <video controls>
-                                    <source src="@call.record" type="audio/mp3">
-                                </video>
+                                <button class="play-btn">
+                                    <img src="./icons/play_icon.svg">
+                                </button>
+                                <button class="download-btn">
+                                    <img src="./icons/download.svg">
+                                </button>
                             }
                             else
                             {
@@ -142,13 +145,13 @@
         </table>
     </div>
     <div class="section-field filter-pagination mt-20">
-        <div>
+        <div class="ind-col-lg-6">
             Страница:
             <input class="pagination-input" type="number" min="1" @bind="current_page" @bind:event="oninput" @onkeydown="OnKeyDown">
             из @page_count.Count()
             <button class="score" @onclick="FindByFilter">Перейти</button>
         </div>
-        <div>
+        <div class="ind-col-lg-4">
             <button class="score" @onclick="PagPrev">Предыдущая</button>
             <button class="score" @onclick="PagNext">Следующая</button>
         </div>
