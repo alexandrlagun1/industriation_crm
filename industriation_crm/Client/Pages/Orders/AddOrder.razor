@@ -71,12 +71,56 @@
     }
     else
     {
-        <div class="main-title">@Title</div>
 
-        <div>
-            Печатные формы
-            <button @onclick='()=>GetOrderPrintForm("1")'>Счет</button>
-            <button @onclick='()=>GetOrderPrintForm("0")'>Счет без печати</button>
+@*        СТАТИЧНЫЙ АЛЕРТ (НУЖНО КУДА-ТО ПРИКРУТИТЬ ПОЯВЛЕНИЕ)*@
+        <div class="saved-modal">
+            <img src="./icons/close.svg">
+            <div class="saved-modal-text">
+                Успешно сохранено!
+            </div>    
+        </div>
+
+
+        <div class="main-title">@Title</div>
+        <div class="main-section  flex">
+            <div class="main-section-label">Печать документов</div>
+            <div class="section-field ind-col-lg-5">
+                <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5">
+                    <option>
+                        Альфабанк
+                    </option> 
+                    <option>
+                        Сбербанк
+                    </option>  
+                    <option>
+                        ВТБ
+                    </option> 
+                    <option>
+                        Совкомбанк
+                    </option>  
+                </select>
+                <button class="score mr-5" @onclick='()=>GetOrderPrintForm("1")'>Счет</button>
+                <button class="score" @onclick='()=>GetOrderPrintForm("0")'>Счет без печати</button>
+            </div>
+@*            Второй блок для договоров (БЕЗ ФУНКЦИОНАЛА)*@
+            <div class="section-field ind-col-lg-5">
+                <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5">
+                    <option>
+                        Альфабанк
+                    </option> 
+                    <option>
+                        Сбербанк
+                    </option>  
+                    <option>
+                        ВТБ
+                    </option> 
+                    <option>
+                        Совкомбанк
+                    </option>  
+                </select>
+                <button class="score mr-5">Договор</button>
+                <button class="score">Договор без печати</button>
+            </div>
         </div>
 
         <hr class="custom-hr" />
@@ -99,11 +143,6 @@
                         @client?.org_name
                     else
                         @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
-
-
-
-
-
                     </a>
                     <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
@@ -116,7 +155,7 @@
                 @if (viewContacts == false)
             {
                 <div class="section-field">
-                    <div class="ind-col-lg-5">
+                    <div class="ind-col-lg-5 ind-col-md-10">
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Имя</div>
                             <input type="text" class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
@@ -130,7 +169,7 @@
                             <input type="text" class="main-input" value="@order?.main_contact?.patronymic" @oninput="@((ChangeEventArgs e) => {order.main_contact.patronymic = e.Value.ToString();clientChange = true;})">
                         </div>
                     </div>
-                    <div class="ind-col-lg-5">
+                    <div class="ind-col-lg-5 ind-col-md-10">
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">E-mail</div>
                             <input type="email" class="main-input" value="@order?.main_contact?.email" @oninput="@((ChangeEventArgs e) => {order.main_contact.email = e.Value.ToString();clientChange = true;})">
@@ -188,21 +227,21 @@
             <div class="main-section">
                 <div class="main-section-label">Данные юридического лица</div>
                 <div class="section-field">
-                    <div class="ind-col-lg-5 input-field">
+                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">Полное наименование</div>
                         <input type="text" class="main-input" @bind="client.org_name">
                     </div>
-                    <div class="ind-col-lg-5 input-field">
+                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">ИНН</div>
                         <input type="number" class="main-input" @bind="client.org_inn">
                     </div>
                 </div>
                 <div class="section-field">
-                    <div class="ind-col-lg-5 input-field">
+                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">Адрес регистрации</div>
                         <input type="text" class="main-input" @bind="client.org_address">
                     </div>
-                    <div class="ind-col-lg-5 input-field">
+                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">ОГРН</div>
                         <input type="number" class="main-input" @bind="client.org_ogrn">
                     </div>
@@ -212,21 +251,21 @@
             <div class="main-section">
                 <div class="main-section-label">Банковские реквизиты</div>
                 <div class="section-field">
-                    <div class="ind-col-lg-5 input-field">
+                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">БИК</div>
                         <input type="number" class="main-input" @bind="client.bank_bik">
                     </div>
-                    <div class="ind-col-lg-5 input-field">
+                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">Корреспондентский счет</div>
                         <input type="number" class="main-input" @bind="client.bank_cor_schet">
                     </div>
                 </div>
                 <div class="section-field">
-                    <div class="ind-col-lg-5 input-field">
+                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">Наименование банка</div>
                         <input type="text" class="main-input" @bind="client.bank_name">
                     </div>
-                    <div class="ind-col-lg-5 input-field">
+                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">Расчетный счет</div>
                         <input type="number" class="main-input" @bind="client.bank_ras_schet">
                     </div>
@@ -338,17 +377,17 @@
                     }
                     else
                     {
-                        <div class="ind-col-lg-4"></div>
-                        <div class="ind-col-lg-2 ta-right mr-20">
+                        <div class="ind-col-lg-7 ind-col-md-4"></div>
+                        <div class="ind-col-lg-1 ind-col-md-2 ta-right">
                             <label>Разовая скидка</label>
                         </div>
-                        <div class="ind-col-lg-2 a-i-c">
-                            <input class="main-input ind-col-lg-6" id="ex1" type="number" @bind="@order._ruble_discount">
-                            <div class="ind-col-lg-1">&nbsp; ₽</div>
+                        <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
+                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex1" type="number" @bind="@order._ruble_discount">
+                            ₽
                         </div>
-                        <div class="ind-col-lg-2 a-i-c">
-                            <input class="main-input ind-col-lg-6" id="ex2" type="number" @bind="@order._percent_discount">
-                            <div class="ind-col-lg-1">&nbsp; %</div>
+                        <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
+                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex2" type="number" @bind="@order._percent_discount">
+                            %
                         </div>
 
                     }
@@ -395,7 +434,7 @@
             </div>
         </div>
         <div class="row-f">
-            <div class="main-section ind-col-lg-5">
+            <div class="main-section ind-col-lg-5 ind-col-md-7">
                 <div class="main-section-label">Отгрузка и доставка</div>
                 <div class="section-field">
                     <div class="ind-col-lg-10">
@@ -432,7 +471,7 @@
                     </div>
                 </div>
             </div>
-            <div class="ind-col-lg-5 background-for-comment">
+            <div class="ind-col-lg-5 ind-col-md-3 background-for-comment">
                 <div class="main-section ind-col-lg-10">
                     <div class="main-section-label">Комментарии к заказу</div>
                     <div class="section-field">
@@ -444,7 +483,7 @@
             </div>
         </div>
 
-        <div class="main-section ind-col-lg-5">
+        <div class="main-section ind-col-lg-5 ind-col-md-10">
             <div class="main-section-label">Оплата</div>
             <div class="section-field">
                 <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>

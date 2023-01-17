@@ -8,12 +8,12 @@
 
 <div class="main-section">
     <div class="row">
-        <div class="ind-col-lg-2">
+        <div class="ind-col-lg-2 ind-col-md-4">
             <a href='/user/add' class="score" role="button">
                 Добавить пользователя
             </a>
         </div>
-        <div class="ind-col-lg-8">
+        <div class="ind-col-lg-8 ind-col-md-6">
             <input type="text" class="main-input" placeholder="Поиск по имени"
                    @bind="SearchString" @bind:event="oninput" @onkeyup="FilterUser" />
         </div>
@@ -31,7 +31,7 @@
                     <tr class="order-row ind-col-lg-10">
                         <td class="ind-col-lg-1">ID</td>
                         <td class="ind-col-lg-4">Имя</td>
-                        <td class="ind-col-lg-3">Роль</td>
+                        <td class="ind-col-lg-3 ind-col-md-3">Роль</td>
                         <td class="ind-col-lg-2">Действия</td>
                     </tr>
                 </thead>
@@ -45,12 +45,18 @@
                             <td class="ind-col-lg-2">
                                 <div class=" ind-col-lg-5">
                                     <a href='/user/edit/@user.id' class="score" role="button">
-                                        Изменить
+                                        <div class="hidden-md">Изменить</div>
+                                        <div class="hidden-lg ind-col-md-10">
+                                            <img src="./icons/edit.svg" class="h20-w20">
+                                        </div>
                                     </a>
                                 </div>
-                                <div classclass="ind-col-lg-5">
+                                <div class="ind-col-lg-5">
                                     <a href='/user/delete/@user.id' class="close" role="button">
-                                        Удалить
+                                        <div class="hidden-md">Удалить</div>
+                                        <div class="hidden-lg ind-col-md-10">
+                                            <img src="./icons/delete-white.svg" class="h20-w20">
+                                        </div>
                                     </a>
                                 </div>
                             </td>

@@ -12,7 +12,7 @@
     <div class="main-section">
         <div class="main-section-label">Основная информация о пользователе</div>
         <div class="mb-3">
-            <div class="ind-col-lg-5 input-field">
+            <div class="ind-col-lg-5 ind-col-md-7 input-field">
                 <div class="input-label">Имя</div>
                 <InputText class="main-input" @bind-Value="user.name" />
                 <ValidationMessage For="@(() => user.name)" />
@@ -20,7 +20,7 @@
         </div>
 
         <div class="mb-3">
-            <div class="ind-col-lg-5 input-field">
+            <div class="ind-col-lg-5 ind-col-md-7 input-field">
                 <div class="input-label">Роль</div>
                 <InputSelect class="main-input" @bind-Value="user.role_id">
                     @foreach (var r in roles)

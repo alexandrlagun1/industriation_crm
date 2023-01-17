@@ -21,7 +21,7 @@
         <div class="main-section">
             <div class="main-section-label">Основные данные</div>
             <div class="section-field">
-                <div class="ind-col-lg-5 input-field">
+                <div class="ind-col-lg-5 ind-col-md-10 input-field">
                     <div class="input-label">Закрепленный менеджер</div>
                     <InputSelect class="main-input" @bind-Value="client.user_id">
                         @foreach (var m in managers)
@@ -30,7 +30,7 @@
                         }
                     </InputSelect>
                 </div>
-                <div class="ind-col-lg-5 input-field">
+                <div class="ind-col-lg-5 ind-col-md-10 input-field">
                     <div class="input-label">Тип клиента</div>
                     <InputSelect class="main-input" @bind-Value="client.client_type">
                         <option value="0">Физическое лицо</option>
@@ -43,7 +43,7 @@
     <div class="main-section">
         <div class="main-section-label">Клиент</div>
         <div class="section-field">
-            <div class="ind-col-lg-5">
+            <div class="ind-col-lg-5 ind-col-md-10">
                 <div class="ind-col-lg-10 input-field">
                     <div class="input-label">Имя</div>
                     <input type="text" class="main-input" @bind-value="main_contact.name" />
@@ -57,7 +57,7 @@
                     <input type="text" class="main-input" @bind-value="main_contact.patronymic" />
                 </div>
             </div>
-            <div class="ind-col-lg-5">
+            <div class="ind-col-lg-5 ind-col-md-10">
                 <div class="ind-col-lg-10 input-field">
                     <div class="input-label">E-mail</div>
                     <input type="email" class="main-input" @bind-value="main_contact.email" />
@@ -75,7 +75,7 @@
         <div class="main-section">
             <div class="main-section-label">Данные по юридическому лицу</div>
             <div class="section-field">
-                <div class="ind-col-lg-5">
+                <div class="ind-col-lg-5 ind-col-md-10">
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">Полное наименование</div>
                         <input type="text" class="main-input" @bind-value="client.org_name" />
@@ -85,7 +85,7 @@
                         <input type="text" class="main-input" @bind-value="client.org_address" />
                     </div>
                 </div>
-                <div class="ind-col-lg-5">
+                <div class="ind-col-lg-5 ind-col-md-10">
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">ИНН</div>
                         <input type="number" class="main-input" @bind-value="client.org_inn" />
@@ -101,7 +101,7 @@
         <div class="main-section">
             <div class="main-section-label">Банковские реквизиты</div>
             <div class="section-field">
-                <div class="ind-col-lg-5">
+                <div class="ind-col-lg-5 ind-col-md-10">
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">БИК</div>
                         <input type="number" class="main-input" @bind="client.bank_bik" />
@@ -111,7 +111,7 @@
                         <input type="text" class="main-input" @bind="client.bank_name" />
                     </div>
                 </div>
-                <div class="ind-col-lg-5">
+                <div class="ind-col-lg-5 ind-col-md-10">
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">Корреспондентский счет</div>
                         <input type="number" class="main-input" @bind="client.bank_cor_schet" />
@@ -157,12 +157,18 @@
                                     <td class="ind-col-lg-2">
                                         <div class="ind-col-lg-5">
                                             <a href='/contact/edit/@clientId/@c.id/@true' class="score" role="button">
-                                                Изменить
+                                                <div class="hidden-md">Изменить</div>
+                                                <div class="hidden-lg ind-col-md-10">
+                                                    <img src="./icons/edit.svg" class="h20-w20">
+                                                </div>
                                             </a>
                                         </div>
                                         <div class="ind-col-lg-5">
                                             <button type="button" class="close" role="button" @onclick="()=>RemoveContact(c)">
-                                                Удалить
+                                                <div class="hidden-md">Удалить</div>
+                                                <div class="hidden-lg ind-col-md-10">
+                                                    <img src="./icons/delete-white.svg" class="h20-w20">
+                                                </div>
                                             </button>
                                         </div>
                                     </td>

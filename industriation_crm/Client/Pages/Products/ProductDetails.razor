@@ -96,7 +96,10 @@ else
                             <td class="ind-col-lg-1">@product.price</td>
                             <td class="ind-col-lg-1">
                                 <a href='/product/edit/@product.id' class="score" role="button">
-                                    Изменить
+                                    <div class="hidden-md">Изменить</div>
+                                    <div class="hidden-lg ind-col-md-10">
+                                        <img src="./icons/edit.svg" class="h20-w20">
+                                    </div>
                                 </a>
                             </td>
                         </tr>
@@ -106,13 +109,13 @@ else
             </table>
         </div>
         <div class="section-field filter-pagination mt-20">
-            <div>
+            <div class="ind-col-lg-6">
                 Страница:
                 <input class="pagination-input" type="number" min="1" @bind="current_page" @bind:event="oninput" @onkeydown="OnKeyDown">
                 из @page_count.Count()
                 <button class="score" @onclick="FindByFilter">Перейти</button>
             </div>
-            <div>
+            <div class="ind-col-lg-4">
                 <button class="score" @onclick="PagPrev">Предыдущая</button>
                 <button class="score" @onclick="PagNext">Следующая</button>
             </div>
