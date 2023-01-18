@@ -326,11 +326,15 @@
                                     <td class="ind-col-lg-1">
                                         <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">
                                             @if(p.ruble_discount == 0 && p.percent_discount == 0){
-                                                @p._product_price
+                                                <span>@p._product_price ₽</span>
                                             }
                                             else{
-                                                @p._product_price_with_discount
-                                                @p._product_price
+                                                <span class="prev-price">
+                                                    @p._product_price ₽
+                                                </span>
+                                                <span class="price-with-discount">
+                                                    @p._product_price_with_discount ₽
+                                                </span>
                                             }
                                         </button>
                                         @if (p.showPriceModal)
@@ -343,7 +347,7 @@
                                                 <div class="input-label mt-10">Дополнительная скидка</div>
                                                 <div class="row-f">
                                                     <div class="ind-col-lg-5 discount-input">
-                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" />P
+                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" />₽
                                                     </div>
                                                     <div class="ind-col-lg-5 discount-input">
                                                         <input type="number" class="main-input" @bind="@p.percent_discount" />%

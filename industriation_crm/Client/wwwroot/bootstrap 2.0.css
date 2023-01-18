@@ -923,17 +923,36 @@ header {
 
 .price-button {
 	border: none;
-	border-radius: 3px;
 	color: #0099ff;
 	font-size: 13px;
 	display: block;
 	width: 100%;
 	font-style: normal;
 	outline: none !important;
-	padding: 5px 10px;
-	text-decoration: underline;
 	position: relative;
 	background-color: #fff;
+}
+
+.prev-price {
+	margin-right: 10px;
+	position: relative;
+	color: #b1b1b1;
+}
+
+.prev-price:before {
+	content: '';
+    width: 130%;
+    height: 1px;
+    background-color: #C30000;
+    position: absolute;
+    top: 8px;
+    left: -14%;
+    transform: rotate(348deg);
+}
+}
+
+.price-width-discount {
+
 }
 
 .main-input::placeholder {
