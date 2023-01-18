@@ -2023,7 +2023,7 @@ td.ind-col-lg-1 {
 	width: 276px;
 	height: 87px;
 	background-color: #00800080;
-	z-index: 5;
+	z-index: 1111;
 	color: #fff;
 	display: flex;
 	text-align: center;
