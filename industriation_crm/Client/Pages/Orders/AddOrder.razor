@@ -16,7 +16,7 @@
 
 @if (showAlert)
 {
-    <Alert text="Успешно сохранено!" show="showAlert"></Alert>
+    <Alert text="Успешно сохранено!" CloseAlert="CloseAlert"></Alert>
 }
 @if (OpenProductAddModel)
 {
@@ -93,8 +93,8 @@
                         Совкомбанк
                     </option>  
                 </select>
-                <button class="score mr-5" @onclick='()=>GetOrderPrintForm("1")'>Счет</button>
-                <button class="score" @onclick='()=>GetOrderPrintForm("0")'>Счет без печати</button>
+                <button class="score mr-5" @onclick='()=>GetOrderPrintForm("1")' type="button">Счет</button>
+                <button class="score" @onclick='()=>GetOrderPrintForm("0")' type="button">Счет без печати</button>
             </div>
 @*            Второй блок для договоров (БЕЗ ФУНКЦИОНАЛА)*@
             <div class="section-field ind-col-lg-5">
@@ -112,8 +112,8 @@
                         Совкомбанк
                     </option>  
                 </select>
-                <button class="score mr-5">Договор</button>
-                <button class="score">Договор без печати</button>
+                <button class="score mr-5" type="button">Договор</button>
+                <button class="score" type="button">Договор без печати</button>
             </div>
         </div>
 
@@ -548,6 +548,11 @@
 
 @code {
     protected bool showAlert {get;set;}
+    protected void CloseAlert()
+    {
+        showAlert = false;
+        StateHasChanged();
+    }
 
     protected bool ViewOrderManagement = false;
     protected string clientClass = "client client--active";

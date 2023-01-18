@@ -1,21 +1,29 @@
-﻿@if (show)
-{
-    <div class="saved-modal">
-        <img src="./icons/close.svg" @onclick="()=>show=false">
+﻿
+<div class="saved-modal" style="@style1">
+        <img src="./icons/close.svg" @onclick="CloseAlert">
         <div class="saved-modal-text">
             @text
         </div>
     </div>
-}
+
 @code {
+
     [Parameter]
     public string? text { get; set; }
     [Parameter]
-    public bool show { get; set; }
-    [Parameter]
     public Action? CloseAlert { get; set; }
 
- }
+    protected string style1 = "";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Task.Delay(2000);
+        style1 = "opacity: 0; transition: opacity .5s";
+        StateHasChanged();
+        await Task.Delay(2000);
+        CloseAlert.Invoke();
+    }
+}
 
 
 
