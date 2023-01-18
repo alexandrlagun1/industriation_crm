@@ -123,9 +123,15 @@
                         </td>
                         <td class="ind-col-lg-1">@call.duration</td>
                         <td class="ind-col-lg-1">
+                            @if (call.isActive)
+                            {
+                                <video controls>
+                                    <source src="@call.record" type="audio/mp3">
+                                </video>
+                            }
                             @if (call.record != null)
                             {
-                                <button class="play-btn">
+                                <button class="play-btn" @onclick="()=>call.isActive=true">
                                     <img src="./icons/play_icon.svg">
                                 </button>
                                 <button class="download-btn">
@@ -133,9 +139,7 @@
                                 </button>
                             @*
                                 Панель управления просшуиванием звонка
-                                <video controls>
-                                    <source src="@call.record" type="audio/mp3">
-                                </video>
+                                
                             *@
                             }
                             else

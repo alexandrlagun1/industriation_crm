@@ -81,6 +81,8 @@ namespace industriation_crm.Shared.Models
     }
     public class call_history
     {
+        [NotMapped]
+        public bool isActive = false;
         [Key]
         public int id { get; set; }
         public string? client_number { get; set; }
@@ -97,6 +99,7 @@ namespace industriation_crm.Shared.Models
         [ForeignKey("contact_id")]
         public contact? contact { get; set; }
         public DateTime? date_time { get; set; }
+        
     }
     public class client
     {

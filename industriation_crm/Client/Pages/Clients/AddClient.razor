@@ -9,8 +9,11 @@
 
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
-<Alert type="@allert_type" text="@allert_text" CloseAlert="()=>allert_type = null"></Alert>
 
+@if (showAlert)
+{
+    <Alert text="Удаление основного контакта запрещено!" CloseAlert="CloseAlert" type="1"></Alert>
+}
 
 <EditForm Model="@client" OnValidSubmit="SaveClient">
     <DataAnnotationsValidator />
@@ -198,6 +201,13 @@
 
 </EditForm>
 @code {
+    protected bool showAlert {get;set;}
+    protected void CloseAlert()
+    {
+        showAlert = false;
+        StateHasChanged();
+    }
+
     [Parameter]
     public string? phone { get; set; }
     [Parameter]
@@ -228,7 +238,7 @@
         {
             managers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
         }
-        
+
     }
 
     protected override async Task OnParametersSetAsync()
@@ -292,7 +302,7 @@
         return false;
     }
 
-   
+
     protected async Task SaveClient()
     {
 
@@ -333,8 +343,7 @@
     {
         if (main_contact_id == _contact.id)
         {
-            allert_type = 1;
-            allert_text = "Прежде чем удалять основной контакт, переназначьте его и сохраните заявку.";
+            showAlert = true;
             return;
         }
 

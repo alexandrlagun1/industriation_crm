@@ -1,10 +1,10 @@
 ﻿
 <div class="saved-modal" style="@style1">
-        <img src="./icons/close.svg" @onclick="CloseAlert">
-        <div class="saved-modal-text">
-            @text
-        </div>
+    <img src="./icons/close.svg" @onclick="CloseAlert">
+    <div class="saved-modal-text">
+        @text
     </div>
+</div>
 
 @code {
 
@@ -12,15 +12,24 @@
     public string? text { get; set; }
     [Parameter]
     public Action? CloseAlert { get; set; }
+    [Parameter]
+    public int? type {get;set;}
 
     protected string style1 = "";
 
     protected override async Task OnParametersSetAsync()
     {
+        if(type == 0)
+        {
+            style1 = "background-color: green";
+        }
+        else if(type == 1)
+        {
+            style1 = "background-color: red";
+        }
         await Task.Delay(2000);
-        style1 = "opacity: 0; transition: opacity .5s";
-        StateHasChanged();
-        await Task.Delay(2000);
+        //style1 = "opacity: 0; transition: opacity .5s";
+        //await Task.Delay(2000);
         CloseAlert.Invoke();
     }
 }

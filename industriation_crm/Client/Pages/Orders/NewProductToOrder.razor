@@ -4,7 +4,10 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
-
+@if (showAlert)
+{
+    <Alert text="Товар добавлен" CloseAlert="CloseAlert" type="0"></Alert>
+}
 
 <div class="modal" tabindex="-1" style="display:block" role="dialog">
     <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
@@ -119,6 +122,13 @@
 </div>
 
 @code {
+    protected bool showAlert { get; set; }
+    protected void CloseAlert()
+    {
+        showAlert = false;
+        StateHasChanged();
+    }
+
     [Parameter]
     public int orderId { get; set; }
     [Parameter]
@@ -139,7 +149,7 @@
 
     protected async Task ViewProducts()
     {
-            productsCountOnPage = productsCountOnPage + 20;
+        productsCountOnPage = productsCountOnPage + 20;
         await FindByFilter();
 
     }
@@ -154,7 +164,7 @@
         categoriesList = await Http.GetFromJsonAsync<List<category>>("api/Category");
         currentCategory = categoriesList.Where(c => c.parent_id == 0).FirstOrDefault();
         await FindByFilter();
-        
+
     }
     protected async Task GetProducts(category category)
     {
@@ -197,6 +207,7 @@
         product_To_Order._product_price = productPackage.product.price;
         product_To_Order.product = productPackage.product;
         AddProductToproductToOrder?.Invoke(product_To_Order);
+        showAlert = true;
     }
     protected List<category> GetCategoryTree(List<category> categoryTree, category category)
     {
