@@ -925,12 +925,14 @@ header {
 	border: none;
 	color: #0099ff;
 	font-size: 13px;
-	display: block;
+	display: flex;
 	width: 100%;
 	font-style: normal;
 	outline: none !important;
 	position: relative;
 	background-color: #fff;
+	flex-wrap: wrap;
+	justify-content: center;
 }
 
 .prev-price {
@@ -949,11 +951,7 @@ header {
     left: -14%;
     transform: rotate(348deg);
 }
-}
 
-.price-width-discount {
-
-}
 
 .main-input::placeholder {
 	color: #636f7f;
