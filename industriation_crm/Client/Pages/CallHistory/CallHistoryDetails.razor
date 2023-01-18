@@ -31,7 +31,7 @@
         </div>
     </row-f>
     <div class="section-field ind-col-lg-10">
-        <div class="ind-col-lg-5 input-field">
+        <div class="ind-col-lg-5 input-field ind-col-md-10">
             <div class="input-label ind-col-lg-5">
                 Тип:
             </div>
@@ -41,7 +41,7 @@
                 <option value="out">Исходящие</option>
             </select>
         </div>
-        <div class="ind-col-lg-5 input-field">
+        <div class="ind-col-lg-5 input-field ind-col-md-10">
             <div class="input-label ind-col-lg-5">
                 Телефон клиента:
             </div>
@@ -49,13 +49,13 @@
         </div>
     </div>
     <div class="section-field ind-col-lg-10">
-        <div class="ind-col-lg-5 input-field">
+        <div class="ind-col-lg-5 input-field ind-col-md-10">
             <div class="input-label ind-col-lg-5">
                 Дата заказа от:
             </div>
             <input type="date" @bind="callHistoryFilter.call_date_from" class="main-input ind-col-lg-5"></input>
         </div>
-        <div class="ind-col-lg-5 input-field">
+        <div class="ind-col-lg-5 input-field ind-col-md-10">
             <div class="input-label ind-col-lg-5">
                 Дата заказа до:
             </div>
@@ -131,6 +131,12 @@
                                 <button class="download-btn">
                                     <img src="./icons/download.svg">
                                 </button>
+                            @*
+                                Панель управления просшуиванием звонка
+                                <video controls>
+                                    <source src="@call.record" type="audio/mp3">
+                                </video>
+                            *@
                             }
                             else
                             {

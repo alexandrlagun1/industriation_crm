@@ -1553,12 +1553,13 @@ td.ind-col-lg-1 {
 
 .manager-field {
 	width: calc(100% - 210px);
-	border: 1px solid #d9d9d9;
+/*	border: 1px solid #d9d9d9;*/
 	min-height: 35px;
 	margin-left: 210px;
 	margin-bottom: 20px;
 	border-radius: 4px;
 	min-height: 35px;
+	display: flex;
 }
 
 .manager-field button {
@@ -1576,6 +1577,20 @@ td.ind-col-lg-1 {
     position: absolute;
     top: calc(50% - 6px);
     right: 2px;
+}
+
+@media (max-width: 1124px) {
+	.manager-field button {
+		font-size: 12px;
+	}
+
+	.manager-field button img {
+		height: 13px;
+		width: 13px;
+		position: absolute;
+		top: calc(50% - 6px);
+		right: 2px;
+	}
 }
 
 .custom-input {
@@ -2021,4 +2036,8 @@ td.ind-col-lg-1 {
 	width: 20px;
 }
 
+.oi.oi-trash {
+	top: 2px;
+	left: 1px;
+}
 	/* ////////////////////////////////////////////////////////////////// */

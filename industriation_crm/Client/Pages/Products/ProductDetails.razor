@@ -77,24 +77,24 @@ else
             <table class="order-table ind-col-lg-10">
                 <thead class="ind-col-lg-10">
                     <tr class="order-row ind-col-lg-10">
-                        <td class="ind-col-lg-1">Артикул</td>
-                        <td class="ind-col-lg-1">Производитель</td>
-                        <td class="ind-col-lg-5">Наименование</td>
-                        <td class="ind-col-lg-1">Количество</td>
-                        <td class="ind-col-lg-1">Цена</td>
-                        <td class="ind-col-lg-1">Действия</td>
+                        <td class="ind-col-lg-1 ind-col-md-1">Артикул</td>
+                        <td class="ind-col-lg-1 ind-col-md-2">Производитель</td>
+                        <td class="ind-col-lg-5 ind-col-md-3">Наименование</td>
+                        <td class="ind-col-lg-1 ind-col-md-2">Количество</td>
+                        <td class="ind-col-lg-1 ind-col-md-1">Цена</td>
+                        <td class="ind-col-lg-1 ind-col-md-1">Действия</td>
                     </tr>
                 </thead>
                 <tbody class="ind-col-lg-10">
                     @foreach (var product in productList)
                     {
                         <tr class="order-row ind-col-lg-10">
-                            <td class="ind-col-lg-1">@product.article</td>
-                            <td class="ind-col-lg-1">Pneumax</td>
-                            <td class="ind-col-lg-5">@product.name</td>
-                            <td class="ind-col-lg-1">100</td>
-                            <td class="ind-col-lg-1">@product.price</td>
-                            <td class="ind-col-lg-1">
+                            <td class="ind-col-lg-1 ind-col-md-1">@product.article</td>
+                            <td class="ind-col-lg-1 ind-col-md-2">Pneumax</td>
+                            <td class="ind-col-lg-5 ind-col-md-3">@product.name</td>
+                            <td class="ind-col-lg-1 ind-col-md-2">100</td>
+                            <td class="ind-col-lg-1 ind-col-md-1">@product.price</td>
+                            <td class="ind-col-lg-1 ind-col-md-1">
                                 <a href='/product/edit/@product.id' class="score" role="button">
                                     <div class="hidden-md">Изменить</div>
                                     <div class="hidden-lg ind-col-md-10">

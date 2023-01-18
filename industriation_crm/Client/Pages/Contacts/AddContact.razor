@@ -50,20 +50,18 @@
         @foreach (var phone in contact?.contact_phones?.Where(p => p.isRemove == false))
         {
             <div class="mb-3">
-                <label for="Name" class="form-label">Доп. телефон</label>
-                <div class="col-md-4">
-                    <InputText type="tel" class="form-control" @bind-Value="phone.phone" />
-                    <button type="button" class="btn btn-danger float-end" @onclick="()=>phone.isRemove = true"><span class=" oi oi-trash" aria-hidden="true"></span></button>
+                <div class="ind-col-lg-5 input-field">
+                    <div class="input-label">Доп. телефон</div>
+                    <InputText type="tel" class="form-control main-input mr-10" @bind-Value="phone.phone" />
+                    <button type="button" class="close" @onclick="()=>phone.isRemove = true"><span class=" oi oi-trash" aria-hidden="true"></span></button>
                 </div>
                 <ValidationMessage For="@(() => phone.phone)" />
             </div>
         }
-        <br />
-        <button type="button" class="btn btn-light" @onclick="AddPhone">Добавить номер</button>
-        <br /><br />
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-            <button type="button" class="btn btn-light" @onclick="Cancel">Закрыть</button>
+        <button type="button" class="score" @onclick="AddPhone">Добавить номер</button>
+        <div class="form-group mt-10">
+            <button type="submit" class="score">Сохранить</button>
+            <button type="button" class="close" @onclick="Cancel">Закрыть</button>
         </div>
     </div>
 </EditForm>
