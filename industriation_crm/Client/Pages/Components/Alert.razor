@@ -1,22 +1,17 @@
-﻿@if (type != null)
+﻿@if (show)
 {
-    if (type == 1)
-    {
-        <div class="alert alert-warning" role="alert" @onclick="CloseAlert">
+    <div class="saved-modal">
+        <img src="./icons/close.svg" @onclick="()=>show=false">
+        <div class="saved-modal-text">
             @text
         </div>
-    }
+    </div>
 }
 @code {
-
-    [Parameter]
-    public int? type { get; set; }
-    //0 - ошибка
-    //1 - предупреждение
-
     [Parameter]
     public string? text { get; set; }
-
+    [Parameter]
+    public bool show { get; set; }
     [Parameter]
     public Action? CloseAlert { get; set; }
 

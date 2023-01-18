@@ -14,6 +14,10 @@
 
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
+@if (showAlert)
+{
+    <Alert text="Успешно сохранено!" show="showAlert"></Alert>
+}
 @if (OpenProductAddModel)
 {
     <NewProductToOrder orderId="orderId" CloseModal="CloseAddProductModal" AddProductToproductToOrder="AddProductToProductToOrder"></NewProductToOrder>
@@ -320,7 +324,15 @@
                                         </div>
                                     </td>
                                     <td class="ind-col-lg-1">
-                                        <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">@p._product_price</button>
+                                        <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">
+                                            @if(p.ruble_discount == 0 && p.percent_discount == 0){
+                                                @p._product_price
+                                            }
+                                            else{
+                                                @p._product_price_with_discount
+                                                @p._product_price
+                                            }
+                                        </button>
                                         @if (p.showPriceModal)
                                         {
                                             <div class="price-modal" tabindex="0">
@@ -335,7 +347,7 @@
                                                     </div>
                                                     <div class="ind-col-lg-5 discount-input">
                                                         <input type="number" class="main-input" @bind="@p.percent_discount" />%
-                                                        <p>@p._product_price_with_discount</p>
+                                                        
                                                     </div>
                                                 </div>
                                                 <div class="discount-buttons mt-10">
@@ -535,6 +547,8 @@
 
 
 @code {
+    protected bool showAlert {get;set;}
+
     protected bool ViewOrderManagement = false;
     protected string clientClass = "client client--active";
     protected string contactClass = "contact";
@@ -738,6 +752,8 @@
             }
             await Http.PutAsJsonAsync("api/ProductToOrder/update_products_to_order", order.product_To_Orders.Where(p => p.id != 0));
         }
+        showAlert = true;
+        StateHasChanged();
     }
     public void Cancel()
     {
