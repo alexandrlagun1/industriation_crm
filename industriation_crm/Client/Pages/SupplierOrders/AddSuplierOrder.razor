@@ -236,7 +236,12 @@
                                             </table>
                                         </td>
                                         <td class="ind-col-lg-1">
-                                            <button type="button" class="close" @onclick="(async () => await RemoveProductFromSup(p))">Удалить</button>
+                                            <button type="button" class="close" @onclick="(async () => await RemoveProductFromSup(p))">
+                                                <div class="hidden-md">Удалить</div>
+                                                <div class="hidden-lg ind-col-md-10">
+                                                    <img src="./icons/delete-white.svg" class="h20-w20">
+                                                </div>
+                                            </button>
                                         </td>
                                     </tr>
                                 }
