@@ -98,7 +98,7 @@ else
                 </thead>
                 <tbody>
                     @foreach (var order in ordersReturnData?.orders!)
-                    {
+                    { 
                         <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1">@order.id</td>
                             <td class="ind-col-lg-2">@order.main_contact?.full_name</td>
@@ -236,5 +236,8 @@ else
         
     }
 
-
+    public void Change(string href)
+    {
+        NavigationManager.NavigateTo(href);
+    }
 }

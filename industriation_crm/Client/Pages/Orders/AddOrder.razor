@@ -14,6 +14,7 @@
 
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
+
 @if (showAlert)
 {
     <Alert text="Успешно сохранено!" CloseAlert="CloseAlert" type="0"></Alert>
@@ -24,42 +25,37 @@
 }
 @if (role == 1)
 {
+    @if (order?.stage_id > 1 || user_id != order?.user_id)
+    {
+        <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
+        <style type="text/css">
+            .main-section input,
+            .main-section textarea,
+            .main-section select {
+                user-select: none;
+                opacity: .7;
+                pointer-events: none;
+                background-color: #eee;
+            }
+
+            .main-section button,
+            .add-payment {
+                opacity: .7;
+                pointer-events: none;
+                user-select: none;
+            }
+        </style>
+    }
+    else
+    {
+        <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
+    }
     <div class="buttons-bar mb-10">
         <button @onclick="()=>ViewOrderManagement = false" class="score">Информация о заказе</button>
         <button @onclick="()=>ViewOrderManagement = true" class="score">Управление заказом</button>
         @if (order?.order_Pays?.Count() == 0)
         {
             <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
-        }
-        else
-        {
-
-
-            @if (order?.stage_id == 2)
-            {
-                <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
-                <style type="text/css">
-                    .main-section input,
-                    .main-section textarea,
-                    .main-section select {
-                        user-select: none;
-                        opacity: .7;
-                        pointer-events: none;
-                        background-color: #eee;
-                    }
-
-                    .main-section button,
-                    .add-payment {
-                        opacity: .7;
-                        pointer-events: none;
-                        user-select: none;
-                    }
-                </style>
-            }
-            else
-            {
-                <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
-            }
         }
 
     </div>
@@ -82,29 +78,29 @@
                 <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5">
                     <option>
                         Альфабанк
-                    </option> 
+                    </option>
                     <option>
                         Сбербанк
-                    </option>  
+                    </option>
                     <option>
                         ВТБ
-                    </option> 
+                    </option>
                 </select>
                 <button class="score mr-5" @onclick='()=>GetOrderPrintForm("1")' type="button">Счет</button>
                 <button class="score" @onclick='()=>GetOrderPrintForm("0")' type="button">Счет без печати</button>
             </div>
-@*            Второй блок для договоров (БЕЗ ФУНКЦИОНАЛА)*@
+            @*            Второй блок для договоров (БЕЗ ФУНКЦИОНАЛА)*@
             <div class="section-field ind-col-lg-5">
                 <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5">
                     <option>
                         Альфабанк
-                    </option> 
+                    </option>
                     <option>
                         Сбербанк
-                    </option>  
+                    </option>
                     <option>
                         ВТБ
-                    </option>  
+                    </option>
                 </select>
                 <button class="score mr-5" type="button">Договор</button>
                 <button class="score" type="button">Договор без печати</button>
@@ -131,6 +127,7 @@
                         @client?.org_name
                     else
                         @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
+
                     </a>
                     <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
@@ -241,7 +238,6 @@
                 </div>
                 <div class="section-field">
                     <div class="ind-col-lg-5 input-field hidden-md">
-
                     </div>
                     <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">КПП</div>
@@ -334,10 +330,12 @@
                                     </td>
                                     <td class="ind-col-lg-1">
                                         <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">
-                                            @if(p.ruble_discount == 0 && p.percent_discount == 0){
+                                            @if (p.ruble_discount == 0 && p.percent_discount == 0)
+                                            {
                                                 <span>@p._product_price ₽</span>
                                             }
-                                            else{
+                                            else
+                                            {
                                                 <div class="prev-price">
                                                     @p._product_price ₽
                                                 </div>
@@ -360,7 +358,7 @@
                                                     </div>
                                                     <div class="ind-col-lg-5 discount-input">
                                                         <input type="number" class="main-input" @bind="@p.percent_discount" />%
-                                                        
+
                                                     </div>
                                                 </div>
                                                 <div class="discount-buttons mt-10">
@@ -501,8 +499,8 @@
         <div class="main-section ind-col-lg-5 ind-col-md-10">
             <div class="main-section-label">Оплата</div>
             @*<div class="section-field">
-                <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
-            </div>*@
+        <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
+        </div>*@
             <div class="input-field">
                 <div class="input-label">Условия оплаты</div>
                 <select type="text" class="main-input" @bind="@order.pay_conditions">
@@ -546,21 +544,24 @@
     <div class="bottom-buttons ind-col-lg-10">
         <button type="submit" class="save">Сохранить</button>
         <button class="close" @onclick="Cancel">Закрыть</button>
-        @if (order?.stage_id == 1 && order?.order_status_id == 3)
+        @if (order?.stage_id == 1 && (order?.order_status_id == 3 || order?.order_status_id == 4) && role == 1)
         {
             <button class="score" type="button" @onclick="Bill">Передать в снабжение</button>
         }
         @if (role == 6 && (order.supplier_manager_id == null || order.supplier_manager_id == user_id))
         {
-            <button class="score" type="button" @onclick="CreateSupplierOrder">Сформировать заказ поставщику</button>
-            <button class="close" type="button" @onclick="ReturnOrderToManager">На пересогласование</button>
+            if (order.order_status_id == 3 || order.order_status_id == 5)
+            {
+                <button class="score" type="button" @onclick="CreateSupplierOrder">Сформировать заказ поставщику</button>
+                <button class="close" type="button" @onclick="ReturnOrderToManager">На пересогласование</button>
+            }
         }
     </div>
 </EditForm>
 
 
 @code {
-    protected bool showAlert {get;set;}
+    protected bool showAlert { get; set; }
     protected void CloseAlert()
     {
         showAlert = false;
@@ -659,7 +660,6 @@
         await CreateOrderHistory("Заказ отправлен на пересогласование с клиентом");
         await SendUserNotification($"Заказ {order.id} отправлен на пересогласование с клиентом", order.user_id);
         await SaveOrder();
-
     }
     protected async Task CreateSupplierOrder()
     {
@@ -721,6 +721,10 @@
         order.stage_id = 2;
         if (order.id != 0)
         {
+            if (order.order_status_id == 3 && order.pay_conditions == 2)
+            {
+                await Http.GetAsync($"api/_1C/{order.id}");
+            }
             if (order.order_status_id == 4)
                 order.order_status_id = 3;
             await Http.PutAsJsonAsync("api/Order", order);

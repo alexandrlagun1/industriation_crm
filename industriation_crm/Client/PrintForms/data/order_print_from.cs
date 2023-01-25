@@ -32,7 +32,7 @@ namespace industriation_crm.Client.PrintForms
         public string? payment_method { get; set; } = "";
         public string? shipping_method { get; set; } = "";
         public string? user_name { get; set; } = ""; //имя заказчика
-        public string? driving_directions { get; set; } = ""; //при самовывозе клеит карту
+        public string? driving_directions { get; set; } = ""; //при самовывозе клеет карту
         public simpla simpla { get; set; } = new simpla();
         public List<product> products { get; set; } = new List<product>();
         public List<total_info> totals_info { get; set; } = new List<total_info>();

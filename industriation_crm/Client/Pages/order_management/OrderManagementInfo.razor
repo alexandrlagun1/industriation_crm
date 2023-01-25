@@ -197,12 +197,13 @@
     }
     protected void createTask()
     {
+        viewCreateTask = false;
         newTask.complete = 0;
         newTask.creator_id = order.user_id;
         newTask.order_id = order.id;
         newTask.executor = executors.Where(e => e.id == newTask.executor_id).First();
         newTask.creator = order.user;
         order.tasks.Add(newTask);
-        viewCreateTask = false;
+        
     }
 }

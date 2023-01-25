@@ -65,6 +65,7 @@
             </div>
         </div>
     </div>
+    }
     <div class="main-section">
         <div class="main-section-label">Банковские реквизиты</div>
         <div class="section-field">
@@ -263,7 +264,7 @@
             </div>
         </div>
     </div>
-}
+
 @code {
     [Parameter]
     public client? client { get; set; }
@@ -313,6 +314,7 @@
     }
     protected async Task createTask()
     {
+        viewCreateTask = false;
         newTask.complete = 0;
         newTask.creator_id = user_id;
         newTask.client_id = client?.id;
@@ -322,6 +324,6 @@
         newTask.creator = executors.Where(e => e.id == user_id).First();
         tasks.Add(newTask);
 
-        viewCreateTask = false;
+        
     }
 }

@@ -23,8 +23,14 @@ namespace industriation_crm.Client.PrintForms
                 order_Print_From.order_data.payment_method = "Постоплата";
             order_Print_From.order_data.shipping_method = order.delivery?.delivery_type?.name;
             order_Print_From.order_data.user_name = order.client?.contacts?.Where(c => c.main_contact == 1).FirstOrDefault()?.full_name;
-            order_Print_From.order_data.driving_directions = "https://industriation.ru/image/catalog/sklad-map/zrelishnaya.jpg";
-
+            if (order.delivery.delivery_type_id == 1)
+            {
+                order_Print_From.order_data.driving_directions = "https://industriation.ru/image/catalog/sklad-map/zrelishnaya.jpg";
+            }
+            else
+            {
+                order_Print_From.order_data.driving_directions = "";
+            }
             order_Print_From.order_data.simpla.inn = order.client?.org_inn.ToString();
             order_Print_From.order_data.simpla.kpp = order.client?.org_kpp.ToString();
             order_Print_From.order_data.simpla.address = order.client?.org_address;

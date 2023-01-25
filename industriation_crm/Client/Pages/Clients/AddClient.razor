@@ -218,7 +218,7 @@
         StateHasChanged();
     }
 
-    protected bool showClientData { get; set; } = true;
+    protected bool showClientData { get; set; } = false;
     [Parameter]
     public string? phone { get; set; }
     [Parameter]
@@ -322,7 +322,7 @@
         if (clientId != 0)
         {
             await Http.PutAsJsonAsync("api/Client", client);
-            await Http.PutAsJsonAsync("api/Contact", main_contact);
+            
         }
         else
         {
@@ -386,8 +386,9 @@
     }
 
     //Проверка дублей изменяемых контактов
-    protected void CheckContainsContact(contact _contact)
+    protected async Task CheckContainsContact(contact _contact)
     {
+        await Http.PutAsJsonAsync("api/Contact", _contact);
         var changeContact = ChangeContacts.Where(c => c.id == _contact.id).FirstOrDefault();
         if (changeContact != null)
         {
@@ -398,5 +399,6 @@
         {
             ChangeContacts.Add(_contact);
         }
+        
     }
 }

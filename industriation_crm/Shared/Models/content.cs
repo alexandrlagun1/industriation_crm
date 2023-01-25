@@ -175,7 +175,7 @@ namespace industriation_crm.Shared.Models
         public int? stage_id { get; set; }
         public int? pay_status_id { get; set; }
         public int? pay_conditions { get; set; } = 1;
-        public int? pay_predoplata_percent { get; set; } = 50;
+        public int? pay_predoplata_percent { get; set; } = 100;
         public int? supplier_manager_id { get; set; }
         [ForeignKey("supplier_manager_id")]
         public user? supplier_manager { get; set; }
