@@ -20,6 +20,11 @@ namespace industriation_crm.Server.Controllers
             _IOrder = IOrder;
             this.hubContext = statusHub;
         }
+        [HttpGet("GetOrdersByClientId/{clientId}")]
+        public async Task<List<order>> GetOrdersByClientId(int clientId)
+        {
+            return await Task.FromResult(_IOrder.GetOrdersByClientId(clientId));
+        }
         [HttpPost("GetOrders")]
         public async Task<OrdersReturnData> GetOrders([FromBody]OrdersFilter ordersFilter)
         {

@@ -18,9 +18,15 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                _dbContext.client.Add(client);
-                _dbContext.SaveChanges();
-                return client.id;
+                client? _client = _dbContext.client.Where(c=>c.org_inn == client.org_inn).FirstOrDefault();
+                if (_client == null)
+                {
+                    _dbContext.client.Add(client);
+                    _dbContext.SaveChanges();
+                    return client.id;
+                }
+                else
+                    return 0;
             }
             catch
             {

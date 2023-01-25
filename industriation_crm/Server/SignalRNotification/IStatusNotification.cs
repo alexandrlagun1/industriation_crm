@@ -6,5 +6,6 @@ namespace industriation_crm.Server.SignalRNotification
     {
         Task UpdateStatus(string status);
         Task MegafonCall(megafon_info megafon_info);
+        Task AddNewPay(order_pay order_pay);
     }
 }

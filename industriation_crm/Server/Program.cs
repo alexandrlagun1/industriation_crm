@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<DatabaseContext>
     (options =>
     {
-        options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")).LogTo(Console.WriteLine, LogLevel.Information);
+        options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))/*.LogTo(Console.WriteLine, LogLevel.Information)*/;
         options.ConfigureWarnings(warnings =>warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
     });
 

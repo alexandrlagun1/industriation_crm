@@ -1,0 +1,327 @@
+﻿@using System.Security.Claims;
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="main-section">
+    <div class="main-section-label">Клиент</div>
+    <div class="section-field">
+        <div class="ind-col-lg-5 ind-col-md-10">
+            <div class="ind-col-lg-10 input-field">
+                <div class="input-label">Имя</div>
+                @main_contact?.name
+            </div>
+            <div class="ind-col-lg-10 input-field">
+                <div class="input-label">Фамилия</div>
+                @main_contact?.surname
+            </div>
+            <div class="ind-col-lg-10 input-field">
+                <div class="input-label">Отчество</div>
+                @main_contact?.patronymic
+            </div>
+        </div>
+        <div class="ind-col-lg-5 ind-col-md-10">
+            <div class="ind-col-lg-10 input-field">
+                <div class="input-label">E-mail</div>
+                @main_contact?.email
+            </div>
+            <div class="ind-col-lg-10 input-field">
+                <div class="input-label">Телефон</div>
+                @main_contact?.phone
+            </div>
+        </div>
+    </div>
+</div>
+@if (client?.client_type == 1)
+{
+    <div class="main-section">
+        <div class="main-section-label">Данные по юридическому лицу</div>
+        <div class="section-field">
+            <div class="ind-col-lg-5 ind-col-md-10">
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">Полное наименование</div>
+                    @client.org_name
+                </div>
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">Адрес регистрации</div>
+                    @client.org_address
+                </div>
+            </div>
+            <div class="ind-col-lg-5 ind-col-md-10">
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">ИНН</div>
+                    @client.org_inn
+
+                </div>
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">ОГРН</div>
+                    @client.org_ogrn
+                </div>
+            </div>
+            <div class="ind-col-lg-5 ind-col-md-10">
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">КПП</div>
+                    @client.org_kpp
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="main-section">
+        <div class="main-section-label">Банковские реквизиты</div>
+        <div class="section-field">
+            <div class="ind-col-lg-5 ind-col-md-10">
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">БИК</div>
+                    @client.bank_bik
+                </div>
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">Наименование банка</div>
+                    @client.bank_name
+                </div>
+            </div>
+            <div class="ind-col-lg-5 ind-col-md-10">
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">Корреспондентский счет</div>
+                    @client.bank_cor_schet
+                </div>
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">Расчетный счет</div>
+                    @client.bank_ras_schet
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="main-section">
+        <div class="main-section-label">Заказы</div>
+        <div class="section-field">
+            @foreach (var o in client_Orders!)
+            {
+                <div><a href='/order/edit/@o.id' role="button"> Заказ @o?.id</a></div>
+
+                <br>
+                @foreach (var p in o.product_To_Orders!)
+                {
+                    <div>@p.product?.name </div>
+                    <div> Артикул: @p.product?.article </div>
+                    <div> Колличество: @p.count @p.product?.unit </div>
+                    <div> Сумма: @p._total_price </div>
+                    <div> Цена: @p._product_price_with_discount за 1шт. </div>
+
+                }
+            }
+        </div>
+    </div>
+    <div class="main-section">
+        <div class="main-section-label">Звонки</div>
+        <div class="section-field">
+            <table class="order-table ind-col-lg-10">
+                <thead class="ind-col-lg-10">
+                    <tr class="order-row ind-col-lg-10">
+                        <td class="ind-col-lg-1">Дата и время</td>
+                        <td class="ind-col-lg-2">Менеджер</td>
+                        <td class="ind-col-lg-1">Телефон</td>
+                        <td class="ind-col-lg-2">Клиент</td>
+                        <td class="ind-col-lg-1">Тип</td>
+                        <td class="ind-col-lg-1">Результат</td>
+                        <td class="ind-col-lg-1">Длительность</td>
+                        <td class="ind-col-lg-1">Запись</td>
+                    </tr>
+                </thead>
+                <tbody class="ind-col-lg-10">
+                    @foreach (var call in call_Histories!)
+                    {
+                        <tr class="order-row ind-col-lg-10">
+                            <td class="ind-col-lg-1">@call.date_time</td>
+                            <td class="ind-col-lg-2">
+                                @call.user?.name
+                            </td>
+                            <td class="ind-col-lg-1">@call.client_number</td>
+                            <td class="ind-col-lg-2">
+                                <a href="/client/edit/@call.contact?.client_id">
+                                    @call.contact?.full_name
+                                </a>
+                            </td>
+                            <td class="ind-col-lg-1">
+                                @if (call.type?.ToLower() == "in")
+                                {
+                                    <div>Входящий</div>
+                                }
+                                else if (call.type?.ToLower() == "out")
+                                {
+                                    <div>Исходящий</div>
+                                }
+                            </td>
+                            <td class="ind-col-lg-1">
+                                @if (call.status?.ToLower() == "success")
+                                {
+                                    <div>Принят</div>
+                                }
+                                else if (call.status?.ToLower() == "missed")
+                                {
+                                    <div>Не отвечено</div>
+                                }
+                                else if (call.status?.ToLower() == "noanswer")
+                                {
+                                    <div>Занято</div>
+                                }
+                                else
+                                {
+                                    <div>Ошибка</div>
+                                }
+                            </td>
+                            <td class="ind-col-lg-1">@call.duration</td>
+                            <td class="ind-col-lg-1">
+                                @if (call.isActive)
+                                {
+                                    <video controls autoplay>
+                                        <source src="@call.record" type="audio/mp3">
+                                    </video>
+                                }
+                                @if (call.record != null)
+                                {
+                                    @if (call.isActive)
+                                    {
+                                        <button class="play-btn" @onclick="()=>call.isActive=false">
+                                            <img src="./icons/close.svg">
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="play-btn" @onclick="()=>call.isActive=true">
+                                            <img src="./icons/play_icon.svg">
+                                        </button>
+                                    }
+                                    <a class="download-btn" href="@call.record" target="_blank">
+                                        <img src="./icons/download.svg">
+                                    </a>
+                                }
+                                else
+                                {
+                                    <div>---</div>
+                                }
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="row-f ind-col-10 mt-20" style="justify-content: space-between">
+        <div class="main-section ind-col-lg-4-8">
+            <div class="main-section-label">Задачи:</div>
+            <button @onclick="openCreatetaskModal" type="button" class="save task-create">Создать задачу</button>
+            @if (viewCreateTask)
+            {
+                <div class="modal" tabindex="-1" style="display:block" role="dialog">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
+                        <div class="modal-content b-s">
+                            <div class="modal-body">
+                                Исполнитель:
+                                <select @bind="newTask.executor_id">
+                                    @foreach (var e in executors)
+                                    {
+                                        <option value="@e.id">@e.name</option>
+                                    }
+                                </select>
+                                <br>
+                                Задача:
+                                <br>
+                                <textarea @bind="newTask.text" class="notes-textarea main-input" placeholder="Введите текст задачи"></textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="close" data-dismiss="modal" @onclick="()=>viewCreateTask = false">Закрыть</button>
+                                <button type="button" class="score" @onclick="createTask">Создать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div>
+                <b>Актуальные задачи:</b>
+                @foreach (var task in tasks?.Where(t => t.complete == 0)!)
+                {
+                    <div class="actual-task mt-10">
+                        <div><b>От кого:</b> @task?.creator?.name</div>
+                        <div><b>Исполнитель:</b> @task?.executor?.name</div>
+                        <div><b>Задача:</b> @task?.text</div>
+                        <button @onclick="()=>CompleteTask(task)" class="score task-btn">Выполнить</button>
+                    </div>
+                }
+            </div>
+            <hr>
+            <div>
+                <b>Завершенные задачи:</b>
+                @foreach (var task in tasks?.Where(t => t.complete == 1)!)
+                {
+                    <div class="done-task mt-10">
+                        <div><b>От кого:</b> @task?.creator?.name</div>
+                        <div><b>Исполнитель:</b> @task?.executor?.name</div>
+                        <div><b>Задача:</b> @task?.text</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+@code {
+    [Parameter]
+    public client? client { get; set; }
+
+    protected contact? main_contact { get; set; }
+    protected List<order>? client_Orders { get; set; } = new();
+    protected List<task>? tasks { get; set; } = new();
+    protected List<user> executors = new();
+    protected List<call_history> call_Histories = new();
+
+    protected task? newTask { get; set; } = new();
+    protected bool viewCreateTask = false;
+
+    protected int? user_id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
+
+        client_Orders = await Http.GetFromJsonAsync<List<order>>($"api/Order/GetOrdersByClientId/{client.id}");
+        tasks = await Http.GetFromJsonAsync<List<task>>($"api/Task/GetTasksByClientId/{client.id}");
+        executors = await Http.GetFromJsonAsync<List<user>>("api/User?type=all");
+
+        if(client?.contacts != null){
+        var answer = await Http.PostAsJsonAsync("api/CallHistory/GetCallHistoryByClientId", client?.contacts?.Select(c=>c.id).ToList());
+        call_Histories = await answer.Content.ReadFromJsonAsync<List<call_history>>();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        main_contact = client?.contacts?.Where(c => c.main_contact == 1).FirstOrDefault();
+
+    }
+
+    protected void openCreatetaskModal()
+    {
+        newTask = new();
+        newTask.executor_id = executors.FirstOrDefault()?.id;
+        viewCreateTask = true;
+    }
+    protected void CompleteTask(task task)
+    {
+        task.complete = 1;
+        Http.PutAsJsonAsync("api/Task", task);
+    }
+    protected async Task createTask()
+    {
+        newTask.complete = 0;
+        newTask.creator_id = user_id;
+        newTask.client_id = client?.id;
+        var answer = await Http.PostAsJsonAsync("api/Task", newTask);
+        newTask.id = await answer.Content.ReadFromJsonAsync<int>();
+        newTask.executor = executors.Where(e => e.id == newTask.executor_id).First();
+        newTask.creator = executors.Where(e => e.id == user_id).First();
+        tasks.Add(newTask);
+
+        viewCreateTask = false;
+    }
+}

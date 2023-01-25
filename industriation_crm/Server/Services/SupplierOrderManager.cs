@@ -93,14 +93,14 @@ namespace industriation_crm.Server.Services
                 if (ordersFilter.supplier_order_id == null) {
                     supplierOrderReturnData.count = _dbContext.supplier_order.Where(o => o.date >= ordersFilter.order_date_from && o.date <= ordersFilter.order_date_to && o.supplier.org_name.Contains(ordersFilter.supplier)).Count();
                     supplierOrderReturnData.supplier_orders = _dbContext.supplier_order.Where(o => o.date >= ordersFilter.order_date_from && o.date <= ordersFilter.order_date_to && o.supplier.org_name.Contains(ordersFilter.supplier))
-                        .Include(s => s.product_to_orders).ThenInclude(p => p.product).Include(s => s.supplier).Include(s => s.user)
+                        .Include(s => s.product_to_orders).ThenInclude(p => p.product).Include(s => s.supplier).Include(s => s.user).Include(s=>s.supplier_order_status)
                         .OrderByDescending(o => o.date).Skip(ordersFilter.order_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.order_on_page).ToList();
                 }
                 else
                 {
                     supplierOrderReturnData.count = _dbContext.supplier_order.Where(o =>o.id == ordersFilter.supplier_order_id && o.date >= ordersFilter.order_date_from && o.date <= ordersFilter.order_date_to && o.supplier.org_name.Contains(ordersFilter.supplier)).Count();
                     supplierOrderReturnData.supplier_orders = _dbContext.supplier_order.Where(o => o.id == ordersFilter.supplier_order_id && o.date >= ordersFilter.order_date_from && o.date <= ordersFilter.order_date_to && o.supplier.org_name.Contains(ordersFilter.supplier))
-                        .Include(s => s.product_to_orders).ThenInclude(p => p.product).Include(s => s.supplier).Include(s => s.user)
+                        .Include(s => s.product_to_orders).ThenInclude(p => p.product).Include(s => s.supplier).Include(s => s.user).Include(s => s.supplier_order_status)
                         .OrderByDescending(o => o.date).Skip(ordersFilter.order_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.order_on_page).ToList();
                 }
                 return supplierOrderReturnData;

@@ -7,5 +7,6 @@ namespace industriation_crm.Server.Interfaces
     {
         public void AddCallHistory(call_history call_history);
         public CallHistoryReturnData GetCallHistoryDetails(CallHistoryFilter callHistoryFilter);
+        public List<call_history> GetCallHistoryByContactIds(List<int?> contactsIds);
     }
 }

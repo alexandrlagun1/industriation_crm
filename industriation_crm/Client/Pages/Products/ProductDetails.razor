@@ -15,6 +15,11 @@
 }
 else
 {
+    <div class="section-field">
+        <a class="score" type="button" href="/product/add/">
+            Добавить продукт
+        </a>
+    </div>
     <div class="main-section">
         <div class="main-section-label">
             Фильтр
@@ -90,7 +95,7 @@ else
                     {
                         <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1 ind-col-md-1">@product.article</td>
-                            <td class="ind-col-lg-1 ind-col-md-2">Pneumax</td>
+                            <td class="ind-col-lg-1 ind-col-md-2">@product.manufacturer</td>
                             <td class="ind-col-lg-5 ind-col-md-3">@product.name</td>
                             <td class="ind-col-lg-1 ind-col-md-2">100</td>
                             <td class="ind-col-lg-1 ind-col-md-1">@product.price</td>

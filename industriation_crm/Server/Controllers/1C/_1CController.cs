@@ -43,7 +43,7 @@ namespace industriation_crm.Server.Controllers._1C
             {
                 _1CSupplierOrder _1CSupplierOrder = new _1CSupplierOrder();
                 _1CSupplierOrder.id = supplier_Order.id.ToString();
-                _1CSupplierOrder.products = Complete1CProductData(supplier_Order?.product_to_orders!);
+                _1CSupplierOrder.products = Complete1CSupplierProductData(supplier_Order?.product_to_orders!);
                 _1CSupplierOrder.contragent = Complete1CContragentData(supplier_Order?.supplier!);
                 integration1C.AddNewSupplierOrder(_1CSupplierOrder);
             }
@@ -51,12 +51,38 @@ namespace industriation_crm.Server.Controllers._1C
         [HttpPost]
         public async void CreatePayment([FromBody] Pay pay)
         {
+
+            
+            string pay_summ = pay.paySumm.Replace(" ", "");
             order order = _IOrder.GetOrderData(Convert.ToInt32(pay.orderId));
-            order_pay order_Pay = new order_pay();
-            order_Pay.price = Convert.ToDouble(pay.paySumm);
-            order.order_Pays?.Add(order_Pay);
+            
+            order_pay order_pay = new order_pay();
+            order_pay.date = DateTime.Now;
+            try
+            {
+                order_pay.price = Convert.ToDouble(pay_summ.Replace(",", "."));
+            }
+            catch
+            {
+                order_pay.price = Convert.ToDouble(pay_summ.Replace(".",","));
+            }
+            order.order_Pays?.Add(order_pay);
+            if (order.order_status_id == 1 && order.pay_conditions == 1)
+            {
+                double? order_pays_summ = order.order_Pays?.Select(p => p.price).Sum();
+                Console.WriteLine($"order_pays_summ = {order_pays_summ}");
+                double? min_predoplata = order.price_summ / 100 * order.pay_predoplata_percent;
+                Console.WriteLine($"min_predoplata = {min_predoplata}");
+                if (order_pays_summ + 1 >= min_predoplata)
+                    order.order_status_id = 3;
+            }
             _IOrder.UpdateOrderDetails(order);
-            await this.hubContext.Clients.All.UpdateStatus("1");
+
+            megafon_info megafon_Info = new megafon_info();
+            megafon_Info.cmd = "1";
+
+            order_pay.order = null;
+            await this.hubContext.Clients.User(order.user_id.ToString()).AddNewPay(order_pay);
         }
         
         private _1COrderPay Complete1CData(order order)
@@ -64,7 +90,7 @@ namespace industriation_crm.Server.Controllers._1C
             _1COrderPay _1COrderPay = new _1COrderPay();
             _1COrderPay.id = order.id.ToString();
             _1COrderPay.contragent = Complete1CContragentData(order?.client!);
-            _1COrderPay.products = Complete1CProductData(order?.product_To_Orders!);
+            _1COrderPay.products = Complete1COrderProductData(order?.product_To_Orders!);
 
             return _1COrderPay;
         }
@@ -82,7 +108,22 @@ namespace industriation_crm.Server.Controllers._1C
             return contragent;
         }
 
-        private List<_1CProduct> Complete1CProductData(List<product_to_order> product_To_Orders)
+        private List<_1CProduct> Complete1COrderProductData(List<product_to_order> product_To_Orders)
+        {
+            List<_1CProduct> _1CProducts = new List<_1CProduct>();
+            foreach (var p in product_To_Orders!)
+            {
+                _1CProduct _1CProduct = new _1CProduct();
+                _1CProduct.price = (p?._total_price / p?.count).ToString();
+                _1CProduct.summ = p?._total_price.ToString();
+                _1CProduct.count = p?.count?.ToString();
+                _1CProduct.article = p?.product?.article!.ToString(); //POMENIAT na article;
+                _1CProduct.name = p?.product?.name;
+                _1CProducts.Add(_1CProduct);
+            }
+            return _1CProducts;
+        }
+        private List<_1CProduct> Complete1CSupplierProductData(List<product_to_order> product_To_Orders)
         {
             List<_1CProduct> _1CProducts = new List<_1CProduct>();
             foreach (var p in product_To_Orders!)

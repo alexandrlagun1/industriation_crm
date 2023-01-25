@@ -10,5 +10,6 @@ namespace industriation_crm.Server.Interfaces
         public int AddOrder(order order);
         public void UpdateOrderDetails(order order);
         public void DeleteOrder(int id);
+        public List<order> GetOrdersByClientId(int clientId); 
     }
 }

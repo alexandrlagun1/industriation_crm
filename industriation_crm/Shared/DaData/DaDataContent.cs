@@ -20,6 +20,7 @@ namespace industriation_crm.Shared.DaData
     {
         public string? inn { get; set; }
         public string? ogrn { get; set; }
+        public string? kpp { get; set; }
         public address? address { get; set; }
     }
     public class address

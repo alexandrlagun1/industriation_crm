@@ -5,6 +5,7 @@ using industriation_crm.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using System.Threading.Tasks;
 
 namespace industriation_crm.Server.Controllers
 {
@@ -21,6 +22,11 @@ namespace industriation_crm.Server.Controllers
         public async Task<CallHistoryReturnData> GetCallHistoryes([FromBody] CallHistoryFilter callHistoryFilter)
         {
             return await Task.FromResult(_ICallHistory.GetCallHistoryDetails(callHistoryFilter));
+        }
+        [HttpPost("GetCallHistoryByClientId")]
+        public async Task<List<call_history>> GetCallHistoryByClientId(List<int?> clientIds)
+        {
+            return await Task.FromResult(_ICallHistory.GetCallHistoryByContactIds(clientIds));
         }
     }
 }

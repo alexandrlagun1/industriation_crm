@@ -125,22 +125,27 @@
                         <td class="ind-col-lg-1">
                             @if (call.isActive)
                             {
-                                <video controls>
+                                <video controls autoplay>
                                     <source src="@call.record" type="audio/mp3">
                                 </video>
                             }
                             @if (call.record != null)
                             {
-                                <button class="play-btn" @onclick="()=>call.isActive=true">
-                                    <img src="./icons/play_icon.svg">
-                                </button>
-                                <button class="download-btn">
+                                @if (call.isActive)
+                                {
+                                    <button class="play-btn" @onclick="()=>call.isActive=false">
+                                        <img src="./icons/close.svg">
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="play-btn" @onclick="()=>call.isActive=true">
+                                        <img src="./icons/play_icon.svg">
+                                    </button>
+                                }
+                                <a class="download-btn" href="@call.record" target="_blank">
                                     <img src="./icons/download.svg">
-                                </button>
-                            @*
-                                Панель управления просшуиванием звонка
-                                
-                            *@
+                                </a>
                             }
                             else
                             {

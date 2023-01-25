@@ -9,11 +9,11 @@ namespace industriation_crm.Client.PrintForms
         public static order_print_form ConvertOrderPrintForm(order? order, string pch)
         {
             order_print_form order_Print_From = new order_print_form();
-
+            order_Print_From.order_id = order.id.ToString();
             order_Print_From.pch = pch;
 
-            string order_date = $"{order?.order_date?.ToString("dd")} {order.order_date?.ToString("MMMM")} {order.order_date?.ToString("yyyy")}";
-            string order_date_dote = $"{order.order_date?.ToString("dd")}.{order.order_date?.ToString("MM")}.{order.order_date?.ToString("yyyy")}";
+            string order_date = $"{order?.order_date?.ToString("dd")} {order?.order_date?.ToString("MMMM")} {order?.order_date?.ToString("yyyy")}";
+            string order_date_dote = $"{order?.order_date?.ToString("dd")}.{order?.order_date?.ToString("MM")}.{order?.order_date?.ToString("yyyy")}";
 
             order_Print_From.order_data.order_date = order_date;
             order_Print_From.order_data.order_date_dote = order_date_dote;

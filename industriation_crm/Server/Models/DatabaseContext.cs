@@ -24,6 +24,7 @@ namespace industriation_crm.Server.Models
         public DbSet<order_history> order_history { get; set; }
         public DbSet<call_history> call_history { get; set; }
         public DbSet<stage> stage { get; set; }
+        public DbSet<supplier_order_status> supplier_order_status { get; set; }
         public DbSet<user_notifications> user_notifications { get; set; }
         public DatabaseContext()
         {

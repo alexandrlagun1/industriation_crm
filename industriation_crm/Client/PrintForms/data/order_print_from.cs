@@ -8,6 +8,7 @@ namespace industriation_crm.Client.PrintForms
 {
     public class order_print_form
     {
+        public string order_id { get; set; }
         public string? pch { get; set; } = "1";
         public order_data order_data { get; set; } = new order_data();
         public string? summ { get; set; } = "";

@@ -12,13 +12,18 @@
 
 @if (showAlert)
 {
-    <Alert text="Удаление основного контакта запрещено!" CloseAlert="CloseAlert" type="1"></Alert>
+    <Alert text="@alertText" CloseAlert="CloseAlert" type="1"></Alert>
 }
 
 <EditForm Model="@client" OnValidSubmit="SaveClient">
     <DataAnnotationsValidator />
     <div class="main-title">@Title</div>
     <hr />
+    @if (showClientData)
+    {
+        <ClientData client="@client"></ClientData>
+    }
+    else{
     @if (role == 1)
     {
         <div class="main-section">
@@ -97,6 +102,12 @@
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">ОГРН</div>
                         <input type="number" class="main-input" @bind-value="client.org_ogrn" />
+                    </div>
+                </div>
+                <div class="ind-col-lg-5 ind-col-md-10">
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">КПП</div>
+                        <input type="number" class="main-input" @bind-value="client.org_kpp" />
                     </div>
                 </div>
             </div>
@@ -182,9 +193,7 @@
                 </div>
             </div>
         }
-
-
-
+    }
     }
     <div class="bottom-buttons ind-col-lg-10">
         <button type="submit" class="save">Сохранить</button>
@@ -201,13 +210,15 @@
 
 </EditForm>
 @code {
-    protected bool showAlert {get;set;}
+    protected bool showAlert { get; set; }
+    protected string alertText { get; set; }
     protected void CloseAlert()
     {
         showAlert = false;
         StateHasChanged();
     }
 
+    protected bool showClientData { get; set; } = true;
     [Parameter]
     public string? phone { get; set; }
     [Parameter]
@@ -243,7 +254,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if(phone != null)
+        if (phone != null)
         {
             main_contact = new();
             client = new();
@@ -279,9 +290,11 @@
 
     protected async Task GetClientByDaData()
     {
-        client = await Http.GetFromJsonAsync<client?>($"api/DaData/{client?.org_inn}");
-
-        string a = "";
+        var da_client = await Http.GetFromJsonAsync<client?>($"api/DaData/{client?.org_inn}");
+        client.org_kpp = da_client.org_kpp;
+        client.org_name = da_client.org_name;
+        client.org_address = da_client.org_address;
+        client.org_ogrn = da_client.org_ogrn;
     }
     //Методы для определения main contact
     protected void ChangeMainContact(contact _main_contact)
@@ -323,6 +336,12 @@
             }
             var clientResponse = await Http.PostAsJsonAsync("api/Client", client);
             clientId = await clientResponse.Content.ReadFromJsonAsync<int>();
+            if (clientId == 0)
+            {
+                alertText = "Клиент с таким ИНН уже заведен!";
+                showAlert = true;
+                return;
+            }
             client.id = clientId;
 
             //Добавление основного контакта
@@ -343,6 +362,7 @@
     {
         if (main_contact_id == _contact.id)
         {
+            alertText = "Удаление основного контакта запрещено!";
             showAlert = true;
             return;
         }
@@ -360,7 +380,7 @@
                 returnToFetchUsers.Invoke(client);
             else
                 returnToFetchUsers.Invoke(null);
-    }
+        }
         else
             NavigationManager.NavigateTo("/fetchclientdetails");
     }

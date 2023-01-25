@@ -30,12 +30,13 @@ namespace industriation_crm.Shared.Models
     {
         [Key]
         public int id { get; set; }
-        public string text { get; set; }
+        public string? text { get; set; }
         public int complete { get; set; }
         public int? creator_id { get; set; }
         public int? executor_id { get; set; }
+        public int? client_id { get; set; }
         public DateTime? date { get; set; } = DateTime.Now;
-        public int order_id { get; set; }
+        public int? order_id { get; set; }
         [ForeignKey("creator_id")]
         public user? creator { get; set; }
         [ForeignKey("executor_id")]
@@ -94,8 +95,10 @@ namespace industriation_crm.Shared.Models
         public string? record { get; set; }
         public int? contact_id { get; set; }
         public int? user_id { get; set; }
+
         [ForeignKey("user_id")]
         public user? user { get; set; }
+
         [ForeignKey("contact_id")]
         public contact? contact { get; set; }
         public DateTime? date_time { get; set; }
@@ -152,6 +155,7 @@ namespace industriation_crm.Shared.Models
         public string? image { get; set; }
         public string? article { get; set; }
         public string? unit { get; set; }
+        public string? manufacturer { get; set; }
     }
     public class order
     {
@@ -159,7 +163,7 @@ namespace industriation_crm.Shared.Models
         public int id { get; set; }
         public int? client_id { get; set; }
         public int? user_id { get; set; }
-        public int? order_status_id { get; set; }
+        public int? order_status_id { get; set; } = 1;
         public int? main_contact_id { get; set; }
         public int? delivery_id { get; set; }
         public string? comments { get; set; }
@@ -324,7 +328,7 @@ namespace industriation_crm.Shared.Models
         public int? supplier_order_id { get; set; }
         public double? product_price { get; set; }
         public int? product_postition { get; set; } = 0;
-        public int? delivery_period { get; set; }
+        public int? delivery_period { get; set; } = 1;
         public int? delivery_period_type_id { get; set; }
         public double? ruble_discount { get; set; }
         public int? percent_discount { get; set; }
@@ -458,7 +462,7 @@ namespace industriation_crm.Shared.Models
         }
 
     }
-
+    
     public class supplier_order
     {
         [Key]
@@ -466,6 +470,9 @@ namespace industriation_crm.Shared.Models
         public int? supplier_id { get; set; }
         public int? user_id { get; set; }
         public DateTime? date { get; set; } = DateTime.Now;
+        public int? status_id { get; set; }
+        [ForeignKey("status_id")]
+        public supplier_order_status? supplier_order_status { get; set; }
 
         [ForeignKey("user_id")]
         public user? user { get; set; }
@@ -473,6 +480,12 @@ namespace industriation_crm.Shared.Models
         [ForeignKey("supplier_id")]
         public client? supplier { get; set; } = new();
         public List<product_to_order>? product_to_orders { get; set; } = new();
+    }
+    public class supplier_order_status
+    {
+        [Key]
+        public int id { get; set; }
+        public string name { get; set; }
     }
     public class delivery
     {

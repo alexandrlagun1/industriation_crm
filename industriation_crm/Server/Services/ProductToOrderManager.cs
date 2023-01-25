@@ -78,7 +78,7 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                return _dbContext.product_to_order.Include(p => p.product).Include(p => p.order).Where(p => p.supplier_order_id == null && p.order.order_status_id == 3).ToList();
+                return _dbContext.product_to_order.Include(p => p.product).Include(p => p.order).Where(p => p.supplier_order_id == null && (p.order.order_status_id == 3 || p.order.order_status_id == 5)).ToList();
             }
             catch
             {

@@ -17,7 +17,7 @@ namespace industriation_crm.Server.Controllers.PrintForms
         {
             using (var client = new HttpClient())
             {
-                var response = await client.PostAsJsonAsync($"https://industriation.ru/index.php?route=checkout/ppa_score_pdf&order_id=83&CRM=1&file_method=D", order_print_form);
+                var response = await client.PostAsJsonAsync($"https://industriation.ru/index.php?route=checkout/ppa_score_pdf&order_id={order_print_form.order_id}&CRM=1&file_method=D", order_print_form);
                 var file = await response.Content.ReadAsStreamAsync();
                 return file;
             }

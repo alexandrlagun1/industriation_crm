@@ -28,6 +28,19 @@ namespace industriation_crm.Server.Services
             }
         }
 
+        public List<call_history> GetCallHistoryByContactIds(List<int?> contactsIds)
+        {
+            try
+            {
+                List<call_history> call_Histories = _dbContext.call_history.Where(c => contactsIds.Contains(c.contact_id)).ToList();
+                return call_Histories;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public CallHistoryReturnData GetCallHistoryDetails(CallHistoryFilter callHistoryFilter)
         {
             CallHistoryReturnData callHistoryReturnData = new CallHistoryReturnData();

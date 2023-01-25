@@ -27,11 +27,10 @@ namespace industriation_crm.Server.Controllers.DaData
                 daDataContent = await response.Content.ReadFromJsonAsync<DaDataContent>();
             }
             client client = new client();
-            client.org_inn = inn;
             client.org_ogrn = Convert.ToInt64(daDataContent?.suggestions?[0]?.data?.ogrn);
             client.org_name = daDataContent?.suggestions?[0]?.value;
             client.org_address = daDataContent?.suggestions?[0]?.data?.address?.value;
-
+            client.org_kpp = Convert.ToInt64(daDataContent?.suggestions?[0]?.data?.kpp);
             return client;
         }
     }

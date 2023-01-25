@@ -9,6 +9,11 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <AuthorizeView Roles="6">
+    @if (showAlert)
+    {
+        <Alert text="@alertText" CloseAlert="CloseAlert" type="@alertType"></Alert>
+    }
+
     <div class="main-title">@Title заказ поставщику @supplierOrderId</div>
     <hr />
 
@@ -22,17 +27,6 @@
     }
     else
     {
-        @*<div class="mb-3">
-    <label for="Name" class="form-label">Специалист по снабжению</label>
-    <div class="col-md-4">
-    <select class="form-control" @bind="supplier_order.user_id">
-    @foreach (var u in users)
-    {
-    <option value="@u.id">@u.name</option>
-    }
-    </select>
-    </div>
-    </div>*@
 
         <div class="main-section mb-20">
             <div class="main-section-label">Поставщик:</div>
@@ -78,89 +72,7 @@
                             </a>
                         }
                     </label>
-                    @*<div class="section-field mb-20">
-                        <table class="order-table ind-col-lg-10">
-                            <thead class="ind-col-lg-10">
-                                <tr class="order-row ind-col-lg-10">
-                                    <td class="ind-col-lg-1">Артикул</td>
-                                    <td class="ind-col-lg-3">Наименование</td>
-                                    <td class="ind-col-lg-2">Количество</td>
-                                    <td class="ind-col-lg-2">Срок поставки</td>
-                                    <td class="ind-col-lg-1">Стоимость</td>
-                                    <td class="ind-col-lg-1"></td>
-                                </tr>
-                            </thead>
-                            <tbody class="ind-col-lg-10">
-                                @foreach (var p in supplier_order?.product_to_orders?.Where(p => p.order_id == id && p.id_delete_from_supplier_order! == false))
-                                {
-                                    <tr class="order-row">
-                                        <td class="ind-col-lg-1">@p.product.id</td>
-                                        <td class="ind-col-lg-3">@p.product.name</td>
-                                        <td class="ind-col-lg-2">
-                                            <table class="table-inside">
-                                                <tr class="tr-inside">
-                                                    <td>
-                                                        Колличество: @p.count
-                                                    </td>
-                                                </tr>
-                                                <tr class="tr-inside">
-                                                    <td>
-                                                        Цена: @p._product_price_with_discount
-                                                    </td>
-                                                </tr>
-                                                <tr class="tr-inside">
-                                                    <td>
-                                                        Срок доставки: @p.delivery_period
-                                                        @switch (p.delivery_period_type_id)
-                                                        {
-                                                            case 1:
-                                                                <div> дней</div>
-                                                                break;
-                                                            case 2:
-                                                                <div> недели</div>
-                                                                break;
-                                                            case 3:
-                                                                <div> месяца</div>
-                                                                break;
-                                                        }
-                                                    </td>
-                                                </tr>
-                                                <tr class="tr-inside">
-                                                    <td>
-                                                        Скидка: @p?._discount_total_price
-                                                    </td>
-                                                </tr>
-                                                <tr class="tr-inside">
-                                                    <td>
-                                                        Стоимость: @p?._total_price
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                        <td class="ind-col-lg-2">
-                                            <div class="ind-col-lg-3">
-                                                <input type="number" class="table-input" @bind="p!.supplier_delivery_period">
-                                            </div>
-                                            <div class="ind-col-lg-7">
-                                                <select name="" id="" class="table-input" @bind="p.delivery_period_type_id">
-                                                    @foreach (var delivery_period_type in delivery_Period_Types!)
-                                                    {
-                                                        <option value="@delivery_period_type.id">@delivery_period_type.name</option>
-                                                    }
-                                                </select>
-                                            </div>
-                                        </td>
-                                        <td class="ind-col-lg-1">
-                                            <input type="number" step="0.1" class="main-input" @bind-value="@p.supplier_price">
-                                        </td>
-                                        <td class="ind-col-lg-1">
-                                            <button type="button" class="close" @onclick="(async () => await RemoveProductFromSup(p))">Удалить</button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>*@
+
                     <div class="section-field mb-20">
                         <table class="order-table ind-col-lg-10">
                             <thead class="ind-col-lg-10">
@@ -201,7 +113,7 @@
                                                         }
                                                     </td>
                                                 </tr>
-                                                   -------
+                                                -------
                                                 <tr class="tr-inside">
                                                     <td>
                                                         <div class="ind-col-lg-10 flex">
@@ -257,11 +169,22 @@
         <div class="form-group">
             <button type="submit" class="score" @onclick="SaveOrder">Сохранить</button>
             <button type="button" class="close" @onclick="Cancel">Закрыть</button>
-            <button type="button" class="save" @onclick="SendTo1C">Сформировать заказ</button>
+            @if (supplierOrderId != 0 && supplier_order.status_id != 2)
+            {
+                <button type="button" class="save" @onclick="SendTo1C">Сформировать заказ</button>
+            }
         </div>
     }
 </AuthorizeView>
 @code {
+    protected bool showAlert { get; set; }
+    protected string alertText { get; set; }
+    protected int alertType { get; set; }
+    protected void CloseAlert()
+    {
+        showAlert = false;
+        StateHasChanged();
+    }
 
     [Parameter]
     public string? order_guid { get; set; }
@@ -290,7 +213,7 @@
     }
     protected override async Task OnParametersSetAsync()
     {
-        
+
         if (supplierOrderId != 0)
         {
             Title = "Изменить";
@@ -319,21 +242,59 @@
     }
     protected async Task SendTo1C()
     {
-        //if (supplier_order?.product_to_orders?.Where(o => o.order?.order_status_id != 3).FirstOrDefault() != null)
-        //{
-        //    //Оповестить пользователя о ошибке валидации
-        //    return;
-        //}
-        //else
-        //{
+        if (supplier_order.supplier?.id == 0)
+        {
+            alertText = "Выберите поставщика!";
+            alertType = 1;
+            showAlert = true;
+            return;
+        }
+        if (supplier_order?.product_to_orders?.Where(o => o.order?.order_status_id == 4).FirstOrDefault() != null)
+        {
+            alertText = "Заказ клиента на пересогласовании!";
+            alertType = 1;
+            showAlert = true;
+            return;
+        }
+        if (supplier_order?.product_to_orders?.Where(o => o.order?.order_status_id == 7).FirstOrDefault() != null)
+        {
+            alertText = "Заказ клиента отменен!";
+            alertType = 1;
+            showAlert = true;
+            return;
+        }
+        if (supplier_order?.product_to_orders?.Where(o => o.order?.order_status_id == 8).FirstOrDefault() != null)
+        {
+            alertText = "Заказ клиента в статусе Возврат!";
+            alertType = 1;
+            showAlert = true;
+            return;
+        }
         supplier_order?.product_to_orders?.ForEach(p => p.order = null);
+        supplier_order.status_id = 2;
+        await Http.PutAsJsonAsync("api/SupplierOrder", supplier_order);
         await Http.PostAsJsonAsync("api/_1C/CreateSupplierOrder", supplier_order);
-            Cancel();
-        //}
+        foreach (int? id in supplier_order?.product_to_orders?.Where(p => p.order_id != null && p.id_delete_from_supplier_order == false).GroupBy(p => p.order_id)?.OrderBy(o => o.Key)?.Select(p => p.Key)!)
+        {
+            order? order = await Http.GetFromJsonAsync<order>("api/order/" + id);
+            if(order.product_To_Orders.Where(p=>p.supplier_order_id == null).FirstOrDefault() == null)
+            {
+                order.order_status_id = 6;
+            }
+            else
+            {
+                order.order_status_id = 5;
+            }
+            await Http.PutAsJsonAsync("api/Order", order);
+        }
+        alertText = "Заказ сформирован в 1С";
+        alertType = 0;
+
+        showAlert = true;
+
     }
     protected async Task SaveOrder()
     {
-
         foreach (int? id in supplier_order?.product_to_orders?.Where(p => p.order_id != null && p.id_delete_from_supplier_order == false).GroupBy(p => p.order_id)?.OrderBy(o => o.Key)?.Select(p => p.Key)!)
         {
             order? order = await Http.GetFromJsonAsync<order>("api/order/" + id);
@@ -360,10 +321,13 @@
         else
         {
             supplier_order.user_id = user_id;
+            supplier_order.status_id = 1;
             var response = await Http.PostAsJsonAsync("api/SupplierOrder", supplier_order);
             supplierOrderId = await response.Content.ReadFromJsonAsync<int>();
+            order_guid = null;
             await OnParametersSetAsync();
         }
+        
     }
     public void Cancel()
     {

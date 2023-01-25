@@ -6,29 +6,55 @@
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
 <EditForm Model="@product" OnValidSubmit="SaveProduct">
-    <DataAnnotationsValidator />
     <div class="main-title">@Title продукт</div>
     <hr />
+    
     <div class="main-section">
         <div class="main-section-label">Основная информация о продукте</div>
         <div class="mb-3">
             <div class="ind-col-lg-5 input-field">
                 <div class="input-label">Наименование</div>
                 <InputText class="main-input" @bind-Value="product.name" />
-                <ValidationMessage For="@(() => product.name)" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Артикул</div>
+                <InputText class="main-input" @bind-Value="product.article" />
             </div>
         </div>
         <div class="mb-3">
             <div class="ind-col-lg-5 input-field">
                 <div class="input-label">Цена</div>
                 <InputNumber class="main-input" @bind-Value="product.price" />
-                <ValidationMessage For="@(() => product.price)" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Производитель</div>
+                <InputText class="main-input" @bind-Value="product.manufacturer" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Ед. изм.</div>
+                <div class="section-field ind-col-lg-5">
+                    <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5" @bind="product.unit">
+                        <option>
+                            шт
+                        </option>
+                        <option>
+                            м
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
     <div class="bottom-buttons ind-col-lg-10">
         <button type="submit" class="save">Сохранить</button>
-        <button class="close" @onclick="Cancel">Закрыть</button>
+        <button type="button"  class="close" @onclick="Cancel">Закрыть</button>
     </div>
 </EditForm>
 @code {
@@ -58,6 +84,8 @@
         }
         else
         {
+            product.category_id = 100000;
+
             await Http.PostAsJsonAsync("api/product", product);
         }
         Cancel();

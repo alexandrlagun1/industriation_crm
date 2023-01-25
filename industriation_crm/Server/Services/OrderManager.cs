@@ -171,5 +171,19 @@ namespace industriation_crm.Server.Services
                 throw;
             }
         }
+
+        public List<order> GetOrdersByClientId(int clientId)
+        {
+            try
+            {
+                List<order> orders = _dbContext.order.Where(o => o.client_id == clientId).Include(o => o.product_To_Orders).ThenInclude(p=>p.product).ToList();
+                return orders;
+                
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }
