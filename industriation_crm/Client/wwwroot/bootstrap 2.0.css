@@ -748,6 +748,14 @@ li {
 	margin-right: auto;
 }
 
+.pl-10 {
+	padding-left: 10px;
+}
+
+.pr-10 {
+	padding-right: 10px;
+}
+
 
 
 body {
@@ -2066,4 +2074,122 @@ video {
 	box-shadow: 0px 0px 8px 0px rgb(34 60 80 / 20%);
 	border-radius: 25px;
 }
+
+.mh-500 {
+	max-height: 500px;
+	overflow-y: scroll;
+	padding-right: 10px;
+}
+
+.mh-500::-webkit-scrollbar {
+	width: 8px;
+}
+
+.mh-500::-webkit-scrollbar-track {
+	background-color: transparent;
+	border-radius: 10px;
+}
+
+.mh-500::-webkit-scrollbar-thumb {
+	background-color: #DFE3ED;
+	border-radius: 10px;
+}
+
+.mh-500::-webkit-scrollbar-thumb {
+	background-color: #eceef2;
+}
+
+.mh-250 {
+	max-height: 250px;
+	overflow-y: scroll;
+	padding-right: 10px;
+}
+
+.mh-250::-webkit-scrollbar {
+	width: 8px;
+}
+
+.mh-250::-webkit-scrollbar-track {
+	background-color: transparent;
+	border-radius: 10px;
+}
+
+.mh-250::-webkit-scrollbar-thumb {
+	background-color: #DFE3ED;
+	border-radius: 10px;
+}
+
+.mh-250::-webkit-scrollbar-thumb {
+	background-color: #eceef2;
+}
+
+.client-order {
+	border: 2px solid #0099ff;
+	margin-bottom: 10px;
+	border-radius: 4px;
+}
+
+.client-order a {
+	font-size: 20px;
+	padding: 5px 10px;
+}
+
+.client-order-item {
+	display: flex;
+	justify-content: space-between;
+	font-size: 14px;
+	padding: 5px 10px;
+	background-color: #eaf7ff;
+}
+
+.client-order-item:not(:last-child){
+	margin-bottom: 10px;
+}
+
+.client-order-item .item-name .name {
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.client-order-item .item-price {
+	max-width: 20%;
+    width: 100%;
+    text-align: right;
+}
+
+.client-call {
+	display: flex;
+	align-items: center;
+	margin-bottom: 10px;
+	font-size: 16px;
+	position: relative;
+}
+
+.client-call div:not(:last-child) {
+	margin-right: 10px;
+}
+
+.client-call .button {
+	display: flex;
+	align-items: center;
+	max-width: 100px;
+	width: 100%;
+	justify-content: center;
+}
+
+.client-call .button video {
+	width: 300px;
+	height: 30px;
+	position: absolute;
+	right: 0;
+	top: 0px;
+	box-shadow: 0px 0px 8px 0px rgb(34 60 80 / 20%);
+	border-radius: 25px;
+}
+
+.client-call .duration {
+	max-width: 25%;
+	width: 100%;
+}
+
 	/* ////////////////////////////////////////////////////////////////// */
