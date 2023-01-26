@@ -2192,4 +2192,36 @@ video {
 	width: 100%;
 }
 
+.nav-buttons {
+	position: absolute;
+	top: -14px;
+}
+
+.nav-buttons button:not(:last-child) {
+	margin-right: 7px;
+}
+
+.nav-buttons .tab {
+	background-color: #0099ff;
+	border: none;
+	border-radius: 4px;
+	color: #fff;
+	transition: background-color .5s;
+	padding: 2px 5px;
+	min-width: 100px;
+}
+
+.nav-buttons .tab-active {
+	background-color: red;
+	transition: background-color .5s;
+}
+
+.tab-section {
+	display: none;
+}
+
+.tab-section-active {
+	display: block;
+}
+
 	/* ////////////////////////////////////////////////////////////////// */
