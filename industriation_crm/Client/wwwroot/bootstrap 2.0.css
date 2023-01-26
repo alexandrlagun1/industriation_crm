@@ -1031,6 +1031,11 @@ tbody tr:last-child td {
 	border-bottom: none;
 }
 
+tbody .order-row:hover td {
+	background-color: #eaf7ff;
+}
+
+
 thead td {
 	font-size: 14px !important;
 	background-color: #f4f6f8 !important;
