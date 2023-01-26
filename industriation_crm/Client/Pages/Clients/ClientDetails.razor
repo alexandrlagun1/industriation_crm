@@ -47,19 +47,23 @@ else
                     <thead class="ind-col-lg-10">
                         <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1">ID</td>
-                            <td class="ind-col-lg-2">Организация</td>
+                            <td class="ind-col-lg-3">Организация</td>
                             <td class="ind-col-lg-2">ФИО</td>
                             <td class="ind-col-lg-2">Тип клиента</td>
                             <td class="ind-col-lg-2">Закрепленный менеджер</td>
-                            <td class="ind-col-lg-1">Действия</td>
+@*                            <td class="ind-col-lg-1">Действия</td>*@
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var _client in clientList)
                         {
                             <tr class="order-row ind-col-lg-10">
-                                <td class="ind-col-lg-1">@_client.id</td>
-                                <td class="ind-col-lg-2">@_client.org_name</td>
+                                <td class="ind-col-lg-1">
+                                    <a href='/client/edit/@_client.id'>
+                                        @_client.id
+                                    </a>
+                                </td>
+                                <td class="ind-col-lg-3">@_client.org_name</td>
                                 <td class="ind-col-lg-2">@_client.contacts.Where(c=>c.main_contact==1).FirstOrDefault()?.full_name</td>
                                 <td class="ind-col-lg-2">
                                     @if (_client.client_type == 0)
@@ -72,7 +76,7 @@ else
                                     }
                                 </td>
                                 <td class="ind-col-lg-2">@_client.user?.name</td>
-                                <td class="ind-col-lg-1">
+                               @* <td class="ind-col-lg-1">
                                     @if (SelectOrderClient == null)
                                     {
                                         <div class="ind-col-lg-10">
@@ -92,7 +96,7 @@ else
                                             </button>
                                         </div>
                                     }
-                                </td>
+                                </td>*@
                             </tr>
                         }
                     </tbody>

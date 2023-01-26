@@ -30,9 +30,9 @@
                 <thead class="table-success ind-col-lg-10">
                     <tr class="order-row ind-col-lg-10">
                         <td class="ind-col-lg-1">ID</td>
-                        <td class="ind-col-lg-4">Имя</td>
+                        <td class="ind-col-lg-6">Имя</td>
                         <td class="ind-col-lg-3 ind-col-md-3">Роль</td>
-                        <td class="ind-col-lg-2">Действия</td>
+@*                        <td class="ind-col-lg-2">Действия</td>*@
                     </tr>
                 </thead>
                 <tbody class="ind-col-lg-10">
@@ -40,9 +40,13 @@
                     {
                         <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1">@user.id</td>
-                            <td class="ind-col-lg-4">@user.name</td>
+                            <td class="ind-col-lg-6">
+                                <a href='/user/edit/@user.id'>
+                                    @user.name
+                                </a>
+                            </td>
                             <td class="ind-col-lg-3">@user.roles?.name</td>
-                            <td class="ind-col-lg-2">
+@*                            <td class="ind-col-lg-2">
                                 <div class=" ind-col-lg-5">
                                     <a href='/user/edit/@user.id' class="score" role="button">
                                         <div class="hidden-md">Изменить</div>
@@ -59,7 +63,7 @@
                                         </div>
                                     </a>
                                 </div>
-                            </td>
+                            </td>*@
                         </tr>
                     }
                 </tbody>

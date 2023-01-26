@@ -90,18 +90,22 @@ else
                         {
                             <td class="ind-col-lg-2">Менеджер по снабжению</td>
                         }
-                        <td class="ind-col-lg-1">Менеджер</td>
+                        <td class="ind-col-lg-2">Менеджер</td>
                         <td class="ind-col-lg-1">Статус оплаты</td>
                         <td class="ind-col-lg-1">Статус заказа</td>
                         <td class="ind-col-lg-1">Этап</td>
-                        <td class="ind-col-lg-1">Действия</td>
+@*                        <td class="ind-col-lg-1">Действия</td>*@
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var order in ordersReturnData?.orders!)
                     { 
                         <tr class="order-row ind-col-lg-10">
-                            <td class="ind-col-lg-1">@order.id</td>
+                            <td class="ind-col-lg-1">
+                                <a href='/order/edit/@order.id'>
+                                    @order.id
+                                </a>
+                            </td>
                             <td class="ind-col-lg-2">@order.main_contact?.full_name</td>
                             @if (role == 1)
                             {
@@ -122,18 +126,18 @@ else
                                     @order?.supplier_manager?.name
                                 </td>
                             }
-                            <td class="ind-col-lg-1">@order.user?.name</td>
+                            <td class="ind-col-lg-2">@order.user?.name</td>
                             <td class="ind-col-lg-1">@order.pay_status?.name</td>
                             <td class="ind-col-lg-1">@order.order_status?.name</td>
                             <td class="ind-col-lg-1">@order.stage?.name</td>
-                            <td class="ind-col-lg-1">
+@*                            <td class="ind-col-lg-1">
                                 <a href='/order/edit/@order.id' class="score" role="button">
                                     <div class="hidden-md">Изменить</div>
                                     <div class="hidden-lg ind-col-md-10">
                                         <img src="./icons/edit.svg" class="h20-w20">
                                     </div>
                                 </a>
-                            </td>
+                            </td>*@
                         </tr>
                     }
                 </tbody>
