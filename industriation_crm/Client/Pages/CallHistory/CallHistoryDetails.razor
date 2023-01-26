@@ -89,9 +89,18 @@
                         </td>
                         <td class="ind-col-lg-1">@call.client_number</td>
                         <td class="ind-col-lg-2">
-                            <a href="/client/edit/@call.contact?.client_id">
-                                @call.contact?.full_name
-                            </a>
+                            @if (call.contact != null)
+                            {
+                                <a href="/client/edit/@call.contact?.client_id">
+                                    @call.contact?.full_name
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="/client/add/@call.client_number">
+                                    Создать клиента
+                                </a>
+                            }
                         </td>
                         <td class="ind-col-lg-1">
                             @if (call.type?.ToLower() == "in")

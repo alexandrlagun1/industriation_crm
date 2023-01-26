@@ -14,7 +14,11 @@
 {
     <Alert text="@alertText" CloseAlert="CloseAlert" type="1"></Alert>
 }
+<div class="buttons-bar mb-10">
+    <button @onclick="()=>showClientData = false" class="score">Редактирование</button>
+    <button @onclick="()=>showClientData = true" class="score">Данные</button>
 
+</div>
 <EditForm Model="@client" OnValidSubmit="SaveClient">
     <DataAnnotationsValidator />
     <div class="main-title">@Title</div>
@@ -218,7 +222,7 @@
         StateHasChanged();
     }
 
-    protected bool showClientData { get; set; } = true;
+    protected bool showClientData { get; set; } = false;
     [Parameter]
     public string? phone { get; set; }
     [Parameter]
@@ -266,7 +270,7 @@
         }
         if (clientId != 0)
         {
-
+            showClientData = true;
             client = await Http.GetFromJsonAsync<client>("api/Client/" + clientId);
             contacts = client?.contacts;
             main_contact = contacts.Where(c => c.main_contact == 1).FirstOrDefault();
