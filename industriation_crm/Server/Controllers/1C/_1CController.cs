@@ -67,16 +67,25 @@ namespace industriation_crm.Server.Controllers._1C
                 order_pay.price = Convert.ToDouble(pay_summ.Replace(".",","));
             }
             order.order_Pays?.Add(order_pay);
+            
             if (order.order_status_id == 1 && order.pay_conditions == 1)
             {
                 double? order_pays_summ = order.order_Pays?.Select(p => p.price).Sum();
                 Console.WriteLine($"order_pays_summ = {order_pays_summ}");
                 double? min_predoplata = order.price_summ / 100 * order.pay_predoplata_percent;
                 Console.WriteLine($"min_predoplata = {min_predoplata}");
-                if (order_pays_summ + 1 >= min_predoplata)
+                if (order_pays_summ + 0.1 >= min_predoplata)
                     order.order_status_id = 3;
             }
-            _IOrder.UpdateOrderDetails(order);
+            if (order.order_Pays?.Select(p=>p.price).Sum() < order.price_summ)
+            {
+                order.pay_status_id = 1;
+            }
+            else
+            {
+                order.pay_status_id = 2;
+            }
+                _IOrder.UpdateOrderDetails(order);
 
             megafon_info megafon_Info = new megafon_info();
             megafon_Info.cmd = "1";

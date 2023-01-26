@@ -626,6 +626,18 @@
         {
             await SetMainContact();
         }
+        if (String.IsNullOrEmpty(order?.delivery?.recipient_name))
+        {
+            order.delivery.recipient_name = order?.main_contact?.full_name;
+        }
+        if (String.IsNullOrEmpty(order?.delivery?.address))
+        {
+            order.delivery.address = order?.client?.org_address;
+        }
+         if (String.IsNullOrEmpty(order?.delivery?.recipient_phone))
+        {
+            order.delivery.recipient_phone = order?.main_contact?.phone;
+        }
     }
     //Печатные формы
     protected async Task GetOrderPrintForm(string pch)
@@ -755,6 +767,11 @@
         }
         else
         {
+            if(order?.pay_conditions == 2)
+                order.pay_status_id = 3;
+            else
+                order.pay_status_id = 1;
+
             order.client_id = clientId;
             order.order_date = DateTime.Now;
             order.stage_id = 1;

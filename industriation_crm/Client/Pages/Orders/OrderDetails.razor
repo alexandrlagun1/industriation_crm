@@ -90,8 +90,9 @@ else
                         {
                             <td class="ind-col-lg-2">Менеджер по снабжению</td>
                         }
-                        <td class="ind-col-lg-2">Менеджер</td>
-                        <td class="ind-col-lg-1">Этап заказа</td>
+                        <td class="ind-col-lg-1">Менеджер</td>
+                        <td class="ind-col-lg-1">Статус оплаты</td>
+                        <td class="ind-col-lg-1">Статус заказа</td>
                         <td class="ind-col-lg-1">Этап</td>
                         <td class="ind-col-lg-1">Действия</td>
                     </tr>
@@ -121,7 +122,8 @@ else
                                     @order?.supplier_manager?.name
                                 </td>
                             }
-                            <td class="ind-col-lg-2">@order.user?.name</td>
+                            <td class="ind-col-lg-1">@order.user?.name</td>
+                            <td class="ind-col-lg-1">@order.pay_status?.name</td>
                             <td class="ind-col-lg-1">@order.order_status?.name</td>
                             <td class="ind-col-lg-1">@order.stage?.name</td>
                             <td class="ind-col-lg-1">

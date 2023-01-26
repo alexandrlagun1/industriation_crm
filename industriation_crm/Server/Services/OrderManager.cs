@@ -118,7 +118,7 @@ namespace industriation_crm.Server.Services
                     ordersReturnData.count = _dbContext.order.Where(o => o.stage_id >= ordersFilter.stage && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to).Count();
 
                     ordersReturnData.orders = _dbContext.order.Where(o =>o.stage_id>=ordersFilter.stage && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to)
-                        .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o=>o.main_contact).Include(o=>o.stage).Include(o=>o.supplier_manager)
+                        .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o=>o.main_contact).Include(o=>o.stage).Include(o=>o.supplier_manager).Include(o=>o.pay_status)
                         .OrderByDescending(o=>o.order_date)
                         .Skip(ordersFilter.order_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.order_on_page).ToList();
                 }
@@ -127,7 +127,7 @@ namespace industriation_crm.Server.Services
                     ordersReturnData.count = _dbContext.order.Where(o => o.stage_id >= ordersFilter.stage && o.id == ordersFilter.order_id && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to).Count();
 
                     ordersReturnData.orders = _dbContext.order.Where(o => o.stage_id >= ordersFilter.stage && o.id == ordersFilter.order_id && ordersFilter.managers.Contains(o.user) && o.main_contact.full_name.Contains(ordersFilter.client) && o.order_date >= ordersFilter.order_date_from && o.order_date <= ordersFilter.order_date_to)
-                        .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o => o.main_contact).Include(o => o.stage).Include(o => o.supplier_manager)
+                        .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o => o.main_contact).Include(o => o.stage).Include(o => o.supplier_manager).Include(o => o.pay_status)
                         .OrderByDescending(o => o.order_date)
                         .Skip(ordersFilter.order_on_page * (ordersFilter.current_page - 1)).Take(ordersFilter.order_on_page).ToList();
                 }
