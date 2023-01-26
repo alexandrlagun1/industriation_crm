@@ -78,11 +78,11 @@
                             <thead class="ind-col-lg-10">
                                 <tr class="order-row ind-col-lg-10">
                                     <td class="ind-col-lg-1">Артикул</td>
-                                    <td class="ind-col-lg-3">Наименование</td>
+                                    <td class="ind-col-lg-4">Наименование</td>
                                     <td class="ind-col-lg-1">Количество</td>
                                     <td class="ind-col-lg-2">Срок поставки</td>
                                     <td class="ind-col-lg-2">Стоимость</td>
-                                    <td class="ind-col-lg-1"></td>
+@*                                    <td class="ind-col-lg-1"></td>*@
                                 </tr>
                             </thead>
                             <tbody class="ind-col-lg-10">
@@ -90,7 +90,7 @@
                                 {
                                     <tr class="order-row">
                                         <td class="ind-col-lg-1">@p.product.id</td>
-                                        <td class="ind-col-lg-3">@p.product.name</td>
+                                        <td class="ind-col-lg-4">@p.product.name</td>
                                         <td class="ind-col-lg-1">
                                             @p.count
                                         </td>
@@ -147,14 +147,14 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td class="ind-col-lg-1">
+@*                                        <td class="ind-col-lg-1">
                                             <button type="button" class="close" @onclick="(async () => await RemoveProductFromSup(p))">
                                                 <div class="hidden-md">Удалить</div>
                                                 <div class="hidden-lg ind-col-md-10">
                                                     <img src="./icons/delete-white.svg" class="h20-w20">
                                                 </div>
                                             </button>
-                                        </td>
+                                        </td>*@
                                     </tr>
                                 }
                             </tbody>

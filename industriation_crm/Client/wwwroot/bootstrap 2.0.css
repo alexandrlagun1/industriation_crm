@@ -938,7 +938,7 @@ header {
 	font-style: normal;
 	outline: none !important;
 	position: relative;
-	background-color: #fff;
+	background-color: transparent;
 	flex-wrap: wrap;
 	justify-content: center;
 }

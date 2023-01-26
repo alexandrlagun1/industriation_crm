@@ -25,37 +25,37 @@
 }
 @if (role == 1)
 {
-    @if (order?.stage_id > 1 || user_id != order?.user_id)
-    {
-        <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
-        <style type="text/css">
-            .main-section input,
-            .main-section textarea,
-            .main-section select {
-                user-select: none;
-                opacity: .7;
-                pointer-events: none;
-                background-color: #eee;
-            }
-
-            .main-section button,
-            .add-payment {
-                opacity: .7;
-                pointer-events: none;
-                user-select: none;
-            }
-        </style>
-    }
-    else
-    {
-        <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
-    }
     <div class="buttons-bar mb-10">
         <button @onclick="()=>ViewOrderManagement = false" class="score">Информация о заказе</button>
         <button @onclick="()=>ViewOrderManagement = true" class="score">Управление заказом</button>
         @if (order?.order_Pays?.Count() == 0)
         {
             <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
+        }
+        @if (order?.stage_id > 1 || user_id != order?.user_id)
+        {
+            <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
+            <style type="text/css">
+                .main-section input,
+                .main-section textarea,
+                .main-section select {
+                    user-select: none;
+                    opacity: .7;
+                    pointer-events: none;
+                    background-color: #eee;
+                }
+
+                .main-section button,
+                .add-payment {
+                    opacity: .7;
+                    pointer-events: none;
+                    user-select: none;
+                }
+            </style>
+        }
+        else
+        {
+            <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
         }
 
     </div>

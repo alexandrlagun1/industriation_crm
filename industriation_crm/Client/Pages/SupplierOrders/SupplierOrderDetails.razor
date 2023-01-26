@@ -49,23 +49,27 @@
                         <td class="ind-col-lg-2">Номер заказа</td>
                         <td class="ind-col-lg-3">Специалист по снабжению</td>
                         <td class="ind-col-lg-3">Поставщик</td>
-                        <td class="ind-col-lg-1">Статус</td>
-                        <td class="ind-col-lg-1">Действия</td>
+                        <td class="ind-col-lg-2">Статус</td>
+@*                        <td class="ind-col-lg-1">Действия</td>*@
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var supplierOrder in ordersReturnData!.supplier_orders)
                     {
                         <tr class="order-row ind-col-lg-10">
-                            <td class="ind-col-lg-2">@supplierOrder?.id</td>
+                            <td class="ind-col-lg-2">
+                                <a href='/supplierorder/edit/@supplierOrder?.id'>
+                                    @supplierOrder?.id
+                                </a>
+                            </td>
                             <td class="ind-col-lg-3">@supplierOrder?.user?.name</td>
                             <td class="ind-col-lg-3">@supplierOrder?.supplier?.org_name</td>
-                            <td class="ind-col-lg-1">@supplierOrder?.supplier_order_status?.name</td>
-                            <td class="ind-col-lg-1">
+                            <td class="ind-col-lg-2">@supplierOrder?.supplier_order_status?.name</td>
+@*                            <td class="ind-col-lg-1">
                                 <a href='/supplierorder/edit/@supplierOrder?.id' class="score" role="button">
                                     Изменить
                                 </a>
-                            </td>
+                            </td>*@
                         </tr>
                     }
                 </tbody>
