@@ -24,7 +24,7 @@
                 </div>
                 @if (ViewTasks == false)
                 {
-                        @foreach (var n in user_Notifications!)
+                    @foreach (var n in user_Notifications!.OrderByDescending(ut => ut.date))
                         {
                         <div class="modal-actual-task">
                             <div class="order-info-date">
@@ -37,7 +37,7 @@
                 else
                 {
 
-                    @foreach (var t in user_tasks!)
+                    @foreach (var t in user_tasks!.OrderByDescending(ut=>ut.date))
                     {
                         @if (t.complete == 1)
                         {

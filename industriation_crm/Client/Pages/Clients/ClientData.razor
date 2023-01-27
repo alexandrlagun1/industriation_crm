@@ -134,7 +134,7 @@
                     }
                 <div class="mh-500">
                     <b>Актуальные задачи:</b>
-                        @foreach (var task in tasks?.Where(t => t.complete == 0)!)
+                    @foreach (var task in tasks?.Where(t => t.complete == 0)!.OrderByDescending(ut => ut.date))
                         {
                         <div class="actual-task mt-10">
                             <div><b>От кого:</b> @task?.creator?.name</div>
@@ -147,7 +147,7 @@
                 <hr>
                 <div class="mh-500">
                     <b>Завершенные задачи:</b>
-                        @foreach (var task in tasks?.Where(t => t.complete == 1)!)
+                    @foreach (var task in tasks?.Where(t => t.complete == 1)!.OrderByDescending(ut => ut.date))
                         {
                         <div class="done-task mt-10">
                             <div><b>От кого:</b> @task?.creator?.name</div>

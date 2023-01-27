@@ -15,7 +15,7 @@ builder.Services.AddDbContext<DatabaseContext>
     (options =>
     {
         options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))/*.LogTo(Console.WriteLine, LogLevel.Information)*/;
-        options.ConfigureWarnings(warnings =>warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
+        //options.ConfigureWarnings(warnings =>warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
     });
 
 builder.Services.AddOidcAuthentication(options =>

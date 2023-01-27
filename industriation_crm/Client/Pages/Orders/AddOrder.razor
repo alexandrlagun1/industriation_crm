@@ -32,7 +32,7 @@
         {
             <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
         }
-        @if (order?.stage_id > 1 || user_id != order?.user_id)
+        @if (order?.stage_id > 1@* || user_id != order?.user_id*@)
         {
             <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
             <style type="text/css">
@@ -127,6 +127,7 @@
                         @client?.org_name
                     else
                         @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
+
 
                     </a>
                     <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
@@ -234,15 +235,6 @@
                     <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">КПП</div>
                         <input type="number" class="main-input" @bind="client.org_kpp">
-                    </div>
-                </div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 input-field hidden-md">
-                    </div>
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">КПП</div>
-                        @*ПОЛЕ ДЛЯ КПП*@
-                        <input type="number" class="main-input">
                     </div>
                 </div>
             </div>
@@ -498,9 +490,10 @@
 
         <div class="main-section ind-col-lg-5 ind-col-md-10">
             <div class="main-section-label">Оплата</div>
-            @*<div class="section-field">
-        <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
-        </div>*@
+            <div class="section-field">
+                <input type="number" step="0.01" class="main-input" @bind="pay"></input>
+                <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
+            </div>
             <div class="input-field">
                 <div class="input-label">Условия оплаты</div>
                 <select type="text" class="main-input" @bind="@order.pay_conditions">
@@ -521,6 +514,7 @@
             </div>
             <hr class="custom-hr" />
 
+
             @foreach (var p in order?.order_Pays!.Where(o => o.isRemove == false))
             {
                 <div class="payment-field ind-col-lg-10">
@@ -536,7 +530,7 @@
                         </div>
                         <label>@p.price</label>
                     </div>
-                    @*<button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>*@
+                    <button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>
                 </div>
             }
         </div>
@@ -547,6 +541,7 @@
         @if (order?.stage_id == 1 && (order?.order_status_id == 3 || order?.order_status_id == 4) && role == 1)
         {
             <button class="score" type="button" @onclick="Bill">Передать в снабжение</button>
+
         }
         @if (role == 6 && (order.supplier_manager_id == null || order.supplier_manager_id == user_id))
         {
@@ -556,11 +551,29 @@
                 <button class="close" type="button" @onclick="ReturnOrderToManager">На пересогласование</button>
             }
         }
+        @if (role == 1 && order?.stage_id == 2 && order?.order_status_id == 6)
+        {
+            <button class="score" type="button" @onclick="ChangeStatus_OnStock">На складе</button>
+        }
+        @if (role == 1 && order?.stage_id == 3 && order?.order_status_id == 9)
+        {
+            <button class="score" type="button" @onclick="ChangeStatus_OnDelivery">Передан в доставку</button>
+        }
+        @if (role == 1 && order?.stage_id == 3 && order?.order_status_id == 10)
+        {
+            <button class="score" type="button" @onclick="ChangeStatus_Delivered">Доставлен</button>
+        }
+        @if (role == 1 && order?.stage_id == 3 && order?.order_status_id == 11)
+        {
+            <button class="score" type="button" @onclick="ChangeStatus_Closed">Закрыт</button>
+        }
     </div>
 </EditForm>
 
 
 @code {
+    protected double? pay{ get; set; }
+
     protected bool showAlert { get; set; }
     protected void CloseAlert()
     {
@@ -616,6 +629,7 @@
     }
     protected override async Task OnParametersSetAsync()
     {
+
         if (orderId != 0)
         {
             Title = $"Изменить заказ {orderId}";
@@ -634,7 +648,7 @@
         {
             order.delivery.address = order?.client?.org_address;
         }
-         if (String.IsNullOrEmpty(order?.delivery?.recipient_phone))
+        if (String.IsNullOrEmpty(order?.delivery?.recipient_phone))
         {
             order.delivery.recipient_phone = order?.main_contact?.phone;
         }
@@ -682,7 +696,39 @@
             NavigationManager.NavigateTo($"/supplierorder/add/{guid.ToString()}");
         }
     }
-
+    protected async Task ChangeStatus_OnStock()
+    {
+        if (order.order_status_id == 6)
+        {
+            order.order_status_id = 9;
+            order.stage_id = 3;
+            await SaveOrder();
+        }
+    }
+    protected async Task ChangeStatus_OnDelivery()
+    {
+        if (order.order_status_id == 9)
+        {
+            order.order_status_id = 10;
+            await SaveOrder();
+        }
+    }
+    protected async Task ChangeStatus_Delivered()
+    {
+        if (order.order_status_id == 10)
+        {
+            order.order_status_id = 11;
+            await SaveOrder();
+        }
+    }
+    protected async Task ChangeStatus_Closed()
+    {
+        if (order.order_status_id == 11)
+        {
+            order.order_status_id = 12;
+            await SaveOrder();
+        }
+    }
     protected async Task GetClientsManagers()
     {
         if (clientId != 0)
@@ -757,6 +803,28 @@
     }
     protected async Task SaveOrder()
     {
+        //удалить потом
+        if (order.order_status_id == 1 && order.pay_conditions == 1)
+        {
+            double? order_pays_summ = order.order_Pays?.Select(p => p.price).Sum();
+            double? min_predoplata = order.price_summ / 100 * order.pay_predoplata_percent;
+            if (order_pays_summ + 0.1 >= min_predoplata)
+                order.order_status_id = 3;
+        }
+        if (order.order_Pays?.Select(p => p.price).Sum() < order.price_summ)
+        {
+            order.pay_status_id = 1;
+        }
+        else
+        {
+            order.pay_status_id = 2;
+        }
+        if(order.order_Pays?.Count == 0){
+            order.pay_status_id = null;
+        }
+
+
+
         if (order.pay_conditions == 2 && order.order_status_id == 1)
             order.order_status_id = 3;
         if (order.pay_conditions == 1 && order.order_status_id == 3 && order.order_Pays.Count == 0)
@@ -767,7 +835,7 @@
         }
         else
         {
-            if(order?.pay_conditions == 2)
+            if (order?.pay_conditions == 2)
                 order.pay_status_id = 3;
             else
                 order.pay_status_id = 1;
@@ -799,7 +867,6 @@
         showAlert = true;
 
         await OnParametersSetAsync();
-
         StateHasChanged();
     }
     public void Cancel()
@@ -872,7 +939,7 @@
     protected void AddNewOrderPay()
     {
         order_pay order_Pay = new order_pay();
-        order_Pay.price = order._price_summ;
+        order_Pay.price = pay;
         order.order_Pays.Add(order_Pay);
     }
     protected void RemoveOrderPay(order_pay order_Pay)

@@ -172,7 +172,7 @@ namespace industriation_crm.Shared.Models
         public double? price_summ { get; set; }
         public DateTime? order_date { get; set; } = DateTime.Now;
         public string? notes { get; set; }
-        public int? stage_id { get; set; }
+        public int? stage_id { get; set; } = 1;
         public int? pay_status_id { get; set; }
         public int? pay_conditions { get; set; } = 1;
         public int? pay_predoplata_percent { get; set; } = 100;

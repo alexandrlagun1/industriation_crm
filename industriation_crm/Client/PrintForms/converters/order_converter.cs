@@ -36,7 +36,7 @@ namespace industriation_crm.Client.PrintForms
             order_Print_From.order_data.simpla.address = order.client?.org_address;
             order_Print_From.order_data.simpla.company = order.client?.org_name;
 
-            foreach (var p in order.product_To_Orders!)
+            foreach (var p in order.product_To_Orders!.OrderBy(p => p.product_postition))
             {
                 product product = new product();
                 product.name = p.product?.name;

@@ -59,9 +59,16 @@ else
                         {
                             <tr class="order-row ind-col-lg-10">
                                 <td class="ind-col-lg-1">
-                                    <a href='/client/edit/@_client.id'>
-                                        @_client.id
-                                    </a>
+                                    @if (SelectOrderClient == null)
+                                    {
+                                        <a href='/client/edit/@_client.id'>
+                                            @_client.id
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-link" @onclick="()=>SelectOrderClient(_client)">@_client.id</button>
+                                    }
                                 </td>
                                 <td class="ind-col-lg-3">@_client.org_name</td>
                                 <td class="ind-col-lg-2">@_client.contacts.Where(c=>c.main_contact==1).FirstOrDefault()?.full_name</td>
