@@ -193,19 +193,17 @@
                             <a href='/order/edit/@o.id' role="button"> Заказ @o?.id</a>
                             @if (o?._current_check != null)
                             {
-                                @foreach (var p in o?._current_check?.product_To_Orders)
-                                {
-                                    <div class="client-order-item">
-                                        <div class="item-name">
-                                            <div class="name">@p.product?.name </div>
-                                            <div class="model"> Артикул: <b>@p.product?.article</b></div>
-                                        </div>
-                                        <div class="item-price">
-                                            <div class="count"> Колличество: <b>@p.count @p.product?.unit</b> </div>
-                                            <div class="price"> Цена: <b>@p._product_price_with_discount ₽ за 1шт.</b> </div>
-                                            <div class="summ"> Сумма: <b>@p._total_price ₽</b> </div>
-                                        </div>
+                                <div class="client-order-item">
+                                    <div class="item-name">
+                                        <div class="name">@p.product?.name </div>
+                                        <div class="model"> Артикул: <b>@p.product?.article</b></div>
                                     </div>
+                                    <div class="item-price">
+                                        <div class="count"> Колличество: <b>@p.count @p.product?.unit</b> </div>
+                                        <div class="price"> Цена: <b>@p._product_price_with_discount ₽ за 1шт.</b> </div>
+                                        <div class="summ"> Сумма: <b>@p._total_price ₽</b> </div>
+                                    </div>
+                                </div>
 
                                 }
                             }

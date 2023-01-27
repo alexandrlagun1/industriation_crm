@@ -1,5 +1,40 @@
 ﻿@inject HttpClient Http
-<div class="main-title">Управление заказом @order.id</div>
+<div class="main-title main-title-centered">
+    Управление заказом @order.id
+    @if (role == 1)
+    {
+        @if (order?.order_Pays?.Count() == 0)
+        {
+            <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
+        }
+        @if (order?.stage_id > 1 || user_id != order?.user_id)
+        {
+            <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
+            <style type="text/css">
+                .main-section input,
+                .main-section textarea,
+                .main-section select {
+                user-select: none;
+                opacity: .7;
+                pointer-events: none;
+                background-color: #eee;
+                }
+
+                .main-section button,
+                .add-payment {
+                opacity: .7;
+                pointer-events: none;
+                user-select: none;
+                }
+            </style>
+        }
+        else
+        {
+            <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
+        }
+
+    }
+</div>
 <hr />
 <div class="main-section">
 
@@ -42,7 +77,7 @@
                                                 @p?.product?.name
                                             </div>
                                             <div class="table-modal-price">
-                                                @p._product_price
+                                                @p._product_price ₽
                                             </div>
                                         </div>
                                     </div>
@@ -69,13 +104,13 @@
                                 }
                             </td>
                             <td class="ind-col-lg-1">
-                                @p._product_price_with_discount
+                                @p._product_price_with_discount ₽
                             </td>
 
                             <td class="ind-col-lg-1">@p._count</td>
-                            <td class="ind-col-lg-1">@p?._discount_total_price</td>
+                            <td class="ind-col-lg-1">@p?._discount_total_price ₽</td>
                             <td class="ind-col-lg-1">
-                                @p?._total_price
+                                @p?._total_price ₽
                             </td>
                             <td class="ind-col-lg-1">
                                 @if (p.supplier_order_id == null)
@@ -187,6 +222,10 @@
 </div>
 @code {
     [Parameter]
+    public int? role{ get; set; }
+    [Parameter]
+    public int? user_id { get; set; }
+    [Parameter]
     public int? orderId { get; set; }
     [Parameter]
     public order? order { get; set; }
@@ -226,5 +265,16 @@
         newTask.creator = order.user;
         order.tasks.Add(newTask);
         await Http.PostAsJsonAsync<task>("api/task", newTask);
+    }
+
+    protected async Task OrderCancellation()
+    {
+        order.order_status_id = 7;
+        await Http.PutAsJsonAsync("api/Order", order);
+    }
+    protected async Task OrderPayReturn()
+    {
+        order.order_status_id = 8;
+        await Http.PutAsJsonAsync("api/Order", order);
     }
 }

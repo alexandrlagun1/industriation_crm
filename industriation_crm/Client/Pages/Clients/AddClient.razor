@@ -27,78 +27,60 @@
     {
         <ClientData client="client" progress_client_discount="progress_client_discount" client_Orders="client_Orders" client_discount="GetClientDiscount" next_lvl_discount="@next_lvl_discount"> </ClientData>
     }
-    else
+    else{
+    @if (role == 1)
     {
-        @if (role == 1)
-        {
-            <div class="main-section">
-                <div class="main-section-label">Основные данные</div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">Закрепленный менеджер</div>
-                        <InputSelect class="main-input" @bind-Value="client.user_id">
-                            @foreach (var m in managers)
-                            {
-                                <option value="@m.id">@m.name</option>
-                            }
-                        </InputSelect>
-                    </div>
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">Тип клиента</div>
-                        <InputSelect class="main-input" @bind-Value="client.client_type">
-                            <option value="0">Физическое лицо</option>
-                            <option value="1">Юридическое лицо</option>
-                            <option value="2">Индивидуальный предприниматель</option>
-                        </InputSelect>
-                    </div>
-                </div>
-            </div>
-        }
         <div class="main-section">
-            <div class="main-section-label">Клиент</div>
+            <div class="main-section-label">Основные данные</div>
             <div class="section-field">
-                <div class="ind-col-lg-5 ind-col-md-10">
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Фамилия</div>
-                        <input type="text" class="main-input" @bind-value="main_contact.surname" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Имя</div>
-                        <input type="text" class="main-input" @bind-value="main_contact.name" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Отчество</div>
-                        <input type="text" class="main-input" @bind-value="main_contact.patronymic" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Адрес доставки</div>
-                        <input type="text" class="main-input" @bind-value="client.delivery_adr" />
-                    </div>
+                <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                    <div class="input-label">Закрепленный менеджер</div>
+                    <InputSelect class="main-input" @bind-Value="client.user_id">
+                        @foreach (var m in managers)
+                        {
+                            <option value="@m.id">@m.name</option>
+                        }
+                    </InputSelect>
                 </div>
-                <div class="ind-col-lg-5 ind-col-md-10">
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">E-mail</div>
-                        <input type="email" class="main-input" @bind-value="main_contact.email" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Доп. E-mail</div>
-                        <input type="email" class="main-input" @bind-value="main_contact.dop_email" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Телефон</div>
-                        <input type="tel" class="main-input" @bind-value="main_contact.phone" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">ФИО получателя</div>
-                        <input type="tel" class="main-input" @bind-value="client.delivery_cont" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Телефон получателя</div>
-                        <input type="tel" class="main-input" @bind-value="client.delivery_cont_phone" />
-                    </div>
+                <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                    <div class="input-label">Тип клиента</div>
+                    <InputSelect class="main-input" @bind-Value="client.client_type">
+                        <option value="0">Физическое лицо</option>
+                        <option value="1">Юридическое лицо</option>
+                    </InputSelect>
                 </div>
             </div>
         </div>
+    }
+    <div class="main-section">
+        <div class="main-section-label">Клиент</div>
+        <div class="section-field">
+            <div class="ind-col-lg-5 ind-col-md-10">
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">Имя</div>
+                    <input type="text" class="main-input" @bind-value="main_contact.name" />
+                </div>
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">Фамилия</div>
+                    <input type="text" class="main-input" @bind-value="main_contact.surname" />
+                </div>
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">Отчество</div>
+                    <input type="text" class="main-input" @bind-value="main_contact.patronymic" />
+                </div>
+            </div>
+            <div class="ind-col-lg-5 ind-col-md-10">
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">E-mail</div>
+                    <input type="email" class="main-input" @bind-value="main_contact.email" />
+                </div>
+                <div class="ind-col-lg-10 input-field">
+                    <div class="input-label">Телефон</div>
+                    <input placeholder="+7(000)000-00-00" type="text" class="main-input phoneMasked"  @bind-value="main_contact.phone" />
+                </div>
+            </div>
+        </div>
+    </div>
 
         @if (client.client_type == 1 || client.client_type == 2)
         {

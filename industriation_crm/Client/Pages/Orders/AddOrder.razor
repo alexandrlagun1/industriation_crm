@@ -28,37 +28,28 @@
     <div class="buttons-bar mb-10">
         <button @onclick="()=>ViewOrderManagement = false" class="score">Информация о заказе</button>
         <button @onclick="()=>ViewOrderManagement = true" class="score">Управление заказом</button>
-        @if (order?.order_Pays?.Count() == 0)
+    </div>
+    @if (order?.stage_id > 1 || user_id != order?.user_id)
         {
-            <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
-        }
-        @if (order?.stage_id > 1@* || user_id != order?.user_id*@)
-        {
-            <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
             <style type="text/css">
                 .main-section input,
                 .main-section textarea,
                 .main-section select {
-                    user-select: none;
-                    opacity: .7;
-                    pointer-events: none;
-                    background-color: #eee;
+                user-select: none;
+                opacity: .7;
+                pointer-events: none;
+                background-color: #eee;
                 }
 
                 .main-section button,
                 .add-payment {
-                    opacity: .7;
-                    pointer-events: none;
-                    user-select: none;
+                opacity: .7;
+                pointer-events: none;
+                user-select: none;
                 }
             </style>
         }
-        else
-        {
-            <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
-        }
 
-    </div>
 }
 
 
@@ -67,7 +58,7 @@
 
     @if (ViewOrderManagement || role != 1)
     {
-        <industriation_crm.Client.Pages.order_management.OrderManagementInfo order="order!"></industriation_crm.Client.Pages.order_management.OrderManagementInfo>
+        <industriation_crm.Client.Pages.order_management.OrderManagementInfo user_id="user_id" order="order!" role="role"></industriation_crm.Client.Pages.order_management.OrderManagementInfo>
     }
     else
     {
@@ -331,7 +322,7 @@
                                                         @p?.product?.name
                                                     </div>
                                                     <div class="table-modal-price">
-                                                        @Math.Round(p._product_price.Value, 2)
+                                                        @p._product_price ₽
                                                     </div>
                                                 </div>
                                             </div>
@@ -439,7 +430,7 @@
                                 Стоимость товаров:
                             </div>
                             <div class="ind-col-lg-3" style="text-align: right;">
-                                @current_order_check._total_product_price ₽
+                                @order._total_price ₽
                             </div>
                         </div>
                     </div>
@@ -560,13 +551,7 @@
                         </div>
                         <label>@p.price ₽</label>
                     </div>
-                    <div class="input-field">
-                        <div class="input-label">
-                            Оплата счета
-                        </div>
-                        <label>@(order?.id)-@(order?._pay_check.check_number)</label>
-                    </div>
-                    @*<button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>*@
+                    <button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>
                 </div>
             }
         </div>
@@ -918,19 +903,74 @@
                 await SendUserNotification($"Заказ {order.id} переведен на стадию снабжения", order.supplier_manager_id);
         }
     }
-    protected async Task OrderCancellation()
+   
+    protected async Task SaveOrder()
     {
-        order.order_status_id = 7;
-        await PutOrder();
-    }
-    protected async Task OrderPayReturn()
-    {
-        order.order_status_id = 8;
-        await PutOrder();
-    }
-    protected async Task PutOrder()
-    {
-        await Http.PutAsJsonAsync("api/Order", order);
+        //удалить потом
+        if (order.order_status_id == 1 && order.pay_conditions == 1)
+        {
+            double? order_pays_summ = order.order_Pays?.Select(p => p.price).Sum();
+            double? min_predoplata = order.price_summ / 100 * order.pay_predoplata_percent;
+            if (order_pays_summ + 0.1 >= min_predoplata)
+                order.order_status_id = 3;
+        }
+        if (order.order_Pays?.Select(p => p.price).Sum() < order.price_summ)
+        {
+            order.pay_status_id = 1;
+        }
+        else
+        {
+            order.pay_status_id = 2;
+        }
+        if(order.order_Pays?.Count == 0){
+            order.pay_status_id = null;
+        }
+
+
+
+        if (order.pay_conditions == 2 && order.order_status_id == 1)
+            order.order_status_id = 3;
+        if (order.pay_conditions == 1 && order.order_status_id == 3 && order.order_Pays.Count == 0)
+            order.order_status_id = 1;
+        if (order?.id != 0)
+        {
+            await Http.PutAsJsonAsync("api/Order", order);
+        }
+        else
+        {
+            if (order?.pay_conditions == 2)
+                order.pay_status_id = 3;
+            else
+                order.pay_status_id = 1;
+
+            order.client_id = clientId;
+            order.order_date = DateTime.Now;
+            order.stage_id = 1;
+
+            var response = await Http.PostAsJsonAsync("api/Order", order);
+            orderId = await response.Content.ReadFromJsonAsync<int>();
+
+            await CreateOrderHistory("Заказ клиента сформирован");
+        }
+
+        //Сохранение и удаление продуктов из заказа
+        if (RemoveProductToOrdersList.Count != 0)
+            await Http.PostAsJsonAsync("api/ProductToOrder/remove_products_to_orders", RemoveProductToOrdersList);
+        if (order.product_To_Orders != null)
+        {
+            List<product_to_order> AddProductsToOrderList = order.product_To_Orders?.Where(p => p.id == 0).ToList();
+            if (AddProductsToOrderList.Count != 0)
+            {
+                foreach (var p in order.product_To_Orders)
+                    p.order_id = orderId;
+                await Http.PostAsJsonAsync("api/ProductToOrder/add_products_to_order", AddProductsToOrderList);
+            }
+            await Http.PutAsJsonAsync("api/ProductToOrder/update_products_to_order", order.product_To_Orders.Where(p => p.id != 0));
+        }
+        showAlert = true;
+
+        await OnParametersSetAsync();
+        StateHasChanged();
     }
     public void Cancel()
     {
