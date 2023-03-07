@@ -5,6 +5,11 @@
 
 <div class="main-title">Звонки</div>
 
+@if (openSelectClient)
+    {
+    <industriation_crm.Client.Pages.Clients.ClientDetails contact_number="@contactNumber"></industriation_crm.Client.Pages.Clients.ClientDetails>
+    }
+
 <div class="main-section">
     <div class="main-section-label">
         Фильтр:
@@ -100,6 +105,7 @@
                                 <a href="/client/add/@call.client_number">
                                     Создать клиента
                                 </a>
+                                <button @onclick="()=>OpenSelectClient(call?.client_number)">Выбрать существующего</button>
                             }
                         </td>
                         <td class="ind-col-lg-1">
@@ -182,10 +188,14 @@
     </div>
 </div>
 @code {
+    protected bool openSelectClient { get; set; } = false;
+    protected string? contactNumber { get; set; }
+
     protected CallHistoryFilter callHistoryFilter = new();
     protected List<call_history>? call_Histories = new();
     protected List<user> SelectManagers = new();
     protected List<user>? noSelectManagers = new();
+
 
     List<int> page_count = new List<int>();
     protected int count_on_page = 50;
@@ -221,7 +231,11 @@
             page_count.Add(i);
         StateHasChanged();
     }
-
+    protected void OpenSelectClient(string num)
+    {
+        contactNumber = num;
+        openSelectClient = true;
+    }
     protected async Task OnKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")

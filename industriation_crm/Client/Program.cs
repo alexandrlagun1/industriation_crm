@@ -21,7 +21,6 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services
 .AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
-
 builder.Services.AddSingleton<HubConnection>(sp =>
 {
     var navigationManager = sp.GetRequiredService<NavigationManager>();

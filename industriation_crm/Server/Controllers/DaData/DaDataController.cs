@@ -12,9 +12,9 @@ namespace industriation_crm.Server.Controllers.DaData
     public class DaDataController : ControllerBase
     {
         [HttpGet("{inn}")]
-        public async Task<client> Get(long inn)
+        public async Task<client?> Get(long inn)
         {
-            
+            client client = new client();
             DaDataContent? daDataContent = new();
             using (var httpClient = new HttpClient())
             {
@@ -25,8 +25,10 @@ namespace industriation_crm.Server.Controllers.DaData
 
                 var response = await httpClient.PostAsJsonAsync("https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party", daDataRequest);
                 daDataContent = await response.Content.ReadFromJsonAsync<DaDataContent>();
+                if (daDataContent?.suggestions?.Count == 0)
+                    return client;
             }
-            client client = new client();
+            
             client.org_ogrn = Convert.ToInt64(daDataContent?.suggestions?[0]?.data?.ogrn);
             client.org_name = daDataContent?.suggestions?[0]?.value;
             client.org_address = daDataContent?.suggestions?[0]?.data?.address?.value;

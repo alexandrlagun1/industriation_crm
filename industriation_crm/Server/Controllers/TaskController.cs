@@ -1,7 +1,9 @@
 ﻿using industriation_crm.Server.Interfaces;
+using industriation_crm.Server.SignalRNotification;
 using industriation_crm.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace industriation_crm.Server.Controllers
 {
@@ -10,9 +12,11 @@ namespace industriation_crm.Server.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITask _ITask;
-        public TaskController(ITask ITask)
+        private readonly IHubContext<StatusNotificationHub, IStatusNotification> hubContext;
+        public TaskController(ITask ITask, IHubContext<StatusNotificationHub, IStatusNotification> statusHub)
         {
             _ITask = ITask;
+            this.hubContext = statusHub;
         }
         [HttpGet("{user_id}")]
         public async Task<List<task>> Get(int user_id)
@@ -30,9 +34,11 @@ namespace industriation_crm.Server.Controllers
             _ITask.UpdateTask(task);
         }
         [HttpPost]
-        public int Post(task task)
+        public async Task<int> Post(task task)
         {
-            return  _ITask.AddNewTask(task);
+            int task_id = _ITask.AddNewTask(task);
+            await this.hubContext.Clients.User(task.executor_id.ToString()).UserTaskNotificate("1");
+            return task_id;
         }
     }
 }

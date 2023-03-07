@@ -1,5 +1,6 @@
 ﻿using industriation_crm.Server._1C;
 using industriation_crm.Server.Interfaces;
+using industriation_crm.Server.Retail;
 using industriation_crm.Server.SignalRNotification;
 using industriation_crm.Shared.FilterModels;
 using industriation_crm.Shared.Models;
@@ -14,7 +15,7 @@ namespace industriation_crm.Server.Controllers
     {
         private readonly IOrder _IOrder;
         private readonly IHubContext<StatusNotificationHub, IStatusNotification> hubContext;
-       
+
         public OrderController(IOrder IOrder, IHubContext<StatusNotificationHub, IStatusNotification> statusHub)
         {
             _IOrder = IOrder;
@@ -23,10 +24,11 @@ namespace industriation_crm.Server.Controllers
         [HttpGet("GetOrdersByClientId/{clientId}")]
         public async Task<List<order>> GetOrdersByClientId(int clientId)
         {
-            return await Task.FromResult(_IOrder.GetOrdersByClientId(clientId));
+            List <order> orders = await Task.FromResult(_IOrder.GetOrdersByClientId(clientId));
+            return orders;
         }
         [HttpPost("GetOrders")]
-        public async Task<OrdersReturnData> GetOrders([FromBody]OrdersFilter ordersFilter)
+        public async Task<OrdersReturnData> GetOrders([FromBody] OrdersFilter ordersFilter)
         {
             return await Task.FromResult(_IOrder.GetOrderDetails(ordersFilter));
         }
@@ -43,24 +45,30 @@ namespace industriation_crm.Server.Controllers
         [HttpPost]
         public int Post(order order)
         {
-            return _IOrder.AddOrder(order);
+
+            int order_id = _IOrder.AddOrder(order);
+            if (order?.retail_synchro == true)
+                RetailOrderCreator.CreateOrder(order);
+            return order_id;
         }
         [HttpPut]
         public void Put(order order)
         {
-            _IOrder.UpdateOrderDetails(order);
+            _IOrder.UpdateOrderDetails(order, true);
+            if (order?.retail_synchro == true)
+                RetailOrderCreator.UpdateOrder(order);
         }
         [HttpPut("bill")]
         public async Task<IActionResult> Bill(order order)
         {
-            _IOrder.UpdateOrderDetails(order);
-            
+            _IOrder.UpdateOrderDetails(order, true);
 
 
-            
+
+
             return Ok();
         }
-        
-        
+
+
     }
 }

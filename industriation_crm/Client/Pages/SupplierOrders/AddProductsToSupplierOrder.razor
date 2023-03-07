@@ -22,7 +22,7 @@
             <div class="modal-body">
 
 
-                @foreach (int id in noSupleirOrderProducts!.GroupBy(o => o!.order_id).OrderBy(o => o!.Key).Select(o => o!.Key))
+                @foreach (int id in noSupleirOrderProducts!.GroupBy(o => o!.order_check?.order_id).OrderBy(o => o!.Key).Select(o => o!.Key))
                 {
                     <label class="form-label">Заказ №@id</label>
                     <div class="section-field">
@@ -36,9 +36,9 @@
                                 </tr>
                             </thead>
                             <tbody class="ind-col-lg-10">
-                                @foreach (var p in noSupleirOrderProducts.Where(o => o.order_id == id))
+                                    @foreach (var p in noSupleirOrderProducts.Where(o => o!.order_check?.order_id == id))
                                 {
-                                    if (productsInSuplierOrder.Where(pr => pr.id == p.id).FirstOrDefault() == null || p.id_delete_from_supplier_order == true)
+                                    if (productsInSuplierOrder.Where(pr => pr.id == p.id).FirstOrDefault() == null || p.is_delete_from_supplier_order == true)
                                     {
                                         <tr class="order-row">
                                             <td class="ind-col-lg-2">@p.product.id</td>
@@ -79,13 +79,15 @@
     }
     protected override async Task OnParametersSetAsync()
     {
-        noSupleirOrderProducts!.AddRange(productsInSuplierOrder!.Where(p => p.id_delete_from_supplier_order == true).ToList());
+        noSupleirOrderProducts!.AddRange(productsInSuplierOrder!.Where(p => p.is_delete_from_supplier_order == true).ToList());
 
     }
     protected async Task AddProduct(product_to_order product_To_Order)
     {
+        product_To_Order.supplier_price = product_To_Order._total_price;
+        product_To_Order.supplier_delivery_period = product_To_Order.delivery_period;
         if (product_To_Order.supplier_order_id != 0 && product_To_Order.supplier_order_id != null)
-            product_To_Order.id_delete_from_supplier_order = false;
+            product_To_Order.is_delete_from_supplier_order = false;
         else
             productsInSuplierOrder!.Add(product_To_Order);
     }

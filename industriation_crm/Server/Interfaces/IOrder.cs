@@ -8,7 +8,7 @@ namespace industriation_crm.Server.Interfaces
         public OrdersReturnData GetOrderDetails(OrdersFilter ordersFilter);
         public order GetOrderData(int id);
         public int AddOrder(order order);
-        public void UpdateOrderDetails(order order);
+        public void UpdateOrderDetails(order order, bool is_update_inner_data);
         public void DeleteOrder(int id);
         public List<order> GetOrdersByClientId(int clientId); 
     }

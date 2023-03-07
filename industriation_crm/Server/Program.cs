@@ -24,9 +24,10 @@ builder.Services.AddOidcAuthentication(options =>
 });
 
 //Авторизация
-
+Console.WriteLine("Загрузка");
 builder.Services.AddScoped<ICategory, CategoryManager>();
 builder.Services.AddScoped<IContact, ContactManager>();
+builder.Services.AddScoped<IProgressClientDiscount, ProgressClientDiscountManager>();
 builder.Services.AddScoped<IUser, UserManager>();
 builder.Services.AddScoped<IClient, ClientManager>();
 builder.Services.AddScoped<IRoles, RolesManager>();

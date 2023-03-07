@@ -1,4 +1,5 @@
 ﻿@page "/contact/add/{clientId:int}"
+@page "/contact/add/{clientId:int}/{contactPhone}"
 @page "/contact/edit/{clientId:int}/{contactId:int}/{isClient:bool}"
 @using industriation_crm.Shared.Models
 @inject HttpClient Http
@@ -40,6 +41,13 @@
         </div>
         <div class="mb-3">
             <div class="ind-col-lg-5 input-field">
+                <div class="input-label">Доп. Email</div>
+                <InputText type="email" class="main-input" @bind-Value="contact.dop_email" />
+                <ValidationMessage For="@(() => contact.dop_email)" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="ind-col-lg-5 input-field">
                 <div class="input-label">Телефон</div>
                 <InputText type="tel" class="main-input" @bind-Value="contact.phone" />
                 <ValidationMessage For="@(() => contact.phone)" />
@@ -72,6 +80,8 @@
     public int contactId { get; set; }
     [Parameter]
     public bool isClient { get; set; }
+    [Parameter]
+    public string? contactPhone { get; set; }
 
     protected string Title = "Добавить";
     protected contact contact = new();
@@ -90,6 +100,9 @@
         {
             Title = "Изменить";
             contact = await Http.GetFromJsonAsync<contact>("api/Contact/" + contactId);
+        }
+        if(contactPhone != null){
+            contact.phone = contactPhone;
         }
     }
     protected async Task SaveContact()

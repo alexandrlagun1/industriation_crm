@@ -1,5 +1,6 @@
 ﻿using industriation_crm.Server.Interfaces;
 using industriation_crm.Server.Models;
+using industriation_crm.Server.Retail;
 using industriation_crm.Shared.FilterModels;
 using industriation_crm.Shared.Models;
 using Microsoft.EntityFrameworkCore;

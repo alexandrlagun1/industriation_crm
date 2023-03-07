@@ -21,9 +21,9 @@
                 </tr>
             </thead>
             <tbody class="ind-col-lg-10">
-                @if (order != null && order.product_To_Orders != null)
+                @if (order?._current_check != null && order?._current_check.product_To_Orders != null)
                 {
-                    @foreach (var p in order!.product_To_Orders.OrderBy(p => p.product_postition))
+                    @foreach (var p in order!._current_check.product_To_Orders.OrderBy(p => p.product_postition))
                     {
                         <tr class="order-row">
                             <td class="ind-col-lg-1" id="model">
@@ -127,6 +127,8 @@
                                 Задача:
                                 <br>
                                 <textarea @bind="newTask.text" class="notes-textarea main-input" placeholder="Введите текст задачи"></textarea>
+                                Срок исполнения:
+                                <input type="date" class="main-input" @bind="newTask.execute_date">
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="close" data-dismiss="modal" @onclick="()=>viewCreateTask = false">Закрыть</button>
@@ -144,7 +146,14 @@
                         <div><b>От кого:</b> @task.creator.name</div>
                         <div><b>Исполнитель:</b> @task.executor.name</div>
                         <div><b>Задача:</b> @task.text</div>
-                        <button @onclick="()=>task.complete=1" class="score task-btn">Выполнить</button>
+                        <div>
+                            <b>Срок исполнения:</b>
+                           @if(task.execute_date.HasValue){
+                                <div>@task.execute_date.Value.ToString("dd.MM.yyyy")</div>
+                           }
+                            
+                        </div>
+                        <button @onclick="()=>task.complete=1" type="button" class="score task-btn">Выполнить</button>
                     </div>
                 }
             </div>
@@ -157,6 +166,14 @@
                         <div><b>От кого:</b> @task.creator.name</div>
                         <div><b>Исполнитель:</b> @task.executor.name</div>
                         <div><b>Задача:</b> @task.text</div>
+                        <div>
+                            <b>Срок исполнения:</b>
+                            @if (task.execute_date.HasValue)
+                            {
+                                <div>@task.execute_date.Value.ToString("dd.MM.yyyy")</div>
+                            }
+
+                        </div>
                     </div>
                 }
             </div>
@@ -180,17 +197,18 @@
     protected override async Task OnInitializedAsync()
     {
         if (orderId != null)
+        {
             order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
+            order.order_Checks.ForEach(c => c.order = order);
+        }
 
         executors.Add(order?.user!);
-        executors.Add(order?.supplier_manager!);
-        if(order?.supplier_manager != null)
-
+        if (order?.supplier_manager != null)
             executors.Add(order?.supplier_manager!);
     }
     protected async Task checkAllProducts(ChangeEventArgs e)
     {
-        order.product_To_Orders?.Where(p => p.supplier_order_id == null).ToList().ForEach(p => p.is_add_to_supplier_order = Convert.ToBoolean(e.Value));
+        order._current_check?.product_To_Orders?.Where(p => p.supplier_order_id == null).ToList().ForEach(p => p.is_add_to_supplier_order = Convert.ToBoolean(e.Value));
     }
     protected void openCreatetaskModal()
     {
@@ -198,7 +216,7 @@
         newTask.executor_id = order.user_id;
         viewCreateTask = true;
     }
-    protected void createTask()
+    protected async Task createTask()
     {
         viewCreateTask = false;
         newTask.complete = 0;
@@ -207,6 +225,6 @@
         newTask.executor = executors.Where(e => e.id == newTask.executor_id).First();
         newTask.creator = order.user;
         order.tasks.Add(newTask);
-        
+        await Http.PostAsJsonAsync<task>("api/task", newTask);
     }
 }

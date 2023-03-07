@@ -1,15 +1,22 @@
-﻿@inject AuthenticationStateProvider _authStateProvider
+﻿@using System.Security.Claims;
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager _navigationManager
 @inject ILocalStorageService _localStorageService
 @inject HttpClient Http
-
+@inject HubConnection HubConnection
 <AuthorizeView>
     <Authorized>
-        
-        <button @onclick="()=>viewNotifications=true" class="oi oi-bell header-notification header-notification-alert"></button>
+        @if (user_tasks.Where(t => t.is_view == false).FirstOrDefault() != null)
+        {
+            <button @onclick="()=>viewNotifications=true" class="oi oi-bell header-notification header-notification-alert"></button>
+        }
+        else
+        {
+            <button @onclick="()=>viewNotifications=true" class="oi oi-bell"></button>
+        }
         @if (viewNotifications)
         {
-            <industriation_crm.Client.Pages.UserNotifications.UserNotifications CloseModal="CloseModal"></industriation_crm.Client.Pages.UserNotifications.UserNotifications>
+            <industriation_crm.Client.Pages.UserNotifications.UserNotifications CloseModal="CloseModal" user_Notifications="user_Notifications" user_tasks="user_tasks" user_id="userId"></industriation_crm.Client.Pages.UserNotifications.UserNotifications>
         }
         <a href="" class="auth-link">@context.User.Identity?.Name</a>
         <button type="button" @onclick="Logout" class="nav-link btn btn-link auth-button">Выход</button>
@@ -20,28 +27,37 @@
 </AuthorizeView>
 
 @code {
+    public List<task>? user_tasks { get; set; } = new();
+    public List<user_notifications>? user_Notifications { get; set; } = new();
+    int userId = 0;
     protected bool viewNotifications = false;
     protected void CloseModal()
     {
         viewNotifications = false;
+        StateHasChanged();
     }
     protected override async Task OnInitializedAsync()
     {
-        //HubConnection.On<string>("UpdateStatus", async status =>
-        //{
-        //    if (orderId != 0)
-        //    {
-        //        order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
-        //    }
-        //    StateHasChanged();
-        //});
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            userId = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
+            user_Notifications = await Http.GetFromJsonAsync<List<user_notifications>>("api/usernotifications/" + userId);
+            user_tasks = await Http.GetFromJsonAsync<List<task>>("api/Task/" + userId);
+        }
+        HubConnection.On<string>("UserTaskNotificate", async status =>
+        {
+            user_tasks = await Http.GetFromJsonAsync<List<task>>("api/Task/" + userId);
+            StateHasChanged();
+        });
     }
     private async Task Logout()
     {
         var response = await Http.GetAsync("api/Auth");
         if (response.IsSuccessStatusCode == true)
         {
-            (_authStateProvider as CustomAuthStateProvider).ClearAuthInfo();
+            (AuthenticationStateProvider as CustomAuthStateProvider).ClearAuthInfo();
             await _localStorageService.RemoveItemAsync("isauthenticated");
             _navigationManager.NavigateTo("/", true);
         }

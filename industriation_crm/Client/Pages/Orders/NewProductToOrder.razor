@@ -83,30 +83,32 @@
                         <thead class="ind-col-lg-10">
                             <tr class="order-row ind-col-lg-10">
                                 <td class="ind-col-lg-1">Артикул</td>
-                                <td class="ind-col-lg-5">Наименование</td>
-                                <td class="ind-col-lg-2">Цена</td>
+                                <td class="ind-col-lg-4">Наименование</td>
+                                <td class="ind-col-lg-2">Производитель</td>
+                                <td class="ind-col-lg-1">Цена</td>
                                 <td class="ind-col-lg-1">Колличество</td>
                                 <td class="ind-col-lg-1"></td>
                             </tr>
                         </thead>
                         <tbody class="ind-col-lg-10">
-                                @foreach (var p in productPackages)
-                                {
-                                    <tr class="order-row">
-                                        <td class="ind-col-lg-1">@p.product.article</td>
-                                        <td class="ind-col-lg-5">@p.product.name</td>
-                                        <td class="ind-col-lg-2">@p.product.price</td>
-                                        <td class="ind-col-lg-1"><input class="main-input" type="number" @bind-value="p.count"></input></td>
-                                        <td class="ind-col-lg-1">
-                                            <button class="add-item" @onclick="()=>AddProduct(p)">
-                                                <div class="hidden-md">Добавить</div>
-                                                <div class="hidden-lg ind-col-md-10">
-                                                    <img src="./icons/add-white.svg" class="h20-w20">
-                                                </div>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
+                            @foreach (var p in productPackages)
+                            {
+                                <tr class="order-row">
+                                    <td class="ind-col-lg-1">@p.product.article</td>
+                                    <td class="ind-col-lg-4">@p.product.name</td>
+                                    <td class="ind-col-lg-4">@p.product.manufacturer</td>
+                                    <td class="ind-col-lg-1">@p.product.price</td>
+                                    <td class="ind-col-lg-1"><input class="main-input" type="number" @bind-value="p.count"></input></td>
+                                    <td class="ind-col-lg-1">
+                                        <button class="add-item" @onclick="()=>AddProduct(p)">
+                                            <div class="hidden-md">Добавить</div>
+                                            <div class="hidden-lg ind-col-md-10">
+                                                <img src="./icons/add-white.svg" class="h20-w20">
+                                            </div>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
 
                     </table>
@@ -202,7 +204,7 @@
     {
         product_to_order product_To_Order = new product_to_order();
         product_To_Order.product_id = productPackage.product.id;
-        product_To_Order.order_id = orderId;
+        //product_To_Order.order_id = orderId;
         product_To_Order.count = productPackage.count;
         product_To_Order._product_price = productPackage.product.price;
         product_To_Order.product = productPackage.product;
@@ -222,7 +224,7 @@
         currentCategory = categoriesList.Where(c => c.id == 1).FirstOrDefault();
         await FindByFilter();
     }
-    
+
     protected void CompleteProductPackage(List<product> _productList)
     {
         productPackages = new();

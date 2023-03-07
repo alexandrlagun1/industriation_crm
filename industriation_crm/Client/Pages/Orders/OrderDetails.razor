@@ -23,7 +23,16 @@
 }
 else
 {
+    @if (view_client_select)
+    {
+        <industriation_crm.Client.Pages.Clients.ClientDetails SelectOrderClient="CreateOrder" CallType="1"></industriation_crm.Client.Pages.Clients.ClientDetails>
+    }
     <div class="main-section mb-20">
+        <div class="section-field">
+            <a class="score" type="button" @onclick="()=>view_client_select=true">
+                Новый заказ
+            </a>
+        </div>
         <div class="main-section-label">
             Фильтр:
         </div>
@@ -215,34 +224,51 @@ else
     }
     protected async Task GetOrders()
     {
-            load = true;
-            ordersFilter.current_page = current_page;
-            if (page_count.Count != 0 && (current_page < 1 || current_page > page_count.Count))
-                return;
-            ordersFilter.order_on_page = count_on_page;
-            if (role == 1)
-                ordersFilter.stage = 1;
-            else if (role == 6)
-                ordersFilter.stage = 2;
+        load = true;
+        ordersFilter.current_page = current_page;
+        if (page_count.Count != 0 && (current_page < 1 || current_page > page_count.Count))
+            return;
+        ordersFilter.order_on_page = count_on_page;
+        if (role == 1)
+            ordersFilter.stage = 1;
+        else if (role == 6)
+            ordersFilter.stage = 2;
 
 
-            if (SelectManagers.Count == 0)
-                ordersFilter.managers = noSelectManagers;
-            else
-                ordersFilter.managers = SelectManagers;
-            var response = await Http.PostAsJsonAsync("api/Order/GetOrders", ordersFilter);
-            string responseBody = await response.Content.ReadAsStringAsync();
-            ordersReturnData = JsonConvert.DeserializeObject<OrdersReturnData>(responseBody);
+        if (SelectManagers.Count == 0)
+            ordersFilter.managers = noSelectManagers;
+        else
+            ordersFilter.managers = SelectManagers;
+        var response = await Http.PostAsJsonAsync("api/Order/GetOrders", ordersFilter);
+        string responseBody = await response.Content.ReadAsStringAsync();
+        ordersReturnData = JsonConvert.DeserializeObject<OrdersReturnData>(responseBody);
 
-            int total_page = Convert.ToInt32(Math.Ceiling(ordersReturnData.count / Convert.ToDouble(count_on_page)));
-            page_count = new();
-            for (int i = 1; i <= total_page; i++)
-                page_count.Add(i);
-            load = false;
-        
+        int total_page = Convert.ToInt32(Math.Ceiling(ordersReturnData.count / Convert.ToDouble(count_on_page)));
+        page_count = new();
+        for (int i = 1; i <= total_page; i++)
+            page_count.Add(i);
+        load = false;
+
     }
 
-    public void Change(string href)
+    protected bool view_client_select = false;
+    protected async Task CreateOrder(client client)
+    {
+        
+        var progress_client_discount = await Http.GetFromJsonAsync<progress_client_discount>("api/ClientDiscount");
+        var client_Orders = await Http.GetFromJsonAsync<List<order>>($"api/Order/GetOrdersByClientId/{client.id}");
+        int discount = 0;
+        double? pay_orders_summ = client_Orders?.Where(o => o.pay_status_id == 2).Select(o => o._price_summ).Sum();
+        if (pay_orders_summ != null)
+        {
+            discount = Convert.ToInt32(Math.Floor((pay_orders_summ / progress_client_discount.up_point).Value)) * progress_client_discount.discount;
+            if (discount > progress_client_discount.max_discount)
+                discount = progress_client_discount.max_discount;
+        }
+        NavigationManager.NavigateTo($"/order/add/{client.id}/{discount}");
+    }
+
+    protected void Change(string href)
     {
         NavigationManager.NavigateTo(href);
     }

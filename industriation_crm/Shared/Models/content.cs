@@ -10,6 +10,7 @@ namespace industriation_crm.Shared.Models
         public string? name { get; set; }
         public int? role_id { get; set; }
         public string? password { get; set; }
+        public bool? retail_synch { get; set; } = true;
         public string? login { get; set; }
         public string? phone { get; set; }
         public string? megafon_login { get; set; }
@@ -17,6 +18,15 @@ namespace industriation_crm.Shared.Models
         [ForeignKey("role_id")]
         public virtual roles? roles { get; set; }
         public virtual List<client>? clients { get; set; }
+    }
+    public class progress_client_discount
+    {
+        [Key]
+        public int id { get; set; }
+        public int discount { get; set; }
+        public int up_point { get; set; }
+        public int max_discount { get; set; }
+
     }
     public class user_notifications
     {
@@ -26,169 +36,26 @@ namespace industriation_crm.Shared.Models
         public int? user_id { get; set; }
         public string? text { get; set; }
     }
-    public class task
-    {
-        [Key]
-        public int id { get; set; }
-        public string? text { get; set; }
-        public int complete { get; set; }
-        public int? creator_id { get; set; }
-        public int? executor_id { get; set; }
-        public int? client_id { get; set; }
-        public DateTime? date { get; set; } = DateTime.Now;
-        public int? order_id { get; set; }
-        [ForeignKey("creator_id")]
-        public user? creator { get; set; }
-        [ForeignKey("executor_id")]
-        public user? executor { get; set; }
-    }
-    public class stage
-    {
-        [Key]
-        public int id { get; set; }
-        public string name { get; set; }
-    }
-    public class order_history
-    {
-        [Key]
-        public int id { get; set; }
-        public string text { get; set; }
-        public DateTime date { get; set; }
-        public int order_id { get; set; }
-
-    }
-    public class roles
-    {
-        [Key]
-        public int id { get; set; }
-        public string? name { get; set; }
-
-    }
-    public class contact
-    {
-        [Key]
-        public int id { get; set; }
-        public string? name { get; set; }
-        public string? patronymic { get; set; }
-        public string? surname { get; set; }
-        public string? full_name { get; set; }
-        public string? email { get; set; }
-        public int? client_id { get; set; }
-        public int? main_contact { get; set; }
-        public string? phone { get; set; }
-        public int? is_active { get; set; }
-        public client? client { get; set; }
-        public List<contact_phone>? contact_phones { get; set; } = new();
-    }
-    public class call_history
+    public class order_check
     {
         [NotMapped]
-        public bool isActive = false;
+        public bool is_add { get; set; }
+        [NotMapped]
+        public bool is_delete { get; set; }
         [Key]
-        public int id { get; set; }
-        public string? client_number { get; set; }
-        public string? manager_number { get; set; }
-        public string? duration { get; set; }
-        public string? status { get; set; }
-        public string? call_id { get; set; }
-        public string? type { get; set; }
-        public string? record { get; set; }
-        public int? contact_id { get; set; }
-        public int? user_id { get; set; }
-
-        [ForeignKey("user_id")]
-        public user? user { get; set; }
-
-        [ForeignKey("contact_id")]
-        public contact? contact { get; set; }
-        public DateTime? date_time { get; set; }
-        
-    }
-    public class client
-    {
-        [Key]
-        public int id { get; set; }
-        public int? client_type { get; set; } = 1;
-        public int? user_id { get; set; }
-        public string? org_name { get; set; }
-        public string? org_address { get; set; }
-        public int is_supplier { get; set; }
-        public long? org_inn { get; set; }
-        public long? org_kpp { get; set; }
-        public long? org_ogrn { get; set; }
-        public long? bank_bik { get; set; }
-        public long? bank_cor_schet { get; set; }
-        public long? bank_ras_schet { get; set; }
-        public string? bank_name { get; set; }
-        public DateTime? add_date { get; set; } = DateTime.Now;
-
-        [ForeignKey("client_id")]
-        public List<contact>? contacts { get; set; }
-
-        [ForeignKey("user_id")]
-        public user? user { get; set; }
-
-        public List<order>? orders { get; set; }
-
-    }
-    public class category
-    {
-        [Key]
-        public int id { get; set; }
-        public string? name { get; set; }
-        public int parent_id { get; set; }
-    }
-    public class pay_status
-    {
-        [Key]
-        public int id { get; set; }
-        public string? name { get; set; }
-    }
-    public class product
-    {
-        [Key]
-        public int id { get; set; }
-        public string? name { get; set; }
-        public double? price { get; set; }
-        public int? category_id { get; set; }
-        public int? external_id { get; set; }
-        public string? image { get; set; }
-        public string? article { get; set; }
-        public string? unit { get; set; }
-        public string? manufacturer { get; set; }
-    }
-    public class order
-    {
-        [Key]
-        public int id { get; set; }
-        public int? client_id { get; set; }
-        public int? user_id { get; set; }
-        public int? order_status_id { get; set; } = 1;
-        public int? main_contact_id { get; set; }
-        public int? delivery_id { get; set; }
-        public string? comments { get; set; }
+        public int id { get; set; } = 0;
         public int? percent_discount { get; set; }
         public double? ruble_discount { get; set; }
         public double? price_summ { get; set; }
-        public DateTime? order_date { get; set; } = DateTime.Now;
-        public string? notes { get; set; }
-        public int? stage_id { get; set; } = 1;
-        public int? pay_status_id { get; set; }
-        public int? pay_conditions { get; set; } = 1;
-        public int? pay_predoplata_percent { get; set; } = 100;
-        public int? supplier_manager_id { get; set; }
-        [ForeignKey("supplier_manager_id")]
-        public user? supplier_manager { get; set; }
-
-        [ForeignKey("pay_status_id")]
-        public pay_status? pay_status { get; set; }
-        [ForeignKey("stage_id")]
-        public stage? stage { get; set; }
+        public double? current_pay_summ { get; set; }
+        public int? current { get; set; } = 0;
+        public int? order_id { get; set; }
+        public int? is_pay { get; set; }
+        public int? check_number { get; set; }
+        public virtual List<product_to_order>? product_To_Orders { get; set; } = new();
         [ForeignKey("order_id")]
-        public List<order_history> order_Histories { get; set; } = new();
-        [ForeignKey("order_id")]
-        public List<task> tasks { get; set; } = new();
-
+        public virtual order? order { get; set; }
+        
         [NotMapped]
         public int? _percent_discount
         {
@@ -228,50 +95,334 @@ namespace industriation_crm.Shared.Models
             }
         }
         [NotMapped]
-        public double? products_with_delivery_price
-        {
-            get
-            {
-                if (delivery.price == null)
-                    return _total_price;
-                return delivery.price + _total_price;
-            }
-        }
-
-
-        [NotMapped]
-        public double? _price_summ
-        {
-            get
-            {
-                if (delivery?.price == null)
-                    price_summ = _total_price - _current_pay_summ;
-                else
-                    price_summ = _total_price + delivery?.price - _current_pay_summ;
-                if (price_summ < 0)
-                    price_summ = 0;
-                return price_summ;
-            }
-            set
-            {
-                price_summ = value;
-                if (value < 0)
-                    price_summ = 0;
-
-            }
-        }
-        [NotMapped]
-        public double? _total_price
+        public double? _total_product_price
         {
             get
             {
                 if (product_To_Orders == null)
                     return null;
                 else
-                    return product_To_Orders?.Select(p => p._total_price).Sum();
+                    return product_To_Orders?.Where(p => p.is_delete_from_order == false).Select(p => p._total_price).Sum();
             }
         }
+
+    }
+    public class task
+    {
+        [Key]
+        public int id { get; set; }
+        public bool? is_view { get; set; } = false;
+        public string? text { get; set; }
+        public int complete { get; set; }
+        public int? creator_id { get; set; }
+        public int? executor_id { get; set; }
+        public int? client_id { get; set; }
+        public DateTime? execute_date { get; set; } = DateTime.Now;
+        public DateTime? date { get; set; } = DateTime.Now;
+        public int? order_id { get; set; }
+        [ForeignKey("creator_id")]
+        public user? creator { get; set; }
+        [ForeignKey("executor_id")]
+        public user? executor { get; set; }
+    }
+    public class stage
+    {
+        [Key]
+        public int id { get; set; }
+        public string name { get; set; }
+    }
+    public class order_history
+    {
+        [Key]
+        public int id { get; set; }
+        public string text { get; set; }
+        public DateTime date { get; set; }
+        public int order_id { get; set; }
+
+    }
+    public class roles
+    {
+        [Key]
+        public int id { get; set; }
+        public string? name { get; set; }
+
+    }
+    public class contact
+    {
+        [Key]
+        public int id { get; set; }
+        public string? dop_email { get; set; }
+        public string? name { get; set; }
+        public string? patronymic { get; set; }
+        public string? surname { get; set; }
+        public string? full_name { get; set; }
+        public string? email { get; set; }
+        public int? client_id { get; set; }
+        public int? main_contact { get; set; }
+        public string? phone { get; set; }
+        public int? is_active { get; set; }
+        public client? client { get; set; }
+        public List<contact_phone>? contact_phones { get; set; } = new();
+    }
+    public class call_history
+    {
+        [NotMapped]
+        public bool isActive = false;
+        [Key]
+        public int id { get; set; }
+        public string? client_number { get; set; }
+        public string? manager_number { get; set; }
+        public string? duration { get; set; }
+        public string? status { get; set; }
+        public string? call_id { get; set; }
+        public string? type { get; set; }
+        public string? record { get; set; }
+        public int? contact_id { get; set; }
+        public int? user_id { get; set; }
+
+        [ForeignKey("user_id")]
+        public user? user { get; set; }
+
+        [ForeignKey("contact_id")]
+        public contact? contact { get; set; }
+        public DateTime? date_time { get; set; }
+
+    }
+    public class client
+    {
+        [Key]
+        public int id { get; set; }
+        public int? client_type { get; set; } = 1;
+        public int? user_id { get; set; }
+        public string? org_name { get; set; }
+        public string? org_address { get; set; }
+        public int is_supplier { get; set; }
+        public long? org_inn { get; set; }
+        public long? org_kpp { get; set; }
+        public long? org_ogrn { get; set; }
+        public string? org_ogrnip { get; set; }
+        public string? delivery_adr { get; set; }
+        public string? delivery_cont_phone { get; set; }
+        public string? delivery_cont { get; set; }
+        public long? bank_bik { get; set; }
+        public string? bank_cor_schet { get; set; }
+        public string? bank_ras_schet { get; set; }
+        public string? bank_name { get; set; }
+        public DateTime? add_date { get; set; } = DateTime.Now;
+
+        [ForeignKey("client_id")]
+        public List<contact>? contacts { get; set; }
+
+        [ForeignKey("user_id")]
+        public user? user { get; set; }
+
+        public List<order>? orders { get; set; }
+
+
+    }
+    public class category
+    {
+        [Key]
+        public int id { get; set; }
+        public string? name { get; set; }
+        public int parent_id { get; set; }
+    }
+    public class pay_status
+    {
+        [Key]
+        public int id { get; set; }
+        public string? name { get; set; }
+    }
+    public class product
+    {
+        [Key]
+        public int id { get; set; }
+        public string? name { get; set; }
+        public double? price { get; set; }
+        public int? category_id { get; set; }
+        public int? external_id { get; set; }
+        public string? image { get; set; }
+        public string? article { get; set; }
+        public string? unit { get; set; }
+        public string? manufacturer { get; set; }
+    }
+    public class order
+    {
+        [Key]
+        public int id { get; set; }
+        [NotMapped]
+        public bool retail_synchro { get; set; }
+        public int? client_id { get; set; }
+        public int? user_id { get; set; }
+        public int? order_status_id { get; set; } = 1;
+        public int? main_contact_id { get; set; }
+        public int? delivery_id { get; set; }
+        public string? comments { get; set; }
+        //public int? percent_discount { get; set; }
+        //public double? ruble_discount { get; set; }
+        //public double? price_summ { get; set; }
         public double? current_pay_summ { get; set; }
+        public DateTime? order_date { get; set; } = DateTime.Now;
+        public string? notes { get; set; }
+        public int? stage_id { get; set; } = 1;
+        public int? pay_status_id { get; set; } = 4;
+        public int? pay_conditions { get; set; } = 1;
+        public int? pay_predoplata_percent { get; set; } = 100;
+        public int? supplier_manager_id { get; set; }
+        public virtual List<order_check>? order_Checks { get; set; } = new();
+        [ForeignKey("supplier_manager_id")]
+        public user? supplier_manager { get; set; }
+
+        [ForeignKey("pay_status_id")]
+        public pay_status? pay_status { get; set; }
+        [ForeignKey("stage_id")]
+        public stage? stage { get; set; }
+        [ForeignKey("order_id")]
+        public List<order_history> order_Histories { get; set; } = new();
+        [ForeignKey("order_id")]
+        public List<task> tasks { get; set; } = new();
+        [NotMapped]
+        public order_check? _pay_check
+        {
+            get
+            {
+
+                return order_Checks?.Where(c => c.is_pay == 1).FirstOrDefault();
+            }
+        }
+        [NotMapped]
+        public order_check? _current_check
+        {
+            get
+            {
+                
+                return order_Checks?.Where(c => c.current == 1).FirstOrDefault();
+            }
+        }
+        [NotMapped]
+        public double? _price_summ //Сколько отсалось оплатить
+        {
+            get
+            {
+                if (_current_check != null)
+                {
+                    if (delivery?.price == null)
+                        _current_check.price_summ = _current_check._total_product_price - _current_pay_summ;
+                    else
+                        _current_check.price_summ = _current_check._total_product_price + delivery?.price - _current_pay_summ;
+                    if (_current_check.price_summ < 0)
+                        _current_check.price_summ = 0;
+                    return _current_check.price_summ;
+                }
+                return 0;
+            }
+            set
+            {
+                if (_current_check != null)
+                {
+                    _current_check.price_summ = value;
+                    if (value < 0)
+                        _current_check.price_summ = 0;
+                }
+            }
+        }
+        [NotMapped]
+        public double? products_with_delivery_price
+        {
+            get
+            {
+                if (_current_check != null)
+                {
+                    if (delivery?.price == null)
+                        return _current_check._total_product_price;
+                    return delivery.price + _current_check._total_product_price;
+                }
+                return 0;
+            }
+        }
+        //[NotMapped]
+        //public int? _percent_discount
+        //{
+        //    get
+        //    {
+        //        if (percent_discount != null)
+        //            return percent_discount;
+        //        else
+        //            return 0;
+        //    }
+        //    set
+        //    {
+        //        if (value != null)
+        //            percent_discount = value;
+        //        else
+        //            percent_discount = 0;
+        //        product_To_Orders?.ForEach(p => p.order_percent_discount = value);
+        //    }
+        //}
+        //[NotMapped]
+        //public double? _ruble_discount
+        //{
+        //    get
+        //    {
+        //        if (ruble_discount != null)
+        //            return ruble_discount;
+        //        else
+        //            return 0;
+        //    }
+        //    set
+        //    {
+        //        if (value != null)
+        //            ruble_discount = value;
+        //        else
+        //            ruble_discount = 0;
+        //        product_To_Orders?.ForEach(p => p.order_ruble_discount = value);
+        //    }
+        //}
+        //[NotMapped]
+        //public double? products_with_delivery_price
+        //{
+        //    get
+        //    {
+        //        if (delivery.price == null)
+        //            return _total_product_price;
+        //        return delivery.price + _total_product_price;
+        //    }
+        //}
+
+
+        //[NotMapped]
+        //public double? _price_summ
+        //{
+        //    get
+        //    {
+        //        if (delivery?.price == null)
+        //            price_summ = _total_product_price - _current_pay_summ;
+        //        else
+        //            price_summ = _total_product_price + delivery?.price - _current_pay_summ;
+        //        if (price_summ < 0)
+        //            price_summ = 0;
+        //        return price_summ;
+        //    }
+        //    set
+        //    {
+        //        price_summ = value;
+        //        if (value < 0)
+        //            price_summ = 0;
+
+        //    }
+        //}
+        //[NotMapped]
+        //public double? _total_product_price
+        //{
+        //    get
+        //    {
+        //        if (product_To_Orders == null)
+        //            return null;
+        //        else
+        //            return product_To_Orders?.Select(p => p._total_product_price).Sum();
+        //    }
+        //}
+
 
 
         [NotMapped]
@@ -303,7 +454,7 @@ namespace industriation_crm.Shared.Models
 
         [ForeignKey("order_status_id")]
         public order_status? order_status { get; set; }
-        public List<product_to_order>? product_To_Orders { get; set; }
+        //public List<product_to_order>? product_To_Orders { get; set; }
         public List<order_pay>? order_Pays { get; set; } = new();
     }
     public class order_status
@@ -314,8 +465,13 @@ namespace industriation_crm.Shared.Models
     }
     public class product_to_order
     {
+
         [NotMapped]
-        public bool id_delete_from_supplier_order { get; set; }
+        public bool is_add_from_order { get; set; }
+        [NotMapped]
+        public bool is_delete_from_order { get; set; }
+        [NotMapped]
+        public bool is_delete_from_supplier_order { get; set; }
         [NotMapped]
         public bool is_add_to_supplier_order { get; set; }
         [NotMapped]
@@ -324,27 +480,31 @@ namespace industriation_crm.Shared.Models
         public int id { get; set; }
         public int? count { get; set; }
         public int? product_id { get; set; }
-        public int? order_id { get; set; }
         public int? supplier_order_id { get; set; }
         public double? product_price { get; set; }
         public int? product_postition { get; set; } = 0;
         public int? delivery_period { get; set; } = 1;
         public int? delivery_period_type_id { get; set; }
+
+        //public int? order_id { get; set; } = null;
         public double? ruble_discount { get; set; }
         public int? percent_discount { get; set; }
         public int? supplier_delivery_period { get; set; }
+        public int? order_check_id { get; set; } = 0;
         public double? supplier_price { get; set; }
         [ForeignKey("product_id")]
         public product? product { get; set; }
-
-        [ForeignKey("order_id")]
-        public order? order { get; set; }
+        [ForeignKey("order_check_id")]
+        public virtual order_check? order_check { get; set; }
+        //[ForeignKey("order_id")]
+        //public order? order { get; set; }
 
         [ForeignKey("supplier_order_id")]
         public supplier_order? supplier_order { get; set; }
 
         [ForeignKey("delivery_period_type_id")]
         public delivery_period_type? delivery_period_type { get; set; }
+
 
         private double? total_price
         {
@@ -462,7 +622,7 @@ namespace industriation_crm.Shared.Models
         }
 
     }
-    
+
     public class supplier_order
     {
         [Key]
@@ -471,6 +631,14 @@ namespace industriation_crm.Shared.Models
         public int? user_id { get; set; }
         public DateTime? date { get; set; } = DateTime.Now;
         public int? status_id { get; set; }
+        public double? _delivery_products_total_price
+        {
+            get
+            {
+                return product_to_orders?.Select(p => p.supplier_price).Sum();
+            }
+        }
+
         [ForeignKey("status_id")]
         public supplier_order_status? supplier_order_status { get; set; }
 

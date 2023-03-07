@@ -6,6 +6,25 @@
 <div class="row-f">
     <div class="ind-col-lg-4">
         <div class="main-section ind-col-lg-10">
+            <div class="main-section-label">Данные</div>
+            <div class="section-field">
+                <div class="ind-col-lg-10 ind-col-md-10">
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Оборот клиента</div>
+                        @client_Orders.Where(o=>o.pay_status_id == 2).Select(o=>o._price_summ).Sum() ₽
+                    </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Скидка</div>
+                        @client_discount %
+                    </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">До повышения скидки</div>
+                        @next_lvl_discount
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main-section ind-col-lg-10">
             <div class="main-section-label">Клиент</div>
             <div class="section-field">
                 <div class="ind-col-lg-10 ind-col-md-10">
@@ -34,42 +53,42 @@
                 </div>
             </div>
         </div>
-    @if (client?.client_type == 1)
-    {
-        <div class="main-section ind-col-lg-10">
-            <div class="main-section-label">Данные по юридическому лицу</div>
-            <div class="section-field">
-                <div class="ind-col-lg-10 ind-col-md-10">
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Полное наименование</div>
-                        @client.org_name
+        @if (client?.client_type == 1)
+        {
+            <div class="main-section ind-col-lg-10">
+                <div class="main-section-label">Данные по юридическому лицу</div>
+                <div class="section-field">
+                    <div class="ind-col-lg-10 ind-col-md-10">
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Полное наименование</div>
+                            @client.org_name
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Адрес регистрации</div>
+                            @client.org_address
+                        </div>
                     </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Адрес регистрации</div>
-                        @client.org_address
-                    </div>
-                </div>
-                <div class="ind-col-lg-10 ind-col-md-10">
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">ИНН</div>
-                        @client.org_inn
+                    <div class="ind-col-lg-10 ind-col-md-10">
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">ИНН</div>
+                            @client.org_inn
 
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">ОГРН</div>
+                            @client.org_ogrn
+                        </div>
                     </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">ОГРН</div>
-                        @client.org_ogrn
-                    </div>
-                </div>
-                <div class="ind-col-lg-10 ind-col-md-10">
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">КПП</div>
-                        @client.org_kpp
+                    <div class="ind-col-lg-10 ind-col-md-10">
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">КПП</div>
+                            @client.org_kpp
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    
-    }
+
+        }
         <div class="main-section ind-col-lg-10">
             <div class="main-section-label">Банковские реквизиты</div>
             <div class="section-field">
@@ -106,18 +125,18 @@
             <div class="tab-section tab-section-active main-section ind-col-lg-10">
                 <div class="main-section-label">Задачи:</div>
                 <button @onclick="openCreatetaskModal" type="button" class="save task-create">Создать задачу</button>
-                    @if (viewCreateTask)
-                    {
+                @if (viewCreateTask)
+                {
                     <div class="modal" tabindex="-1" style="display:block" role="dialog">
                         <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
                             <div class="modal-content b-s">
                                 <div class="modal-body">
                                     Исполнитель:
                                     <select @bind="newTask.executor_id">
-                                            @foreach (var e in executors)
-                                            {
+                                        @foreach (var e in executors)
+                                        {
                                             <option value="@e.id">@e.name</option>
-                                            }
+                                        }
                                     </select>
                                     <br>
                                     Задача:
@@ -131,55 +150,66 @@
                             </div>
                         </div>
                     </div>
-                    }
+                }
                 <div class="mh-500">
                     <b>Актуальные задачи:</b>
                     @foreach (var task in tasks?.Where(t => t.complete == 0)!.OrderByDescending(ut => ut.date))
-                        {
+                    {
                         <div class="actual-task mt-10">
                             <div><b>От кого:</b> @task?.creator?.name</div>
                             <div><b>Исполнитель:</b> @task?.executor?.name</div>
                             <div><b>Задача:</b> @task?.text</div>
                             <button @onclick="()=>CompleteTask(task)" class="score task-btn">Выполнить</button>
                         </div>
-                        }
+                    }
                 </div>
                 <hr>
                 <div class="mh-500">
                     <b>Завершенные задачи:</b>
                     @foreach (var task in tasks?.Where(t => t.complete == 1)!.OrderByDescending(ut => ut.date))
-                        {
+                    {
                         <div class="done-task mt-10">
                             <div><b>От кого:</b> @task?.creator?.name</div>
                             <div><b>Исполнитель:</b> @task?.executor?.name</div>
                             <div><b>Задача:</b> @task?.text</div>
                         </div>
-                        }
+                    }
                 </div>
             </div>
             <div class="tab-section main-section ind-col-lg-10">
                 <div class="main-section-label">Заказы</div>
                 <div class="section-field mh-500">
-                    @foreach (var o in client_Orders!)
+                    Статус оплаты заказа:
+                    <select @bind="order_pay_status">
+                        <option value="0">Все</option>
+                        <option value="1">Частично оплаченые</option>
+                        <option value="2">Оплаченые</option>
+                        <option value="3">Постоплаченые</option>
+                        <option value="4">Не оплаченые</option>
+                    </select>
+                    @foreach (var o in _client_Orders!)
                     {
                         <div class="client-order ind-col-lg-10">
                             <a href='/order/edit/@o.id' role="button"> Заказ @o?.id</a>
-
-                            @foreach (var p in o.product_To_Orders!)
+                            @if (o?._current_check != null)
                             {
-                                <div class="client-order-item">
-                                    <div class="item-name">
-                                        <div class="name">@p.product?.name </div>
-                                        <div class="model"> Артикул: <b>@p.product?.article</b></div>
+                                @foreach (var p in o?._current_check?.product_To_Orders)
+                                {
+                                    <div class="client-order-item">
+                                        <div class="item-name">
+                                            <div class="name">@p.product?.name </div>
+                                            <div class="model"> Артикул: <b>@p.product?.article</b></div>
+                                        </div>
+                                        <div class="item-price">
+                                            <div class="count"> Колличество: <b>@p.count @p.product?.unit</b> </div>
+                                            <div class="price"> Цена: <b>@p._product_price_with_discount ₽ за 1шт.</b> </div>
+                                            <div class="summ"> Сумма: <b>@p._total_price ₽</b> </div>
+                                        </div>
                                     </div>
-                                    <div class="item-price">
-                                        <div class="count"> Колличество: <b>@p.count @p.product?.unit</b> </div>
-                                        <div class="price"> Цена: <b>@p._product_price_with_discount за 1шт.</b> </div>
-                                        <div class="summ"> Сумма: <b>@p._total_price</b> </div>
-                                    </div>
-                                </div>
 
+                                }
                             }
+
                         </div>
                     }
                 </div>
@@ -241,16 +271,34 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 
 </div>
 @code {
     [Parameter]
     public client? client { get; set; }
-
+    [Parameter]
+    public progress_client_discount? progress_client_discount { get; set; }
+    [Parameter]
+    public int client_discount { get; set; }
+    [Parameter]
+    public string next_lvl_discount{ get; set; }
+    protected int order_pay_status { get; set; } = 0;
     protected contact? main_contact { get; set; }
-    protected List<order>? client_Orders { get; set; } = new();
+    [Parameter]
+    public List<order>? client_Orders { get; set; }
+    protected List<order>? _client_Orders
+    {
+        get
+        {
+            if (order_pay_status == 0)
+                return client_Orders;
+            else
+                return client_Orders.Where(o => o.pay_status_id == order_pay_status).ToList();
+        }
+    }
+
     protected List<task>? tasks { get; set; } = new();
     protected List<user> executors = new();
     protected List<call_history> call_Histories = new();
@@ -265,13 +313,14 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
 
-        client_Orders = await Http.GetFromJsonAsync<List<order>>($"api/Order/GetOrdersByClientId/{client.id}");
+        
         tasks = await Http.GetFromJsonAsync<List<task>>($"api/Task/GetTasksByClientId/{client.id}");
         executors = await Http.GetFromJsonAsync<List<user>>("api/User?type=all");
 
-        if(client?.contacts != null){
-        var answer = await Http.PostAsJsonAsync("api/CallHistory/GetCallHistoryByClientId", client?.contacts?.Select(c=>c.id).ToList());
-        call_Histories = await answer.Content.ReadFromJsonAsync<List<call_history>>();
+        if (client?.contacts != null)
+        {
+            var answer = await Http.PostAsJsonAsync("api/CallHistory/GetCallHistoryByClientId", client?.contacts?.Select(c => c.id).ToList());
+            call_Histories = await answer.Content.ReadFromJsonAsync<List<call_history>>();
         }
     }
 
@@ -304,6 +353,6 @@
         newTask.creator = executors.Where(e => e.id == user_id).First();
         tasks.Add(newTask);
 
-        
+
     }
 }

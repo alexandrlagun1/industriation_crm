@@ -51,7 +51,7 @@ else
                             <td class="ind-col-lg-2">ФИО</td>
                             <td class="ind-col-lg-2">Тип клиента</td>
                             <td class="ind-col-lg-2">Закрепленный менеджер</td>
-@*                            <td class="ind-col-lg-1">Действия</td>*@
+                            @*                            <td class="ind-col-lg-1">Действия</td>*@
                         </tr>
                     </thead>
                     <tbody>
@@ -59,15 +59,22 @@ else
                         {
                             <tr class="order-row ind-col-lg-10">
                                 <td class="ind-col-lg-1">
-                                    @if (SelectOrderClient == null)
+                                    @if (CallType == 0 && contact_number == null)
                                     {
                                         <a href='/client/edit/@_client.id'>
                                             @_client.id
                                         </a>
                                     }
-                                    else
+                                    @if (CallType == 1)
                                     {
-                                        <button type="button" class="btn btn-link" @onclick="()=>SelectOrderClient(_client)">@_client.id</button>
+                                        <button type="button" class="btn btn-link" @onclick="()=>SelectClient(_client)">@_client.id</button>
+                                    }
+                                    @if (contact_number != null)
+                                    {
+                                        <a href='/contact/add/@_client.id/@contact_number'>
+                                            @_client.id
+                                        </a>
+
                                     }
                                 </td>
                                 <td class="ind-col-lg-3">@_client.org_name</td>
@@ -83,27 +90,27 @@ else
                                     }
                                 </td>
                                 <td class="ind-col-lg-2">@_client.user?.name</td>
-                               @* <td class="ind-col-lg-1">
-                                    @if (SelectOrderClient == null)
-                                    {
-                                        <div class="ind-col-lg-10">
-                                            <a class="score" type="button" href='/client/edit/@_client.id'>
-                                                <div class="hidden-md">Изменить</div>
-                                                <div class="hidden-lg ind-col-md-10">
-                                                    <img src="./icons/edit.svg" class="h20-w20">
-                                                </div>
-                                            </a>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="ind-col-lg-10">
-                                            <button class="score" type="button" @onclick="()=>SelectOrderClient(_client)">
-                                                Выбрать
-                                            </button>
-                                        </div>
-                                    }
-                                </td>*@
+                                @* <td class="ind-col-lg-1">
+                    @if (SelectOrderClient == null)
+                    {
+                    <div class="ind-col-lg-10">
+                    <a class="score" type="button" href='/client/edit/@_client.id'>
+                    <div class="hidden-md">Изменить</div>
+                    <div class="hidden-lg ind-col-md-10">
+                    <img src="./icons/edit.svg" class="h20-w20">
+                    </div>
+                    </a>
+                    </div>
+                    }
+                    else
+                    {
+                    <div class="ind-col-lg-10">
+                    <button class="score" type="button" @onclick="()=>SelectOrderClient(_client)">
+                    Выбрать
+                    </button>
+                    </div>
+                    }
+                    </td>*@
                             </tr>
                         }
                     </tbody>
@@ -128,8 +135,11 @@ else
 }
 @code {
     [Parameter]
-    public Action<client> SelectOrderClient { get; set; }
-
+    public EventCallback<client> SelectOrderClient { get; set; }
+    [Parameter]
+    public int CallType { get; set; } = 0;
+    [Parameter]
+    public string? contact_number { get; set; }
     protected bool viewAddClient = false;
     protected int count_on_page = 50;
     protected int current_page = 1;
@@ -139,6 +149,10 @@ else
 
     protected List<client> clientList = new();
     protected int role { get; set; }
+    protected async Task SelectClient(client client)
+    {
+            await SelectOrderClient.InvokeAsync(client);
+    }
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();

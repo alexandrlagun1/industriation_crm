@@ -1,6 +1,6 @@
 ﻿@page "/order/add"
 @page "/order/edit/{orderId:int}"
-@page "/order/add/{clientId:int}"
+@page "/order/add/{clientId:int}/{progressDiscount:int}"
 @using System.Globalization
 @using System.Security.Claims
 @using industriation_crm.Server.DataTranslation
@@ -129,6 +129,7 @@
                         @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
 
 
+
                     </a>
                     <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
@@ -143,12 +144,12 @@
                 <div class="section-field">
                     <div class="ind-col-lg-5 ind-col-md-10">
                         <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Имя</div>
-                            <input type="text" class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
-                        </div>
-                        <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Фамилия</div>
                             <input type="text" class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Имя</div>
+                            <input type="text" class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
                         </div>
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Отчество</div>
@@ -208,10 +209,10 @@
                 </div>
             }
         </div>
-        @if (client?.client_type == 1)
+        @if (client?.client_type == 1 || client?.client_type == 2)
         {
             <div class="main-section">
-                <div class="main-section-label">Данные юридического лица</div>
+                <div class="main-section-label">Реквизиты организации</div>
                 <div class="section-field">
                     <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">Полное наименование</div>
@@ -227,16 +228,30 @@
                         <div class="input-label">Адрес регистрации</div>
                         <input type="text" class="main-input" @bind="client.org_address">
                     </div>
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">ОГРН</div>
-                        <input type="number" class="main-input" @bind="client.org_ogrn">
-                    </div>
-                </div><div class="section-field">
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">КПП</div>
-                        <input type="number" class="main-input" @bind="client.org_kpp">
-                    </div>
+                    @if (client.client_type == 1)
+                    {
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">ОГРН</div>
+                            <input type="number" class="main-input" @bind="client.org_ogrn">
+                        </div>
+                    }
+                    @if (client.client_type == 2)
+                    {
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">ОГРНИП</div>
+                            <input type="number" class="main-input" @bind="client.org_ogrnip">
+                        </div>
+                    }
                 </div>
+                @if (client.client_type == 1)
+                {
+                    <div class="section-field">
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">КПП</div>
+                            <input type="number" class="main-input" @bind="client.org_kpp">
+                        </div>
+                    </div>
+                }
             </div>
 
             <div class="main-section">
@@ -266,6 +281,21 @@
         <div class="main-section">
             <div class="main-section-label">Состав заказа</div>
             <div class="section-field">
+                @foreach (var c in order?.order_Checks.Where(c => c.is_delete == false).ToList())
+                {
+                    <button class="score mr-5" @onclick='()=>ChangeCurrentCheck(c)' type="button">
+                        @if (c.is_pay == 1)
+                        {
+                            <div>Счет @c.check_number (*)</div>
+                        }
+                        else
+                        {
+                            <div>Счет @c.check_number</div>
+                        }
+                    </button>
+
+                }
+                <button type="button" class="add-item" @onclick="AddCheck">+</button>
                 <table class="order-table ind-col-lg-10">
                     <thead class="table-success ind-col-lg-10">
                         <tr class="order-row ind-col-lg-10">
@@ -279,9 +309,9 @@
                         </tr>
                     </thead>
                     <tbody class="ind-col-lg-10">
-                        @if (order != null && order.product_To_Orders != null)
+                        @if (current_order_check != null && current_order_check.product_To_Orders != null)
                         {
-                            @foreach (var p in order!.product_To_Orders.OrderBy(p => p.product_postition))
+                            @foreach (var p in current_order_check!.product_To_Orders.Where(pr => pr.is_delete_from_order == false).OrderBy(p => p.product_postition))
                             {
                                 <tr class="order-row">
                                     <td class="ind-col-lg-1" id="model">
@@ -301,7 +331,7 @@
                                                         @p?.product?.name
                                                     </div>
                                                     <div class="table-modal-price">
-                                                        @p._product_price
+                                                        @Math.Round(p._product_price.Value, 2)
                                                     </div>
                                                 </div>
                                             </div>
@@ -324,15 +354,15 @@
                                         <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">
                                             @if (p.ruble_discount == 0 && p.percent_discount == 0)
                                             {
-                                                <span>@p._product_price ₽</span>
+                                                <span>@Math.Round(p._product_price.Value, 2) ₽</span>
                                             }
                                             else
                                             {
                                                 <div class="prev-price">
-                                                    @p._product_price ₽
+                                                    @Math.Round(p._product_price.Value, 2) ₽
                                                 </div>
                                                 <div class="price-with-discount">
-                                                    @p._product_price_with_discount ₽
+                                                    @Math.Round(p._product_price_with_discount.Value, 2) ₽
                                                 </div>
                                             }
                                         </button>
@@ -361,9 +391,9 @@
                                     </td>
 
                                     <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" /></td>
-                                    <td class="ind-col-lg-1">@p?._discount_total_price</td>
+                                    <td class="ind-col-lg-1">@p?._discount_total_price ₽</td>
                                     <td class="ind-col-lg-1">
-                                        @p?._total_price
+                                        @p?._total_price ₽
                                         <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
                                             <img src="./icons/delete-icon.svg" class="delete-button">
                                         </button>
@@ -376,7 +406,7 @@
             </div>
             <div class="section-field a-i-c mt-20">
                 <div class="section-field ind-col-lg-10">
-                    @if (order.product_To_Orders == null || order.product_To_Orders.Count == 0)
+                    @if (current_order_check?.product_To_Orders == null || current_order_check?.product_To_Orders.Count == 0)
                     {
                         <p align="center" class="ind-col-lg-10">Товары в заказе отсутствуют</p>
                     }
@@ -387,11 +417,11 @@
                             <label>Разовая скидка</label>
                         </div>
                         <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
-                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex1" type="number" @bind="@order._ruble_discount">
+                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex1" type="number" @bind="@current_order_check._ruble_discount">
                             ₽
                         </div>
                         <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
-                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex2" type="number" @bind="@order._percent_discount">
+                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex2" type="number" @bind="@current_order_check._percent_discount">
                             %
                         </div>
 
@@ -409,7 +439,7 @@
                                 Стоимость товаров:
                             </div>
                             <div class="ind-col-lg-3" style="text-align: right;">
-                                @order._total_price
+                                @current_order_check._total_product_price ₽
                             </div>
                         </div>
                     </div>
@@ -420,7 +450,7 @@
                                 Стоимость доставки:
                             </div>
                             <div class="ind-col-lg-3" style="text-align: right;">
-                                @order.delivery._price
+                                @order.delivery._price ₽
                             </div>
                         </div>
                     </div>
@@ -431,7 +461,7 @@
                                 Итог:
                             </div>
                             <div class="ind-col-lg-3" style="text-align: right;">
-                                @order.products_with_delivery_price
+                                @order.products_with_delivery_price ₽
                             </div>
                         </div>
                     </div>
@@ -490,10 +520,10 @@
 
         <div class="main-section ind-col-lg-5 ind-col-md-10">
             <div class="main-section-label">Оплата</div>
-            <div class="section-field">
-                <input type="number" step="0.01" class="main-input" @bind="pay"></input>
-                <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
-            </div>
+            @*<div class="section-field">
+        <input type="number" step="0.01" class="main-input" @bind="pay"></input>
+        <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
+        </div>*@
             <div class="input-field">
                 <div class="input-label">Условия оплаты</div>
                 <select type="text" class="main-input" @bind="@order.pay_conditions">
@@ -510,7 +540,7 @@
             }
             <div class="input-field">
                 <div class="input-label">К оплате:</div>
-                <label>@order._price_summ</label>
+                <label>@order._price_summ ₽</label>
             </div>
             <hr class="custom-hr" />
 
@@ -528,14 +558,21 @@
                         <div class="input-label">
                             Сумма
                         </div>
-                        <label>@p.price</label>
+                        <label>@p.price ₽</label>
                     </div>
-                    <button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>
+                    <div class="input-field">
+                        <div class="input-label">
+                            Оплата счета
+                        </div>
+                        <label>@(order?.id)-@(order?._pay_check.check_number)</label>
+                    </div>
+                    @*<button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>*@
                 </div>
             }
         </div>
     }
     <div class="bottom-buttons ind-col-lg-10">
+        <input type="checkbox" @bind="order.retail_synchro">Отправлять в Retail
         <button type="submit" class="save">Сохранить</button>
         <button class="close" @onclick="Cancel">Закрыть</button>
         @if (order?.stage_id == 1 && (order?.order_status_id == 3 || order?.order_status_id == 4) && role == 1)
@@ -572,7 +609,8 @@
 
 
 @code {
-    protected double? pay{ get; set; }
+    protected order_check? current_order_check { get; set; } = new order_check { check_number = 1, is_add = true, current = 1 };
+    //protected double? pay { get; set; }
 
     protected bool showAlert { get; set; }
     protected void CloseAlert()
@@ -580,11 +618,12 @@
         showAlert = false;
         StateHasChanged();
     }
-
     protected bool ViewOrderManagement = false;
     protected string clientClass = "client client--active";
     protected string contactClass = "contact";
     protected bool showPriceModal = false;
+    [Parameter]
+    public int progressDiscount{ get; set; }
     [Parameter]
     public int clientId { get; set; }
 
@@ -594,7 +633,6 @@
 
     protected order? order = new();
     protected List<user>? managers = new();
-    protected List<product_to_order>? RemoveProductToOrdersList = new();
     protected client? client = new();
     protected List<delivery_type>? delivery_Types = new();
     protected List<delivery_period_type>? delivery_Period_Types = new();
@@ -604,18 +642,18 @@
     protected bool viewContacts = false;
     protected int role { get; set; }
     protected int? user_id { get; set; }
-
     protected product_to_order drag_product_to_order { get; set; }
 
     //Методы инициализвции
     protected override async Task OnInitializedAsync()
     {
-        HubConnection.On<order_pay>("AddNewPay", order_pay =>
+        HubConnection.On<order_pay>("AddNewPay", async order_pay =>
         {
             if (orderId == order_pay.order_id)
             {
-                SendUserNotification($"По заказу {order?.id} прошла оплата", order.user_id);
-                order.order_Pays.Add(order_pay);
+                await SendUserNotification($"По заказу {order?.id} прошла оплата", order.user_id);
+                await OnParametersSetAsync();
+                //order.order_Pays.Add(order_pay);
             }
             StateHasChanged();
         });
@@ -634,25 +672,112 @@
         {
             Title = $"Изменить заказ {orderId}";
             order = await Http.GetFromJsonAsync<order>("api/Order/" + orderId);
+
+            current_order_check = order.order_Checks.Where(c => c.current == 1).FirstOrDefault();
             client = order.client;
         }
         else
         {
+            current_order_check._percent_discount = progressDiscount;
+            order.user_id = user_id;
             await SetMainContact();
         }
         if (String.IsNullOrEmpty(order?.delivery?.recipient_name))
         {
-            order.delivery.recipient_name = order?.main_contact?.full_name;
+            order.delivery.recipient_name = client?.delivery_cont;
         }
         if (String.IsNullOrEmpty(order?.delivery?.address))
         {
-            order.delivery.address = order?.client?.org_address;
+            order.delivery.address = client?.delivery_adr;
         }
         if (String.IsNullOrEmpty(order?.delivery?.recipient_phone))
         {
-            order.delivery.recipient_phone = order?.main_contact?.phone;
+            order.delivery.recipient_phone = client?.delivery_cont_phone;
+        }
+
+        if (order.order_Checks.Count == 0)
+        {
+            order.order_Checks.Add(current_order_check);
         }
     }
+    protected async Task SaveOrder()
+    {
+        ////удалить (добаление оплат без участия 1с)
+        //if (order.order_status_id == 1 && order.pay_conditions == 1)
+        //{
+        //    double? order_pays_summ = order.order_Pays?.Select(p => p.price).Sum();
+        //    double? min_predoplata = order._current_check.price_summ / 100 * order.pay_predoplata_percent;
+        //    if (order_pays_summ + 0.1 >= min_predoplata)
+        //        order.order_status_id = 3;
+        //}
+        //if (order.order_Pays?.Select(p => p.price).Sum() < order._current_check.price_summ)
+        //{
+        //    order.pay_status_id = 1;
+        //}
+        //else
+        //{
+        //    order.pay_status_id = 2;
+        //}
+        //if (order.order_Pays?.Count == 0)
+        //{
+        //    order.pay_status_id = null;
+        //}
+
+        //if (order.pay_conditions == 2 && order.order_status_id == 1)
+        //    order.order_status_id = 3;
+        //if (order.pay_conditions == 1 && order.order_status_id == 3 && order.order_Pays.Count == 0)
+        //    order.order_status_id = 1;
+        if (order?.pay_conditions == 2 && order.order_status_id == 1)
+        {
+            order.pay_status_id = 3;
+            order.order_status_id = 3;
+            order._current_check.is_pay = 1;
+        }
+
+        if (order?.id != 0)
+        {
+            await PutOrder();
+        }
+        else
+        {
+            order.client_id = clientId;
+            order.order_date = DateTime.Now;
+            var response = await Http.PostAsJsonAsync("api/Order", order);
+            orderId = await response.Content.ReadFromJsonAsync<int>();
+
+            await CreateOrderHistory("Заказ клиента сформирован");
+        }
+
+        showAlert = true;
+
+        await OnParametersSetAsync();
+        StateHasChanged();
+    }
+    protected void AddCheck()
+    {
+        order_check order_Check = new order_check();
+        order_Check.is_add = true;
+        //if (order.order_Checks.Where(c => c.is_pay == 1).FirstOrDefault() == null)
+        //{
+        order_Check.current = 1;
+        order.order_Checks.Where(c => c.current == 1).FirstOrDefault().current = 0;
+        //}
+        order_Check.check_number = order.order_Checks.OrderBy(c => c.check_number).LastOrDefault().check_number + 1;
+        order.order_Checks.Add(order_Check);
+
+        current_order_check = order_Check;
+
+    }
+    protected void ChangeCurrentCheck(order_check order_Check)
+    {
+        //if (order.order_Checks.Where(c => c.is_pay == 1).FirstOrDefault() == null)
+        //{
+        order.order_Checks.Where(c => c.current == 1).FirstOrDefault().current = 0;
+        order_Check.current = 1;
+        //}
+        current_order_check = order_Check;
+    }
+
     //Печатные формы
     protected async Task GetOrderPrintForm(string pch)
     {
@@ -662,7 +787,7 @@
         var fileStream = await response.Content.ReadAsStreamAsync();
 
         using var streamRef = new DotNetStreamReference(stream: fileStream);
-        await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"Счет на оплату {order?.id} от {order?.order_date?.ToString("dd.MM.yyyy")}.pdf", streamRef);
+        await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"Счет на оплату {order?.id}-{order._current_check.check_number} от {order?.order_date?.ToString("dd.MM.yyyy")}.pdf", streamRef);
     }
 
     //Методы Drag&Drop
@@ -689,8 +814,9 @@
     }
     protected async Task CreateSupplierOrder()
     {
-        if (order?.product_To_Orders?.Where(p => p.is_add_to_supplier_order == true).FirstOrDefault() != null)
+        if (current_order_check?.product_To_Orders?.Where(p => p.is_add_to_supplier_order == true).FirstOrDefault() != null)
         {
+            current_order_check?.product_To_Orders?.ForEach(p => p.order_check = current_order_check);
             Guid guid = Guid.NewGuid();
             order_translation.orders_data.Add(guid, order);
             NavigationManager.NavigateTo($"/supplierorder/add/{guid.ToString()}");
@@ -785,7 +911,8 @@
             }
             if (order.order_status_id == 4)
                 order.order_status_id = 3;
-            await Http.PutAsJsonAsync("api/Order", order);
+            //order.order_Checks.Where(c => c.is_pay == 1).FirstOrDefault().current = 1;
+            await PutOrder();
             await CreateOrderHistory("Заказ переведен на стадию снабжения");
             if (order.supplier_manager_id != null)
                 await SendUserNotification($"Заказ {order.id} переведен на стадию снабжения", order.supplier_manager_id);
@@ -794,80 +921,16 @@
     protected async Task OrderCancellation()
     {
         order.order_status_id = 7;
-        await Http.PutAsJsonAsync("api/Order", order);
+        await PutOrder();
     }
     protected async Task OrderPayReturn()
     {
         order.order_status_id = 8;
-        await Http.PutAsJsonAsync("api/Order", order);
+        await PutOrder();
     }
-    protected async Task SaveOrder()
+    protected async Task PutOrder()
     {
-        //удалить потом
-        if (order.order_status_id == 1 && order.pay_conditions == 1)
-        {
-            double? order_pays_summ = order.order_Pays?.Select(p => p.price).Sum();
-            double? min_predoplata = order.price_summ / 100 * order.pay_predoplata_percent;
-            if (order_pays_summ + 0.1 >= min_predoplata)
-                order.order_status_id = 3;
-        }
-        if (order.order_Pays?.Select(p => p.price).Sum() < order.price_summ)
-        {
-            order.pay_status_id = 1;
-        }
-        else
-        {
-            order.pay_status_id = 2;
-        }
-        if(order.order_Pays?.Count == 0){
-            order.pay_status_id = null;
-        }
-
-
-
-        if (order.pay_conditions == 2 && order.order_status_id == 1)
-            order.order_status_id = 3;
-        if (order.pay_conditions == 1 && order.order_status_id == 3 && order.order_Pays.Count == 0)
-            order.order_status_id = 1;
-        if (order?.id != 0)
-        {
-            await Http.PutAsJsonAsync("api/Order", order);
-        }
-        else
-        {
-            if (order?.pay_conditions == 2)
-                order.pay_status_id = 3;
-            else
-                order.pay_status_id = 1;
-
-            order.client_id = clientId;
-            order.order_date = DateTime.Now;
-            order.stage_id = 1;
-
-            var response = await Http.PostAsJsonAsync("api/Order", order);
-            orderId = await response.Content.ReadFromJsonAsync<int>();
-
-            await CreateOrderHistory("Заказ клиента сформирован");
-        }
-
-        //Сохранение и удаление продуктов из заказа
-        if (RemoveProductToOrdersList.Count != 0)
-            await Http.PostAsJsonAsync("api/ProductToOrder/remove_products_to_orders", RemoveProductToOrdersList);
-        if (order.product_To_Orders != null)
-        {
-            List<product_to_order> AddProductsToOrderList = order.product_To_Orders?.Where(p => p.id == 0).ToList();
-            if (AddProductsToOrderList.Count != 0)
-            {
-                foreach (var p in order.product_To_Orders)
-                    p.order_id = orderId;
-                await Http.PostAsJsonAsync("api/ProductToOrder/add_products_to_order", AddProductsToOrderList);
-            }
-            await Http.PutAsJsonAsync("api/ProductToOrder/update_products_to_order", order.product_To_Orders.Where(p => p.id != 0));
-        }
-        showAlert = true;
-
-        await OnParametersSetAsync();
-        StateHasChanged();
+        await Http.PutAsJsonAsync("api/Order", order);
     }
     public void Cancel()
     {
@@ -891,31 +954,31 @@
     }
     protected void AddProductToProductToOrder(product_to_order product_To_Order)
     {
-        if (order?.product_To_Orders == null)
-            order.product_To_Orders = new List<product_to_order>();
-        if (order.percent_discount != null)
-            product_To_Order.order_ruble_discount = order._ruble_discount;
-        if (order.ruble_discount != null)
-            product_To_Order.order_percent_discount = order._percent_discount;
+        if (current_order_check.percent_discount != null)
+            product_To_Order.order_percent_discount = current_order_check._percent_discount;
+        if (current_order_check.ruble_discount != null)
+            product_To_Order.order_ruble_discount = current_order_check._ruble_discount;
         product_To_Order.delivery_period_type_id = 1;
         product_To_Order.delivery_period = 1;
+        product_To_Order.is_add_from_order = true;
 
-        order.product_To_Orders.Add(product_To_Order);
-        int? last_position = order.product_To_Orders.OrderByDescending(p => p.product_postition)?.FirstOrDefault()?.product_postition;
+        current_order_check.product_To_Orders.Add(product_To_Order);
+
+        int? last_position = current_order_check.product_To_Orders.OrderByDescending(p => p.product_postition)?.FirstOrDefault()?.product_postition;
         product_To_Order.product_postition = last_position + 1;
         StateHasChanged();
     }
     protected async Task RemoveProductToOrder(product_to_order product_to_order)
     {
-        //await Http.DeleteAsync("api/ProductToOrder/" + product_to_order.id);
-        if (product_to_order?.id != null && product_to_order?.id != 0)
-            RemoveProductToOrdersList.Add(product_to_order);
-        order?.product_To_Orders?.Remove(product_to_order);
+
         //Уменьшение позиций всех товаров идущих за удаляемым
-        foreach (var product in order?.product_To_Orders?.Where(p => p.product_postition > product_to_order.product_postition))
+        foreach (var product in current_order_check?.product_To_Orders?.Where(p => p.product_postition > product_to_order.product_postition))
         {
             product.product_postition -= 1;
         }
+        product_to_order.product_postition = 0;
+        product_to_order.is_add_from_order = false;
+        product_to_order.is_delete_from_order = true;
     }
 
     protected async Task SendUserNotification(string text, int? user_id)
@@ -936,15 +999,15 @@
         order.delivery.delivery_type_id = delivery_type.id;
     }
 
-    protected void AddNewOrderPay()
-    {
-        order_pay order_Pay = new order_pay();
-        order_Pay.price = pay;
-        order.order_Pays.Add(order_Pay);
-    }
-    protected void RemoveOrderPay(order_pay order_Pay)
-    {
-        order_Pay.isRemove = true;
-    }
+    //protected void AddNewOrderPay()
+    //{
+    //    order_pay order_Pay = new order_pay();
+    //    order_Pay.price = pay;
+    //    order.order_Pays.Add(order_Pay);
+    //}
+    //protected void RemoveOrderPay(order_pay order_Pay)
+    //{
+    //    order_Pay.isRemove = true;
+    //}
 
 }

@@ -9,7 +9,7 @@ namespace industriation_crm.Client.PrintForms
         public static order_print_form ConvertOrderPrintForm(order? order, string pch)
         {
             order_print_form order_Print_From = new order_print_form();
-            order_Print_From.order_id = order.id.ToString();
+            order_Print_From.order_id = $"{order.id.ToString()}-{order._current_check.check_number}";
             order_Print_From.pch = pch;
 
             string order_date = $"{order?.order_date?.ToString("dd")} {order?.order_date?.ToString("MMMM")} {order?.order_date?.ToString("yyyy")}";
@@ -36,14 +36,14 @@ namespace industriation_crm.Client.PrintForms
             order_Print_From.order_data.simpla.address = order.client?.org_address;
             order_Print_From.order_data.simpla.company = order.client?.org_name;
 
-            foreach (var p in order.product_To_Orders!.OrderBy(p => p.product_postition))
+            foreach (var p in order?._current_check?.product_To_Orders!.OrderBy(p => p.product_postition))
             {
                 product product = new product();
                 product.name = p.product?.name;
                 product.quantity = p.count.ToString();
                 product.model = p.product?.article;
-                product.price = p._product_price_with_discount.ToString();
-                product.total = p._total_price.ToString();
+                product.price = (p._product_price_with_discount / 1.2).Value.ToString("0.00");
+                product.total = (p._total_price / 1.2).Value.ToString("0.00");
 
                 if (p.delivery_period_type_id == 1)
                 {
@@ -68,10 +68,10 @@ namespace industriation_crm.Client.PrintForms
             sub_total.order_id = order.id.ToString();
             sub_total.code = "sub_total";
             sub_total.title = "Сумма без НДС";
-            if (order._total_price != null)
+            if (order?._current_check?._total_product_price != null)
             {
-                sub_total.value_total = (order._total_price.Value / 1.2).ToString("0.00");
-                sub_total.value = (order._total_price.Value / 1.2).ToString("0");
+                sub_total.value_total = (order?._current_check?._total_product_price.Value / 1.2)!.Value.ToString("0"); 
+                sub_total.value = (order?._current_check?._total_product_price.Value / 1.2)!.Value.ToString("0.00");
             }
             sub_total.sort_order = "1";
             order_Print_From.order_data.totals_info.Add(sub_total);
@@ -82,8 +82,8 @@ namespace industriation_crm.Client.PrintForms
             shipping.title = "Самовывоз";
             if (order.delivery?._price != null)
             {
-                shipping.value_total = (order.delivery._price.Value / 1.2).ToString("0.00");
-                shipping.value = (order.delivery._price.Value / 1.2).ToString("0");
+                shipping.value_total =(order.delivery._price.Value / 1.2).ToString("0");
+                shipping.value = (order.delivery._price.Value / 1.2).ToString("0.00");
             }
             shipping.sort_order = "2";
             order_Print_From.order_data.totals_info.Add(shipping);
@@ -92,10 +92,11 @@ namespace industriation_crm.Client.PrintForms
             tax.order_id = order.id.ToString();
             tax.code = "tax";
             tax.title = "НДС 20%";
-            if (order.products_with_delivery_price != null)
+            double? products_with_delivery_price = order?._current_check._total_product_price + order?.delivery?._price;
+            if (products_with_delivery_price != null)
             {
-                tax.value = (order.products_with_delivery_price.Value - order.products_with_delivery_price.Value / 1.2).ToString("0");
-                tax.value_total = (order.products_with_delivery_price.Value - order.products_with_delivery_price.Value / 1.2).ToString("0.00");
+                tax.value = (products_with_delivery_price.Value - products_with_delivery_price.Value / 1.2).ToString("0.00");
+                tax.value_total =  (products_with_delivery_price.Value - products_with_delivery_price.Value / 1.2).ToString("0");
             }
             tax.sort_order = "3";
             order_Print_From.order_data.totals_info.Add(tax);
@@ -104,11 +105,11 @@ namespace industriation_crm.Client.PrintForms
             total.order_id = order.id.ToString();
             total.code = "total";
             total.title = "Итого с НДС";
-            if (order.products_with_delivery_price != null)
+            if (products_with_delivery_price != null)
             {
-                total.value = order.products_with_delivery_price.Value.ToString("0");
-                total.value_total = order.products_with_delivery_price.Value.ToString("0.00");
-                order_Print_From.summ = order.products_with_delivery_price.Value.ToString("0");
+                total.value = products_with_delivery_price.Value.ToString("0.00");
+                total.value_total =  products_with_delivery_price.Value.ToString("0");
+                order_Print_From.summ = products_with_delivery_price.Value.ToString("0.00");
             }
             total.sort_order = "9";
             order_Print_From.order_data.totals_info.Add(total);

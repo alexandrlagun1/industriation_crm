@@ -24,13 +24,16 @@ namespace industriation_crm.Server.Controllers._1C
             _IOrder = IOrder;
             this.hubContext = hubContext;
         }
-        [HttpGet("{orderId}")]
-        public IActionResult CreateNewBuyerCheck(int orderId)
+        [HttpGet("{orderNumber}")]
+        public IActionResult CreateNewBuyerCheck(string orderNumber)
         {
-            order order = _IOrder.GetOrderData(orderId);
+            int order_id = Convert.ToInt32(orderNumber.Split('-')[0]);
+            int check_number = Convert.ToInt32(orderNumber.Split('-')[1]);
+
+            order order = _IOrder.GetOrderData(order_id);
             if (order != null)
             {
-                integration1C.AddNewOrderPay(Complete1CData(order));
+                integration1C.AddNewOrderPay(Complete1CData(order, check_number));
                 return Ok(order);
             }
             return Ok();
@@ -39,7 +42,7 @@ namespace industriation_crm.Server.Controllers._1C
         [HttpPost("CreateSupplierOrder")]
         public void CreateSupplierOrder(supplier_order supplier_Order)
         {
-            if(supplier_Order != null)
+            if (supplier_Order != null)
             {
                 _1CSupplierOrder _1CSupplierOrder = new _1CSupplierOrder();
                 _1CSupplierOrder.id = supplier_Order.id.ToString();
@@ -51,11 +54,12 @@ namespace industriation_crm.Server.Controllers._1C
         [HttpPost]
         public async void CreatePayment([FromBody] Pay pay)
         {
+            int order_id = Convert.ToInt32(pay.orderId.Split('-')[0]);
+            int check_number = Convert.ToInt32(pay.orderId.Split('-')[1]);
 
-            
             string pay_summ = pay.paySumm.Replace(" ", "");
-            order order = _IOrder.GetOrderData(Convert.ToInt32(pay.orderId));
-            
+            order order = _IOrder.GetOrderData(order_id);
+
             order_pay order_pay = new order_pay();
             order_pay.date = DateTime.Now;
             try
@@ -64,42 +68,42 @@ namespace industriation_crm.Server.Controllers._1C
             }
             catch
             {
-                order_pay.price = Convert.ToDouble(pay_summ.Replace(".",","));
+                order_pay.price = Convert.ToDouble(pay_summ.Replace(".", ","));
             }
             order.order_Pays?.Add(order_pay);
-            
+
             if (order.order_status_id == 1 && order.pay_conditions == 1)
             {
                 double? order_pays_summ = order.order_Pays?.Select(p => p.price).Sum();
-                Console.WriteLine($"order_pays_summ = {order_pays_summ}");
-                double? min_predoplata = order.price_summ / 100 * order.pay_predoplata_percent;
-                Console.WriteLine($"min_predoplata = {min_predoplata}");
+                double? min_predoplata = (order?._price_summ + order_pays_summ) / 100 * order?.pay_predoplata_percent;
                 if (order_pays_summ + 0.1 >= min_predoplata)
+                {
                     order.order_status_id = 3;
+                    order.pay_status_id = 2;
+                }
+                else
+                {
+                    order.pay_status_id = 1;
+                }
             }
-            if (order.order_Pays?.Select(p=>p.price).Sum() < order.price_summ)
-            {
-                order.pay_status_id = 1;
-            }
-            else
-            {
-                order.pay_status_id = 2;
-            }
-                _IOrder.UpdateOrderDetails(order);
+            
+            //order.order_Checks.Where(c => c.current == 1).FirstOrDefault().current = 0;
+            //order.order_Checks.Where(c => c.check_number == check_number).FirstOrDefault().current = 1;
+            order.order_Checks.Where(c => c.check_number == check_number).FirstOrDefault().is_pay = 1;
 
-            megafon_info megafon_Info = new megafon_info();
-            megafon_Info.cmd = "1";
+            _IOrder.UpdateOrderDetails(order, false);
+
 
             order_pay.order = null;
             await this.hubContext.Clients.User(order.user_id.ToString()).AddNewPay(order_pay);
         }
-        
-        private _1COrderPay Complete1CData(order order)
+
+        private _1COrderPay Complete1CData(order order, int check_number)
         {
             _1COrderPay _1COrderPay = new _1COrderPay();
-            _1COrderPay.id = order.id.ToString();
+            _1COrderPay.id = $"{order.id}-{check_number}";
             _1COrderPay.contragent = Complete1CContragentData(order?.client!);
-            _1COrderPay.products = Complete1COrderProductData(order?.product_To_Orders!);
+            _1COrderPay.products = Complete1COrderProductData(order?.order_Checks?.Where(c=>c.check_number == check_number).FirstOrDefault()?.product_To_Orders!);
 
             return _1COrderPay;
         }
@@ -138,8 +142,8 @@ namespace industriation_crm.Server.Controllers._1C
             foreach (var p in product_To_Orders!)
             {
                 _1CProduct _1CProduct = new _1CProduct();
-                _1CProduct.price = p?.supplier_price?.ToString();
-                _1CProduct.summ = (p?.supplier_price * p?.count).ToString();
+                _1CProduct.price = (p?.supplier_price / p?.count).ToString();
+                _1CProduct.summ = p?.supplier_price.ToString();
                 _1CProduct.count = p?.count?.ToString();
                 _1CProduct.article = p?.product?.article!.ToString(); //POMENIAT na article;
                 _1CProduct.name = p?.product?.name;

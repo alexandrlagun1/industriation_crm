@@ -65,7 +65,12 @@ namespace industriation_crm.Server.Services
             
             try
             {
-                supplier_order? supplier_order = _dbContext.supplier_order.Include(s => s.product_to_orders).ThenInclude(p => p.product).Include(s => s.product_to_orders).ThenInclude(p => p.order).Include(p => p.supplier).ThenInclude(o => o.contacts).FirstOrDefault(p => p.id == id);
+                supplier_order? supplier_order = _dbContext.supplier_order.Include(s => s.product_to_orders).ThenInclude(p => p.product).Include(s => s.product_to_orders).ThenInclude(p => p.order_check).ThenInclude(c=>c.order).Include(p => p.supplier).ThenInclude(o => o.contacts).FirstOrDefault(p => p.id == id);
+                 foreach(var p in supplier_order.product_to_orders)
+                {
+                    p.order_check.product_To_Orders = null;
+                    p.order_check.order.order_Checks = null;
+                }
                 if (supplier_order != null)
                 {
                     return supplier_order;
@@ -120,7 +125,7 @@ namespace industriation_crm.Server.Services
                     p.supplier_order = null;
                     if (p.supplier_order_id != 0 && p.supplier_order_id != null)
                     {
-                        if (p.id_delete_from_supplier_order == true)
+                        if (p.is_delete_from_supplier_order == true)
                         {
                             p.supplier_order_id = null;
                             p.supplier_delivery_period = null;
@@ -129,7 +134,7 @@ namespace industriation_crm.Server.Services
                     }
                     else
                     {
-                        if (p.id_delete_from_supplier_order == false)
+                        if (p.is_delete_from_supplier_order == false)
                             p.supplier_order_id = supplier_order.id;
                     }
                     _dbContext.Entry(p).State = EntityState.Modified;

@@ -78,7 +78,12 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                return _dbContext.product_to_order.Include(p => p.product).Include(p => p.order).Where(p => p.supplier_order_id == null && (p.order.order_status_id == 3 || p.order.order_status_id == 5)).ToList();
+                List<product_to_order> product_To_Orders =  _dbContext.product_to_order.Include(p => p.product).Include(p => p.order_check).ThenInclude(o=>o.order).Where(p => p.supplier_order_id == null && (p.order_check.order.order_status_id == 3 || p.order_check.order.order_status_id == 5)).ToList();
+                foreach(var p in product_To_Orders)
+                {
+                    p.order_check.product_To_Orders = null;
+                }
+                return product_To_Orders;
             }
             catch
             {
@@ -89,7 +94,7 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                return _dbContext.product_to_order.Include(o => o.delivery_period_type).Include(p => p.product).Include(p => p.order).Where(p => p.supplier_order_id == suplier_order_id).ToList();
+                return _dbContext.product_to_order.Include(o => o.delivery_period_type).Include(p => p.product).Include(p => p.order_check).ThenInclude(c=>c.order).Where(p => p.supplier_order_id == suplier_order_id).ToList();
             }
             catch
             {
@@ -101,8 +106,9 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                List<product_to_order> product_To_Order = _dbContext.product_to_order.Include(o => o.delivery_period_type).Include(p => p.product).Include(p => p.order).Where(p => p.order_id == order_id).ToList();
-                return product_To_Order;
+                //List<product_to_order> product_To_Order = _dbContext.product_to_order.Include(o => o.delivery_period_type).Include(p => p.order_check).ThenInclude(c => c.order).Where(p => p.order_id == order_id).ToList();
+                //return product_To_Order;
+                return new List<product_to_order>();
             }
             catch
             {

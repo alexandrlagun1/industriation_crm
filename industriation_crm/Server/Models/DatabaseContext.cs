@@ -5,6 +5,7 @@ namespace industriation_crm.Server.Models
 {
     public partial class DatabaseContext : DbContext
     {
+        public DbSet<progress_client_discount> progress_client_discount { get; set; }
         public DbSet<pay_status> pay_status { get; set; }
         public DbSet<category> category { get; set; }
         public DbSet<user> user { get; set; }
@@ -14,6 +15,7 @@ namespace industriation_crm.Server.Models
         public DbSet<order> order { get; set; }
         public DbSet<product_to_order> product_to_order { get; set; }
         public DbSet<supplier_order> supplier_order { get; set; }
+        public DbSet<order_check> order_check { get; set; }
         public DbSet<contact> contact { get; set; }
         public DbSet<delivery> delivery { get; set; }
         public DbSet<delivery_type> delivery_type { get; set; }
@@ -35,7 +37,7 @@ namespace industriation_crm.Server.Models
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
+            optionsBuilder.UseMySQL("Server=91.109.201.60; Port=3306; Database=industriation_crm; Uid=alexandr; Pwd=P@ssw0rd; charset=utf8mb4;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

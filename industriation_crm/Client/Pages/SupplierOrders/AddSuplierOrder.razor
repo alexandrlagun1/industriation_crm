@@ -27,17 +27,105 @@
     }
     else
     {
-
+        
         <div class="main-section mb-20">
             <div class="main-section-label">Поставщик:</div>
             <button @onclick="()=>openSelectClient=true" class="score mb-20" type="button">
                 Выбрать поставщика
             </button>
-            <div class="mb-10">
-                <span class="supplier-title">Организация:</span><b>@supplier_order.supplier?.org_name</b>
-            </div>
-            <div class="mb-10">
-                <span class="supplier-title">ИНН:</span><b>@supplier_order.supplier?.org_inn</b>
+            <div class="row-f">
+                <div class="ind-col-lg-4">
+                    <div class="main-section ind-col-lg-10">
+                        <div class="main-section-label">Поставщик</div>
+                        <div class="section-field">
+                            <div class="ind-col-lg-10 ind-col-md-10">
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">Имя</div>
+                                    @main_contact?.name
+                                </div>
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">Фамилия</div>
+                                    @main_contact?.surname
+                                </div>
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">Отчество</div>
+                                    @main_contact?.patronymic
+                                </div>
+                            </div>
+                            <div class="ind-col-lg-10 ind-col-md-10">
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">E-mail</div>
+                                    @main_contact?.email
+                                </div>
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">Телефон</div>
+                                    @main_contact?.phone
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @if (supplier_order.supplier?.client_type == 1)
+                    {
+                        <div class="main-section ind-col-lg-10">
+                            <div class="main-section-label">Данные по юридическому лицу</div>
+                            <div class="section-field">
+                                <div class="ind-col-lg-10 ind-col-md-10">
+                                    <div class="ind-col-lg-10 input-field">
+                                        <div class="input-label">Полное наименование</div>
+                                        @supplier_order.supplier?.org_name
+                                    </div>
+                                    <div class="ind-col-lg-10 input-field">
+                                        <div class="input-label">Адрес регистрации</div>
+                                        @supplier_order.supplier?.org_address
+                                    </div>
+                                </div>
+                                <div class="ind-col-lg-10 ind-col-md-10">
+                                    <div class="ind-col-lg-10 input-field">
+                                        <div class="input-label">ИНН</div>
+                                        @supplier_order.supplier?.org_inn
+
+                                    </div>
+                                    <div class="ind-col-lg-10 input-field">
+                                        <div class="input-label">ОГРН</div>
+                                        @supplier_order.supplier?.org_ogrn
+                                    </div>
+                                </div>
+                                <div class="ind-col-lg-10 ind-col-md-10">
+                                    <div class="ind-col-lg-10 input-field">
+                                        <div class="input-label">КПП</div>
+                                        @supplier_order.supplier?.org_kpp
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+                    <div class="main-section ind-col-lg-10">
+                        <div class="main-section-label">Банковские реквизиты</div>
+                        <div class="section-field">
+                            <div class="ind-col-lg-10 ind-col-md-10">
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">БИК</div>
+                                    @supplier_order.supplier?.bank_bik
+                                </div>
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">Наименование банка</div>
+                                    @supplier_order.supplier?.bank_name
+                                </div>
+                            </div>
+                            <div class="ind-col-lg-10 ind-col-md-10">
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">Корреспондентский счет</div>
+                                    @supplier_order.supplier?.bank_cor_schet
+                                </div>
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">Расчетный счет</div>
+                                    @supplier_order.supplier?.bank_ras_schet
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <hr>
             <label for="Name" class="form-label">
@@ -48,20 +136,20 @@
             </label>
         </div>
         <div class="">
-            @foreach (int? id in supplier_order?.product_to_orders?.Where(p => p.id_delete_from_supplier_order == false).GroupBy(p => p.order_id)?.OrderBy(o => o.Key)?.Select(p => p.Key)!)
+            @foreach (int? id in supplier_order?.product_to_orders?.Where(p => p.is_delete_from_supplier_order == false).GroupBy(p => p.order_check.order_id)?.OrderBy(o => o.Key)?.Select(p => p.Key)!)
             {
                 <div class="main-section mb-20">
                     <div class="main-section-label">Заказ №@id</div>
                     <label class="form-label mb-20">
-                        @if (supplier_order?.product_to_orders?.Where(p => p.order_id == id).FirstOrDefault()?.order?.order_status_id == 4)
+                        @if (supplier_order?.product_to_orders?.Where(p => p.order_check.order_id == id).FirstOrDefault()?.order_check.order?.order_status_id == 4)
                         {
                             <b>На пересогласовании</b>
                         }
-                        else if (supplier_order?.product_to_orders?.Where(p => p.order_id == id).FirstOrDefault()?.order?.order_status_id == 7)
+                        else if (supplier_order?.product_to_orders?.Where(p => p.order_check.order_id == id).FirstOrDefault()?.order_check.order?.order_status_id == 7)
                         {
                             <b>Отменен</b>
                         }
-                        else if (supplier_order?.product_to_orders?.Where(p => p.order_id == id).FirstOrDefault()?.order?.order_status_id == 8)
+                        else if (supplier_order?.product_to_orders?.Where(p => p.order_check.order_id == id).FirstOrDefault()?.order_check.order?.order_status_id == 8)
                         {
                             <b>Возврат</b>
                         }
@@ -82,11 +170,11 @@
                                     <td class="ind-col-lg-1">Количество</td>
                                     <td class="ind-col-lg-2">Срок поставки</td>
                                     <td class="ind-col-lg-2">Стоимость</td>
-@*                                    <td class="ind-col-lg-1"></td>*@
+                                    
                                 </tr>
                             </thead>
                             <tbody class="ind-col-lg-10">
-                                @foreach (var p in supplier_order?.product_to_orders?.Where(p => p.order_id == id && p.id_delete_from_supplier_order! == false))
+                                @foreach (var p in supplier_order?.product_to_orders?.Where(p => p.order_check.order_id == id && p.is_delete_from_supplier_order! == false))
                                 {
                                     <tr class="order-row">
                                         <td class="ind-col-lg-1">@p.product.id</td>
@@ -147,18 +235,27 @@
                                                 </tr>
                                             </table>
                                         </td>
-@*                                        <td class="ind-col-lg-1">
-                                            <button type="button" class="close" @onclick="(async () => await RemoveProductFromSup(p))">
-                                                <div class="hidden-md">Удалить</div>
-                                                <div class="hidden-lg ind-col-md-10">
-                                                    <img src="./icons/delete-white.svg" class="h20-w20">
-                                                </div>
-                                            </button>
-                                        </td>*@
+                                        
                                     </tr>
                                 }
                             </tbody>
                         </table>
+                    </div>
+                    <div class="section-field ind-col-lg-10">
+                        <div class="ind-col-lg-10">
+                            <div class="ind-col-lg-10 row-f">
+                                <div class="ind-col-lg-7"></div>
+                                <div class="ind-col-lg-3 row-f">
+                                    <div class="ind-col-lg-7" style="text-align: right;">
+                                        Сумма:
+                                    </div>
+                                    <div class="ind-col-lg-3" style="text-align: right;">
+                                        @supplier_order?._delivery_products_total_price
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
                     </div>
                 </div>
 
@@ -193,6 +290,7 @@
 
     protected bool openSelectClient = false;
     protected bool openProductModal = false;
+    protected contact? main_contact { get; set; }
 
     protected string Title = "Добавить";
     protected supplier_order supplier_order = new();
@@ -223,14 +321,16 @@
         }
         if (order_guid != null)
         {
-            supplier_order.product_to_orders.AddRange(order_translation.orders_data.Where(c => c.Key == Guid.Parse(order_guid)).FirstOrDefault().Value.product_To_Orders.Where(p => p.is_add_to_supplier_order == true).ToList());
-            foreach(var p in supplier_order.product_to_orders)
+            supplier_order.product_to_orders.AddRange(order_translation.orders_data.Where(c => c.Key == Guid.Parse(order_guid)).FirstOrDefault().Value._pay_check.product_To_Orders.Where(p => p.is_add_to_supplier_order == true).ToList());
+            foreach (var p in supplier_order.product_to_orders)
             {
                 p.supplier_delivery_period = p.delivery_period;
                 p.supplier_price = p._total_price;
+                
             }
             order_translation.orders_data.Remove(Guid.Parse(order_guid));
         }
+        main_contact = supplier_order.supplier?.contacts?.Where(c => c.main_contact == 1).FirstOrDefault();
     }
     protected void SelectClient(client _client)
     {
@@ -242,7 +342,7 @@
     }
     protected async Task RemoveProductFromSup(product_to_order product_To_Order)
     {
-        product_To_Order.id_delete_from_supplier_order = true;
+        product_To_Order.is_delete_from_supplier_order = true;
 
     }
     protected async Task SendTo1C()
@@ -254,21 +354,21 @@
             showAlert = true;
             return;
         }
-        if (supplier_order?.product_to_orders?.Where(o => o.order?.order_status_id == 4).FirstOrDefault() != null)
+        if (supplier_order?.product_to_orders?.Where(o => o.order_check.order?.order_status_id == 4).FirstOrDefault() != null)
         {
             alertText = "Заказ клиента на пересогласовании!";
             alertType = 1;
             showAlert = true;
             return;
         }
-        if (supplier_order?.product_to_orders?.Where(o => o.order?.order_status_id == 7).FirstOrDefault() != null)
+        if (supplier_order?.product_to_orders?.Where(o => o.order_check.order?.order_status_id == 7).FirstOrDefault() != null)
         {
             alertText = "Заказ клиента отменен!";
             alertType = 1;
             showAlert = true;
             return;
         }
-        if (supplier_order?.product_to_orders?.Where(o => o.order?.order_status_id == 8).FirstOrDefault() != null)
+        if (supplier_order?.product_to_orders?.Where(o => o.order_check.order?.order_status_id == 8).FirstOrDefault() != null)
         {
             alertText = "Заказ клиента в статусе Возврат!";
             alertType = 1;
@@ -279,17 +379,17 @@
         alertType = 0;
         showAlert = true;
 
-        supplier_order?.product_to_orders?.ForEach(p => p.order = null);
+        supplier_order?.product_to_orders?.ForEach(p => p.order_check.order = null);
         supplier_order.status_id = 2;
         await Http.PutAsJsonAsync("api/SupplierOrder", supplier_order);
         await Http.PostAsJsonAsync("api/_1C/CreateSupplierOrder", supplier_order);
 
-        
 
-        foreach (int? id in supplier_order?.product_to_orders?.Where(p => p.order_id != null && p.id_delete_from_supplier_order == false).GroupBy(p => p.order_id)?.OrderBy(o => o.Key)?.Select(p => p.Key)!)
+
+        foreach (int? id in supplier_order?.product_to_orders?.Where(p => /*p.order_id != null &&*/ p.is_delete_from_supplier_order == false).GroupBy(p => p.order_check.order_id)?.OrderBy(o => o.Key)?.Select(p => p.Key)!)
         {
             order? order = await Http.GetFromJsonAsync<order>("api/order/" + id);
-            if(order.product_To_Orders.Where(p=>p.supplier_order_id == null).FirstOrDefault() == null)
+            if (order._current_check.product_To_Orders.Where(p => p.supplier_order_id == null).FirstOrDefault() == null)
             {
                 order.order_status_id = 6;
             }
@@ -299,12 +399,14 @@
             }
             await Http.PutAsJsonAsync("api/Order", order);
         }
-        
+
 
     }
     protected async Task SaveOrder()
     {
-        foreach (int? id in supplier_order?.product_to_orders?.Where(p => p.order_id != null && p.id_delete_from_supplier_order == false).GroupBy(p => p.order_id)?.OrderBy(o => o.Key)?.Select(p => p.Key)!)
+        List<int?> ids = new();
+        ids.AddRange(supplier_order?.product_to_orders?.Where(p => p.order_check.order_id != null && p.is_delete_from_supplier_order == false).GroupBy(p => p.order_check.order_id)?.OrderBy(o => o.Key)?.Select(p => p.Key)!);
+        foreach (int? id in ids)
         {
             order? order = await Http.GetFromJsonAsync<order>("api/order/" + id);
             if (order.supplier_manager_id == null)
@@ -313,30 +415,31 @@
                 await Http.PutAsJsonAsync("api/Order", order);
             }
         }
-        foreach (int? id in supplier_order?.product_to_orders?.Where(p => p.id_delete_from_supplier_order == true).GroupBy(p => p.order_id)?.OrderBy(o => o.Key)?.Select(p => p.Key)!)
+        foreach (int? id in supplier_order?.product_to_orders?.Where(p => p.is_delete_from_supplier_order == true).GroupBy(p => p.order_check.order_id)?.OrderBy(o => o.Key)?.Select(p => p.Key)!)
         {
-            if (supplier_order?.product_to_orders?.Where(p => p.id_delete_from_supplier_order == false).Select(p => p.order_id).ToList().Contains(id) == false)
+            if (supplier_order?.product_to_orders?.Where(p => p.is_delete_from_supplier_order == false).Select(p => p.order_check.order_id).ToList().Contains(id) == false)
             {
                 order? order = await Http.GetFromJsonAsync<order>("api/order/" + id);
                 order.supplier_manager_id = null;
                 await Http.PutAsJsonAsync("api/Order", order);
             }
         }
-        supplier_order.product_to_orders?.ForEach(p => p.order = null);
+        supplier_order?.product_to_orders?.ForEach(p => p.order_check = null);
         if (supplier_order.id != 0)
         {
+            
             await Http.PutAsJsonAsync("api/SupplierOrder", supplier_order);
         }
         else
         {
             supplier_order.user_id = user_id;
             supplier_order.status_id = 1;
+            supplier_order.product_to_orders.ForEach(p => p.order_check = null);
             var response = await Http.PostAsJsonAsync("api/SupplierOrder", supplier_order);
             supplierOrderId = await response.Content.ReadFromJsonAsync<int>();
             order_guid = null;
-            await OnParametersSetAsync();
         }
-        
+        await OnParametersSetAsync();
     }
     public void Cancel()
     {

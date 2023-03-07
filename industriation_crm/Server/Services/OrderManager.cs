@@ -18,22 +18,61 @@ namespace industriation_crm.Server.Services
         {
             _dbContext = dbContext;
         }
+        private void UpdateInnerProductData(List<order_check>? order_Checks, int order_id)
+        {
+            foreach (var c in order_Checks)
+            {
+                List<product_to_order> product_To_Orders = new List<product_to_order>();
+                product_To_Orders.AddRange(c.product_To_Orders);
+                product_To_Orders.ForEach(p => p.product = null);
+                product_To_Orders.ForEach(p => p.order_check = null);
+                if (c.is_add == true)
+                {
+                    c.order_id = order_id;
+                    _dbContext.order_check.Add(c);
+                    _dbContext.SaveChanges();
+                }
+                if (c.id != 0 && c.is_delete == false)
+                {
+                    _dbContext.Entry(c).State = EntityState.Modified;
+                    _dbContext.SaveChanges();
+                }
+                foreach (var p in product_To_Orders)
+                {
+                    if (p.order_check_id != 0)
+                    {
+                        _dbContext.Entry(p).State = EntityState.Modified;
+                    }
+                    if (p.is_add_from_order && p.order_check_id == 0)
+                    {
+                        p.order_check_id = c.id;
+                        _dbContext.Add(p);
+                    }
+                    if (p.is_delete_from_order && p.order_check_id != 0)
+                    {
+                        _dbContext.Remove(p);
+                    }
 
+                    _dbContext.SaveChanges();
+                }
+            }
+        }
         public int AddOrder(order order)
         {
             order.main_contact = null;
             try
             {
-                if (order?.product_To_Orders != null)
-                    foreach (var p in order?.product_To_Orders)
-                    {
-                        p.product = null;
-                    }
+                List<order_check>? order_Checks = new List<order_check>();
+                order_Checks.AddRange(order?.order_Checks!);
+
                 if (order?.delivery?.delivery_type != null)
                     order.delivery.delivery_type = null;
-                order.product_To_Orders = null;
+
+                order.order_Checks = null;
+
                 _dbContext.order.Add(order);
                 _dbContext.SaveChanges();
+                UpdateInnerProductData(order_Checks, order.id);
                 return order.id;
             }
             catch
@@ -41,7 +80,7 @@ namespace industriation_crm.Server.Services
                 throw;
             }
         }
-        public void UpdateOrderDetails(order order)
+        public void UpdateOrderDetails(order order, bool is_update_inner_data)
         {
             try
             {
@@ -77,6 +116,8 @@ namespace industriation_crm.Server.Services
                 }
 
                 _dbContext.SaveChanges();
+                if(is_update_inner_data)
+                UpdateInnerProductData(order?.order_Checks!, order.id);
             }
             catch
             {
@@ -87,8 +128,9 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                order? order = _dbContext.order.Include(o=>o.tasks).Include(o => o.order_Pays).Include(o => o.delivery).ThenInclude(d => d.delivery_type).Include(o => o.user).Include(o => o.client).ThenInclude(c => c.contacts).ThenInclude(c => c.contact_phones).Include(o => o.order_status).Include(o => o.product_To_Orders).ThenInclude(o => o.product).Include(o => o.main_contact).Include(o=>o.order_Histories).Include(o => o.stage).FirstOrDefault(u => u.id == id);
-                order.product_To_Orders.ForEach((p) => { p.order_percent_discount = order._percent_discount; p.order_ruble_discount = order._ruble_discount; });
+                
+                order? order = _dbContext.order.Include(o=>o.order_Checks).ThenInclude(c=>c.product_To_Orders).ThenInclude(p=>p.product).Include(o=>o.tasks).Include(o => o.order_Pays).Include(o => o.delivery).ThenInclude(d => d.delivery_type).Include(o => o.user).Include(o => o.client).ThenInclude(c => c.contacts).ThenInclude(c => c.contact_phones).Include(o => o.order_status).Include(o => o.main_contact).Include(o=>o.order_Histories).Include(o => o.stage).FirstOrDefault(u => u.id == id);
+                // order.product_To_Orders.ForEach((p) => { p.order_percent_discount = order._percent_discount; p.order_ruble_discount = order._ruble_discount; });
                 if (order != null)
                 {
                     return order;
@@ -176,7 +218,7 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                List<order> orders = _dbContext.order.Where(o => o.client_id == clientId).Include(o => o.product_To_Orders).ThenInclude(p=>p.product).ToList();
+                List<order> orders = _dbContext.order.Where(o => o.client_id == clientId).Include(o => o.order_Checks).ThenInclude(o=>o.product_To_Orders).ThenInclude(p => p.product).ToList(); ;
                 return orders;
                 
             }

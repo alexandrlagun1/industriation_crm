@@ -11,7 +11,7 @@
                         <div class="main-title ind-col-lg-3">Уведомления</div>
                         <div class="ind-col-lg-7 row-f">
                             <div class="ind-col-lg-1 a-i-c">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="CloseModal"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="Close"></button>
                             </div>
                         </div>
                     </div>
@@ -22,54 +22,110 @@
                     <button @onclick="()=>ViewTasks = false" class="score">Уведомления</button>
                     <button @onclick="()=>ViewTasks = true" class="score">Задачи</button>
                 </div>
+                @if (viewCreateTask)
+                {
+                    <div class="modal" tabindex="-1" style="display:block" role="dialog">
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
+                            <div class="modal-content b-s">
+                                <div class="modal-body">
+                                    Исполнитель:
+                                    <select @bind="newTask.executor_id">
+                                        @foreach (var e in executors)
+                                        {
+                                            <option value="@e.id">@e.name</option>
+                                        }
+                                    </select>
+                                    <br>
+                                    Задача:
+                                    <br>
+                                    <textarea @bind="newTask.text" class="notes-textarea main-input" placeholder="Введите текст задачи"></textarea>
+                                    Срок исполнения:
+                                    <input type="date" class="main-input" @bind="newTask.execute_date">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="close" data-dismiss="modal" @onclick="()=>viewCreateTask = false">Закрыть</button>
+                                    <button type="button" class="score" @onclick="createTask">Создать</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
                 @if (ViewTasks == false)
                 {
                     @foreach (var n in user_Notifications!.OrderByDescending(ut => ut.date))
-                        {
+                    {
                         <div class="modal-actual-task">
                             <div class="order-info-date">
                                 @n.date
                             </div>
                             @n.text
                         </div>
-                        }
+                    }
                 }
                 else
                 {
-
-                    @foreach (var t in user_tasks!.OrderByDescending(ut=>ut.date))
+                    <button @onclick="openCreatetaskModal" class="score">Создать</button>
+                    <br />
+                    @foreach (var t in user_tasks!.OrderByDescending(ut => ut.date))
                     {
                         @if (t.complete == 1)
                         {
                             <div class="modal-done-task">
+                                @if (t.is_view == false)
+                                {
+                                    <b>Новая</b>
+                                }
                                 <div class="order-info-date">
                                     @t.date
                                 </div>
+
                                 <div>
                                     <b>Заказ:</b> @t.order_id
                                 </div>
+
                                 <div>
                                     <b>От кого:</b> @t.creator?.name
                                 </div>
                                 <div>
                                     <b>Текст:</b> @t.text
+                                </div>
+                                <div>
+                                    <b>Срок выполнения:</b>
+                                    @if (t.execute_date != null)
+                                    {
+                                        @t.execute_date.Value.ToString("dd.MM.yyyy")
+                                        ;
+                                    }
                                 </div>
                             </div>
                         }
                         else
                         {
                             <div class="modal-actual-task">
+                                @if (t.is_view == false)
+                                {
+                                    <b>Новая</b>
+                                }
                                 <div class="order-info-date">
                                     @t.date
                                 </div>
                                 <div>
                                     <b>Заказ:</b> @t.order_id
                                 </div>
+
                                 <div>
                                     <b>От кого:</b> @t.creator?.name
                                 </div>
                                 <div>
                                     <b>Текст:</b> @t.text
+                                </div>
+                                <div>
+                                    <b>Срок выполнения:</b>
+                                    @if (t.execute_date != null)
+                                    {
+                                        @t.execute_date.Value.ToString("dd.MM.yyyy")
+                                        ;
+                                    }
                                 </div>
                             </div>
                         }
@@ -83,14 +139,52 @@
 @code {
     [Parameter]
     public Action? CloseModal { get; set; }
-    protected List<user_notifications>? user_Notifications { get; set; } = new();
-    protected List<task>? user_tasks { get; set; } = new();
+    [Parameter]
+    public List<task>? user_tasks { get; set; } = new();
+    [Parameter]
+    public List<user_notifications>? user_Notifications { get; set; } = new();
+    [Parameter]
+    public int user_id { get; set; }
+
+
+    protected bool viewCreateTask = false;
+    protected List<user> executors = new();
     protected bool ViewTasks = false;
+    protected task newTask { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        int userId = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
-        user_Notifications = await Http.GetFromJsonAsync<List<user_notifications>>("api/usernotifications/" + userId);
-        user_tasks = await Http.GetFromJsonAsync<List<task>>("api/Task/" + userId);
+        executors = await Http.GetFromJsonAsync<List<user>>("api/User?type=all");
+
+
+    }
+    protected void Close()
+    {
+
+        foreach (var task in user_tasks?.Where(t => t.is_view == false))
+        {
+            task.is_view = true;
+            Http.PutAsJsonAsync<task>("api/task", task);
+        }
+        CloseModal?.Invoke();
+    }
+    protected void openCreatetaskModal()
+    {
+        newTask = new();
+        viewCreateTask = true;
+    }
+    protected async Task createTask()
+    {
+        if (executors != null && executors.Count != 0)
+        {
+            viewCreateTask = false;
+            newTask.complete = 0;
+            newTask.creator_id = user_id;
+            if (newTask.executor_id == null)
+            {
+                newTask.executor_id = executors.FirstOrDefault().id;
+            }
+            await Http.PostAsJsonAsync<task>("api/task", newTask);
+        }
     }
 }
