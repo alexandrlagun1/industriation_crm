@@ -1577,6 +1577,7 @@ td.ind-col-lg-1 {
 
 .custom-select:hover {
 	height: auto;
+	z-index: 3;
 }
 
 .custom-select button {
