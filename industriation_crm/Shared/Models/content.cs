@@ -12,6 +12,7 @@ namespace industriation_crm.Shared.Models
         public string? password { get; set; }
         public bool? retail_synch { get; set; } = true;
         public string? login { get; set; }
+        public int? retail_id { get; set; }
         public string? phone { get; set; }
         public string? megafon_login { get; set; }
 
@@ -251,7 +252,7 @@ namespace industriation_crm.Shared.Models
         [Key]
         public int id { get; set; }
         [NotMapped]
-        public bool retail_synchro { get; set; }
+        public bool retail_synchro { get; set; } = true;
         public int? client_id { get; set; }
         public int? user_id { get; set; }
         public int? order_status_id { get; set; } = 1;
@@ -483,7 +484,8 @@ namespace industriation_crm.Shared.Models
         public int? supplier_order_id { get; set; }
         public double? product_price { get; set; }
         public int? product_postition { get; set; } = 0;
-        public int? delivery_period { get; set; } = 1;
+        public int? from_delivery_period { get; set; } = 1;
+        public int? to_delivery_period { get; set; } = 3;
         public int? delivery_period_type_id { get; set; }
 
         //public int? order_id { get; set; } = null;
@@ -703,6 +705,8 @@ namespace industriation_crm.Shared.Models
         public double? price { get; set; }
         public int? order_id { get; set; }
         public DateTime? date { get; set; }
+        [NotMapped]
+        public bool? is_new { get; set; }
         [ForeignKey("order_id")]
         public order? order { get; set; }
         [NotMapped]

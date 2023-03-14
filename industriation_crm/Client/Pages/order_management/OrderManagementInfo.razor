@@ -49,10 +49,10 @@
                                 </a>
                             </td>
                             <td class="ind-col-lg-2">
-                                @if (p.delivery_period != null)
+                                @if (p.from_delivery_period != null)
                                 {
                                     <div>
-                                        @p.delivery_period
+                                        @p.from_delivery_period
                                         @switch (p.delivery_period_type_id)
                                         {
                                             case 1:

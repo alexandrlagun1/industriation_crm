@@ -37,7 +37,9 @@ else
             Фильтр:
         </div>
         <row-f>
+            Менеджер:
             <div class="custom-select mr-20">
+
                 <input type="text" class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
                 </input>
                 @foreach (var m in noSelectManagers.Where(m => m.name.Contains(manager_search)))
@@ -52,6 +54,50 @@ else
                 {
                     <button @onclick="()=>{SelectManagers.Remove(m); noSelectManagers.Add(m);}">
                         <div class="name">@m.name</div>
+                        <img src="./icons/delete-icon.svg" />
+                    </button>
+                }
+            </div>
+        </row-f>
+        <row-f>
+            Статус заказа:
+            <div class="custom-select mr-20">
+                <input type="text" class="custom-input" contenteditable="true" @bind="order_status_search" @bind:event="oninput">
+                </input>
+                @foreach (var s in noSelectOrderStatuses.Where(s => s.name.Contains(order_status_search)))
+                {
+                    <button @onclick="()=>{noSelectOrderStatuses.Remove(s); SelectOrderStatuses.Add(s);}">
+                        <div class="name">@s.name</div>
+                    </button>
+                }
+            </div>
+            <div class="manager-field">
+                @foreach (var s in SelectOrderStatuses)
+                {
+                    <button @onclick="()=>{SelectOrderStatuses.Remove(s); noSelectOrderStatuses.Add(s);}">
+                        <div class="name">@s.name</div>
+                        <img src="./icons/delete-icon.svg" />
+                    </button>
+                }
+            </div>
+        </row-f>
+        <row-f>
+            Статус оплаты:
+            <div class="custom-select mr-20">
+                <input type="text" class="custom-input" contenteditable="true" @bind="pay_status_search" @bind:event="oninput">
+                </input>
+                @foreach (var s in noSelectPayStatuses.Where(s => s.name.Contains(pay_status_search)))
+                {
+                    <button @onclick="()=>{noSelectPayStatuses.Remove(s); SelectPayStatuses.Add(s);}">
+                        <div class="name">@s.name</div>
+                    </button>
+                }
+            </div>
+            <div class="manager-field">
+                @foreach (var s in SelectPayStatuses)
+                {
+                    <button @onclick="()=>{SelectPayStatuses.Remove(s); noSelectPayStatuses.Add(s);}">
+                        <div class="name">@s.name</div>
                         <img src="./icons/delete-icon.svg" />
                     </button>
                 }
@@ -92,7 +138,8 @@ else
                     <tr class="order-row ind-col-lg-10">
                         <td class="ind-col-lg-1">Номер заказа</td>
                         <td class="ind-col-lg-2">Покупатель</td>
-                        @if(role == 1){
+                        @if (role == 1)
+                        {
                             <td class="ind-col-lg-2">Контрагент</td>
                         }
                         else
@@ -103,12 +150,12 @@ else
                         <td class="ind-col-lg-1">Статус оплаты</td>
                         <td class="ind-col-lg-1">Статус заказа</td>
                         <td class="ind-col-lg-1">Этап</td>
-@*                        <td class="ind-col-lg-1">Действия</td>*@
+                        @*                        <td class="ind-col-lg-1">Действия</td>*@
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var order in ordersReturnData?.orders!)
-                    { 
+                    {
                         <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1">
                                 <a href='/order/edit/@order.id'>
@@ -139,14 +186,14 @@ else
                             <td class="ind-col-lg-1">@order.pay_status?.name</td>
                             <td class="ind-col-lg-1">@order.order_status?.name</td>
                             <td class="ind-col-lg-1">@order.stage?.name</td>
-@*                            <td class="ind-col-lg-1">
-                                <a href='/order/edit/@order.id' class="score" role="button">
-                                    <div class="hidden-md">Изменить</div>
-                                    <div class="hidden-lg ind-col-md-10">
-                                        <img src="./icons/edit.svg" class="h20-w20">
-                                    </div>
-                                </a>
-                            </td>*@
+                            @*                            <td class="ind-col-lg-1">
+                    <a href='/order/edit/@order.id' class="score" role="button">
+                    <div class="hidden-md">Изменить</div>
+                    <div class="hidden-lg ind-col-md-10">
+                    <img src="./icons/edit.svg" class="h20-w20">
+                    </div>
+                    </a>
+                    </td>*@
                         </tr>
                     }
                 </tbody>
@@ -170,6 +217,8 @@ else
 @code {
 
     protected string manager_search = "";
+    protected string order_status_search = "";
+    protected string pay_status_search = "";
     protected int count_on_page = 50;
     protected int current_page = 1;
     List<int> page_count = new List<int>();
@@ -178,8 +227,15 @@ else
 
     protected order order = new();
     bool load = true;
+
     protected List<user> SelectManagers = new();
     protected List<user> noSelectManagers = new();
+    protected List<order_status> SelectOrderStatuses = new();
+    protected List<order_status> noSelectOrderStatuses = new();
+    protected List<pay_status> SelectPayStatuses = new();
+    protected List<pay_status> noSelectPayStatuses = new();
+
+
     protected int role { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -187,6 +243,8 @@ else
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         role = Convert.ToInt32(authState.User.FindFirst(ClaimTypes.Role).Value);
         noSelectManagers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
+        noSelectOrderStatuses = await Http.GetFromJsonAsync<List<order_status>>("api/OrderStatus");
+        noSelectPayStatuses = await Http.GetFromJsonAsync<List<pay_status>>("api/PayStatus");
         await GetOrders();
     }
     public void EditOrder(int order_id)
@@ -239,6 +297,17 @@ else
             ordersFilter.managers = noSelectManagers;
         else
             ordersFilter.managers = SelectManagers;
+
+        if (SelectOrderStatuses.Count == 0)
+            ordersFilter.order_status = noSelectOrderStatuses;
+        else
+            ordersFilter.order_status = SelectOrderStatuses;
+
+        if (SelectPayStatuses.Count == 0)
+            ordersFilter.pay_status = noSelectPayStatuses;
+        else
+            ordersFilter.pay_status = SelectPayStatuses;
+
         var response = await Http.PostAsJsonAsync("api/Order/GetOrders", ordersFilter);
         string responseBody = await response.Content.ReadAsStringAsync();
         ordersReturnData = JsonConvert.DeserializeObject<OrdersReturnData>(responseBody);
@@ -254,7 +323,7 @@ else
     protected bool view_client_select = false;
     protected async Task CreateOrder(client client)
     {
-        
+
         var progress_client_discount = await Http.GetFromJsonAsync<progress_client_discount>("api/ClientDiscount");
         var client_Orders = await Http.GetFromJsonAsync<List<order>>($"api/Order/GetOrdersByClientId/{client.id}");
         int discount = 0;

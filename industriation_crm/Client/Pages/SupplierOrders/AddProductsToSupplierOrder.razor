@@ -85,7 +85,7 @@
     protected async Task AddProduct(product_to_order product_To_Order)
     {
         product_To_Order.supplier_price = product_To_Order._total_price;
-        product_To_Order.supplier_delivery_period = product_To_Order.delivery_period;
+        product_To_Order.supplier_delivery_period = product_To_Order.from_delivery_period;
         if (product_To_Order.supplier_order_id != 0 && product_To_Order.supplier_order_id != null)
             product_To_Order.is_delete_from_supplier_order = false;
         else

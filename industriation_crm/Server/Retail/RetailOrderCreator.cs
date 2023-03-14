@@ -33,6 +33,14 @@ namespace industriation_crm.Server.Retail
                 if (i + 1 != product_To_Orders.Count)
                     items += ",";
             }
+            user user = new user();
+            using (DatabaseContext contex = new DatabaseContext())
+            {
+                user = contex.user.Where(u => u.id == order.user_id).FirstOrDefault();
+            }
+            string retail_user = "";
+            if (user != null && user.retail_id != null)
+                retail_user = $"\"managerId\":{user.retail_id},";
 
             client client = new client();
             using (DatabaseContext context = new DatabaseContext())
@@ -74,10 +82,13 @@ namespace industriation_crm.Server.Retail
             string customer = "";
 
             if (client_id != 0)
-                customer = "{\"customer\":{\"id\":" + client_id + "},";
+                customer = "\"customer\":{\"id\":" + client_id + "},";
 
             dict.Add("order",
-                customer + "\"firstName\":\"" + contact?.name
+                "{" +
+                customer
+                + retail_user
+                + "\"firstName\":\"" + contact?.name
                 + "\",\"lastName\":\"" + contact?.surname
                 + "\",\"patronymic\":\"" + contact?.patronymic
                 + "\",\"number\":\"" + order.id + "C"
@@ -85,7 +96,7 @@ namespace industriation_crm.Server.Retail
                 + "\",\"orderType\":\"" + order_type
                 + "\",\"phone\":\"" + contact?.phone
                 + "\",\"email\":\"" + contact?.email
-                + "\",\"contragent\":{\"contragentType\":\"" + contragent_type + "\",\"INN\":\"" + client.org_inn + "\",\"OGRN\":\"" + client.org_ogrn + "\", \"KPP\": \"" + client.org_kpp + "\",\"legalName\":\"" + client?.org_name?.Replace("\"", "'") + "\", \"legalAddress\":\"" + client?.org_address + "\",\"BIK\":\"" + client?.bank_bik + "\",\"bank\":\"" + client?.bank_name + "\",\"corrAccount\":\"" + client?.bank_cor_schet + "\",\"bankAccount\":\"" + client?.bank_ras_schet + "\"}"
+                + "\",\"contragent\":{\"contragentType\":\"" + contragent_type + "\",\"INN\":\"" + client.org_inn + "\",\"OGRN\":\"" + client.org_ogrn + "\", \"KPP\": \"" + client.org_kpp + "\",\"legalName\":\"" + client?.org_name?.Replace("\"", "'") + "\", \"legalAddress\":\"" + client?.org_address?.Replace("\"", "'") + "\",\"BIK\":\"" + client?.bank_bik + "\",\"bank\":\"" + client?.bank_name?.Replace("\"", "'") + "\",\"corrAccount\":\"" + client?.bank_cor_schet + "\",\"bankAccount\":\"" + client?.bank_ras_schet + "\"}"
                 + ",\"delivery\":{\"code\":\"" + delivery_type + "\"," + date + "\"address\": {\"text\":\"" + order.delivery.address + "\"}}"
                 + ",\"items\":[" + items + "]"
                 + "}");
@@ -179,6 +190,17 @@ namespace industriation_crm.Server.Retail
             req.Headers.Add("X-API-KEY", "D4xEMlk1WsvXPdv6RnDk72n3eLkbcuXB");
             var res = httpClient.SendAsync(req).Result;
             string s = res.Content.ReadAsStringAsync().Result;
+
+            foreach (var p in order.order_Pays.Where(p => p.is_new == true))
+            {
+                var payDict = new Dictionary<string, string>();
+                payDict.Add("site", "industriation");
+                payDict.Add("payment", "{\"order\":{\"externalId\":\""+order.id+"C\"}, \"amount\":"+p.price+", \"type\":\"bank-transfer\", \"status\":\"paid\"}");
+
+                var payreq = new HttpRequestMessage(HttpMethod.Post, $"https://industriation.retailcrm.ru/api/v5/orders/payments/create") { Content = new FormUrlEncodedContent(payDict) };
+                payreq.Headers.Add("X-API-KEY", "D4xEMlk1WsvXPdv6RnDk72n3eLkbcuXB");
+                var payres = httpClient.SendAsync(payreq).Result;
+            }
         }
         public static void FindCreateProduct(int externalId)
         {
@@ -187,7 +209,7 @@ namespace industriation_crm.Server.Retail
             var res = httpClient.SendAsync(req).Result;
             var productData = res.Content.ReadFromJsonAsync<productData>().Result;
 
-            if(productData.products.Count == 0)
+            if (productData.products.Count == 0)
             {
 
             }

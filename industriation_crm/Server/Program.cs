@@ -23,8 +23,6 @@ builder.Services.AddOidcAuthentication(options =>
     builder.Configuration.Bind("Local", options.ProviderOptions);
 });
 
-//Авторизация
-Console.WriteLine("Загрузка");
 builder.Services.AddScoped<ICategory, CategoryManager>();
 builder.Services.AddScoped<IContact, ContactManager>();
 builder.Services.AddScoped<IProgressClientDiscount, ProgressClientDiscountManager>();
@@ -41,6 +39,8 @@ builder.Services.AddScoped<IOrderHistory, OrderHistoryManager>();
 builder.Services.AddScoped<IUserNotifications, UserNotificationsManager>();
 builder.Services.AddScoped<ITask, TaskManager>();
 builder.Services.AddScoped<ICallHistory, CallHistoryManager>();
+builder.Services.AddScoped<IOrderStatus, OrderStatusManager>();
+builder.Services.AddScoped<IPayStatus, PayStatusManager>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);

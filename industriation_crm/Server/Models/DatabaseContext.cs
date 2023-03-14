@@ -10,6 +10,7 @@ namespace industriation_crm.Server.Models
         public DbSet<category> category { get; set; }
         public DbSet<user> user { get; set; }
         public DbSet<roles> roles { get; set; }
+        public DbSet<order_status> order_status { get; set; }
         public DbSet<client> client { get; set; }
         public DbSet<product> product { get; set; }
         public DbSet<order> order { get; set; }

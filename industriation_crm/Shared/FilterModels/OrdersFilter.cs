@@ -11,6 +11,8 @@ namespace industriation_crm.Shared.FilterModels
     {
         public List<user?>? managers { get; set; } = new();
         public string? client { get; set; } = "";
+        public List<order_status>? order_status { get; set; }
+        public List<pay_status>? pay_status { get; set; }
         public DateTime? order_date_from { get; set; }
         public DateTime? order_date_to { get; set; }
         public int order_on_page { get; set; }

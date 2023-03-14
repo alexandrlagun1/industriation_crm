@@ -23,6 +23,7 @@
 {
     <NewProductToOrder orderId="orderId" CloseModal="CloseAddProductModal" AddProductToproductToOrder="AddProductToProductToOrder"></NewProductToOrder>
 }
+
 @if (role == 1)
 {
     <div class="buttons-bar mb-10">
@@ -338,10 +339,19 @@
                                         </a>
                                     </td>
                                     <td class="ind-col-lg-2">
-                                        <div class="ind-col-lg-3">
-                                            <input type="number" class="table-input" @bind="p.delivery_period">
+                                        <div class="ind-col-lg-1">
+                                            От: 
                                         </div>
-                                        <div class="ind-col-lg-7">
+                                        <div class="ind-col-lg-2">
+                                            <input type="number" class="table-input" @bind="p.from_delivery_period">
+                                        </div>
+                                        <div class="ind-col-lg-1">
+                                            До: 
+                                        </div>
+                                        <div class="ind-col-lg-2">
+                                            <input type="number" class="table-input" @bind="p.to_delivery_period">
+                                        </div>
+                                        <div class="ind-col-lg-4">
                                             <select name="" id="" class="table-input" @bind="p.delivery_period_type_id">
                                                 @foreach (var delivery_period_type in delivery_Period_Types!)
                                                 {
@@ -478,7 +488,7 @@
                             <select type="text" class="main-input" value="@order.delivery?.delivery_type?.id" @onchange="ChangeDeliveryType">
                                 @foreach (var delivery_type in delivery_Types!)
                                 {
-                                    <option value="@delivery_type.id">@delivery_type.name</option>
+                                    <option value="@delivery_type.id">@delivery_type.id. @delivery_type.name</option>
                                 }
                             </select>
                         </div>
@@ -520,10 +530,10 @@
 
         <div class="main-section ind-col-lg-5 ind-col-md-10">
             <div class="main-section-label">Оплата</div>
-            @*<div class="section-field">
+            <div class="section-field">
         <input type="number" step="0.01" class="main-input" @bind="pay"></input>
         <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
-        </div>*@
+        </div>
             <div class="input-field">
                 <div class="input-label">Условия оплаты</div>
                 <select type="text" class="main-input" @bind="@order.pay_conditions">
@@ -560,12 +570,12 @@
                         </div>
                         <label>@p.price ₽</label>
                     </div>
-                    <div class="input-field">
+                    @*<div class="input-field">
                         <div class="input-label">
                             Оплата счета
                         </div>
-                        <label>@(order?.id)-@(order?._pay_check.check_number)</label>
-                    </div>
+                        <label>@(order?.id)-@(order?._pay_check?.check_number)</label>
+                    </div>*@
                     @*<button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>*@
                 </div>
             }
@@ -610,7 +620,7 @@
 
 @code {
     protected order_check? current_order_check { get; set; } = new order_check { check_number = 1, is_add = true, current = 1 };
-    //protected double? pay { get; set; }
+    protected double? pay { get; set; }
 
     protected bool showAlert { get; set; }
     protected void CloseAlert()
@@ -702,31 +712,34 @@
     }
     protected async Task SaveOrder()
     {
-        ////удалить (добаление оплат без участия 1с)
-        //if (order.order_status_id == 1 && order.pay_conditions == 1)
-        //{
-        //    double? order_pays_summ = order.order_Pays?.Select(p => p.price).Sum();
-        //    double? min_predoplata = order._current_check.price_summ / 100 * order.pay_predoplata_percent;
-        //    if (order_pays_summ + 0.1 >= min_predoplata)
-        //        order.order_status_id = 3;
-        //}
-        //if (order.order_Pays?.Select(p => p.price).Sum() < order._current_check.price_summ)
-        //{
-        //    order.pay_status_id = 1;
-        //}
-        //else
-        //{
-        //    order.pay_status_id = 2;
-        //}
-        //if (order.order_Pays?.Count == 0)
-        //{
-        //    order.pay_status_id = null;
-        //}
+        //удалить (добаление оплат без участия 1с)
+        if (order.order_status_id == 1 && order.pay_conditions == 1)
+        {
+            double? order_pays_summ = order.order_Pays?.Select(p => p.price).Sum();
+            double? min_predoplata = order._current_check.price_summ / 100 * order.pay_predoplata_percent;
+            if (order_pays_summ + 0.1 >= min_predoplata)
+                order.order_status_id = 3;
+        }
+        if (order.order_Pays?.Select(p => p.price).Sum() < order._current_check.price_summ)
+        {
+            order.pay_status_id = 1;
+        }
+        else
+        {
+            order.pay_status_id = 2;
+        }
+        if (order.order_Pays?.Count == 0)
+        {
+            order.pay_status_id = null;
+        }
 
-        //if (order.pay_conditions == 2 && order.order_status_id == 1)
-        //    order.order_status_id = 3;
-        //if (order.pay_conditions == 1 && order.order_status_id == 3 && order.order_Pays.Count == 0)
-        //    order.order_status_id = 1;
+        if (order.pay_conditions == 2 && order.order_status_id == 1)
+            order.order_status_id = 3;
+        if (order.pay_conditions == 1 && order.order_status_id == 3 && order.order_Pays.Count == 0)
+            order.order_status_id = 1;
+
+
+
         if (order?.pay_conditions == 2 && order.order_status_id == 1)
         {
             order.pay_status_id = 3;
@@ -959,7 +972,7 @@
         if (current_order_check.ruble_discount != null)
             product_To_Order.order_ruble_discount = current_order_check._ruble_discount;
         product_To_Order.delivery_period_type_id = 1;
-        product_To_Order.delivery_period = 1;
+        product_To_Order.from_delivery_period = 1;
         product_To_Order.is_add_from_order = true;
 
         current_order_check.product_To_Orders.Add(product_To_Order);
@@ -999,12 +1012,14 @@
         order.delivery.delivery_type_id = delivery_type.id;
     }
 
-    //protected void AddNewOrderPay()
-    //{
-    //    order_pay order_Pay = new order_pay();
-    //    order_Pay.price = pay;
-    //    order.order_Pays.Add(order_Pay);
-    //}
+    protected void AddNewOrderPay()
+    {
+        order_pay order_Pay = new order_pay();
+        order_Pay.price = pay;
+        order_Pay.is_new = true;
+        order_Pay.date = DateTime.Now;
+        order.order_Pays.Add(order_Pay);
+    }
     //protected void RemoveOrderPay(order_pay order_Pay)
     //{
     //    order_Pay.isRemove = true;

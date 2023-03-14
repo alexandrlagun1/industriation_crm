@@ -47,18 +47,18 @@ namespace industriation_crm.Client.PrintForms
 
                 if (p.delivery_period_type_id == 1)
                 {
-                    product.dDate = $"Срок доставки: {p.delivery_period} (рабочий день)";
-                    product.dDateFull = $"Срок доставки: {p.delivery_period} (рабочий день)";
+                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочий день)";
+                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочий день)";
                 }
                 if (p.delivery_period_type_id == 2)
                 {
-                    product.dDate = $"Срок доставки: {p.delivery_period} (рабочая неделя)";
-                    product.dDateFull = $"Срок доставки: {p.delivery_period} (рабочая неделя)";
+                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочая неделя)";
+                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочая неделя)";
                 }
                 if (p.delivery_period_type_id == 3)
                 {
-                    product.dDate = $"Срок доставки: {p.delivery_period} (рабочий месяц)";
-                    product.dDateFull = $"Срок доставки: {p.delivery_period} (рабочий месяц)";
+                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочий месяц)";
+                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочий месяц)";
                 }
                 product.unit = p.product?.unit;
                 order_Print_From.order_data.products.Add(product);

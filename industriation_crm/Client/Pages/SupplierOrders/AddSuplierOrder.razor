@@ -186,7 +186,7 @@
                                             <table class="table-inside">
                                                 <tr class="tr-inside">
                                                     <td>
-                                                        Срок доставки: @p.delivery_period
+                                                        Срок доставки: @p.from_delivery_period
                                                         @switch (p.delivery_period_type_id)
                                                         {
                                                             case 1:
@@ -324,7 +324,7 @@
             supplier_order.product_to_orders.AddRange(order_translation.orders_data.Where(c => c.Key == Guid.Parse(order_guid)).FirstOrDefault().Value._pay_check.product_To_Orders.Where(p => p.is_add_to_supplier_order == true).ToList());
             foreach (var p in supplier_order.product_to_orders)
             {
-                p.supplier_delivery_period = p.delivery_period;
+                p.supplier_delivery_period = p.from_delivery_period;
                 p.supplier_price = p._total_price;
                 
             }
