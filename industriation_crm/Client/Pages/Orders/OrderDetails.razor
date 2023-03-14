@@ -38,7 +38,7 @@ else
         </div>
         <row-f>
             Менеджер:
-            <div class="custom-select mr-20">
+            <div class="custom-select mr-20" onmouseover="customScroll()">
 
                 <input type="text" class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
                 </input>
@@ -61,7 +61,7 @@ else
         </row-f>
         <row-f>
             Статус заказа:
-            <div class="custom-select mr-20">
+            <div class="custom-select mr-20" onmouseover="customScroll()">
                 <input type="text" class="custom-input" contenteditable="true" @bind="order_status_search" @bind:event="oninput">
                 </input>
                 @foreach (var s in noSelectOrderStatuses.Where(s => s.name.Contains(order_status_search)))
@@ -83,7 +83,7 @@ else
         </row-f>
         <row-f>
             Статус оплаты:
-            <div class="custom-select mr-20">
+            <div class="custom-select mr-20" onmouseover="customScroll()">
                 <input type="text" class="custom-input" contenteditable="true" @bind="pay_status_search" @bind:event="oninput">
                 </input>
                 @foreach (var s in noSelectPayStatuses.Where(s => s.name.Contains(pay_status_search)))
