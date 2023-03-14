@@ -97,7 +97,10 @@ else
                             <td class="ind-col-lg-1 ind-col-md-1">@product.article</td>
                             <td class="ind-col-lg-2 ind-col-md-3">@product.manufacturer</td>
                             <td class="ind-col-lg-5 ind-col-md-3">
-                                <a href='/product/edit/@product.id'>
+                                <a class="product-line" href='/product/edit/@product.id'>
+                                    <div class="thumb">
+                                        <img src="@("https://industriation.ru/image/"+@product.image)">
+                                    </div>
                                     @product.name
                                 </a>
                             </td>

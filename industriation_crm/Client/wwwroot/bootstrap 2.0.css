@@ -744,6 +744,18 @@ li {
 	margin-left: auto;
 }
 
+.ml-5 {
+	margin-left: 5px;
+}
+
+.ml-10 {
+	margin-left: 10px;
+}
+
+.ml-15 {
+	margin-left: 15px;
+}
+
 .mr-a {
 	margin-right: auto;
 }
@@ -2227,6 +2239,32 @@ video {
 
 .tab-section-active {
 	display: block;
+}
+
+.add-order {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+.product-line {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	padding: 0 10px;
+}
+
+.product-line .thumb {
+	height: 80px;
+	width: 80px;
+	display: flex;
+	margin-right: 10px;
+}
+
+.product-line .thumb img {
+	margin: auto;
+	max-height: 100%;
+	max-width: 100%;
 }
 
 	/* ////////////////////////////////////////////////////////////////// */

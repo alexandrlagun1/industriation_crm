@@ -29,7 +29,7 @@ else
     }
     <div class="main-section mb-20">
         <div class="section-field">
-            <a class="score" type="button" @onclick="()=>view_client_select=true">
+            <a class="score add-order" type="button" @onclick="()=>view_client_select=true">
                 Новый заказ
             </a>
         </div>
@@ -37,7 +37,7 @@ else
             Фильтр:
         </div>
         <row-f>
-            <div class="custom-select mr-20">
+            <div class="custom-select mr-20" onmouseover="customScroll()">
                 <input type="text" class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
                 </input>
                 @foreach (var m in noSelectManagers.Where(m => m.name.Contains(manager_search)))
