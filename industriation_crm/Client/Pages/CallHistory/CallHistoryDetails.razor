@@ -15,7 +15,7 @@
         Фильтр:
     </div>
     <row-f>
-        <div class="custom-select mr-20">
+        <div class="custom-select mr-20" onmouseover="customScroll()">
             <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
             </input>
             @foreach (var m in noSelectManagers!.Where(m => m.name.Contains(manager_search)))
@@ -105,7 +105,7 @@
                                 <a href="/client/add/@call.client_number">
                                     Создать клиента
                                 </a>
-                                <button @onclick="()=>OpenSelectClient(call?.client_number)">Выбрать существующего</button>
+                                <button class="save ml-10" @onclick="()=>OpenSelectClient(call?.client_number)">Выбрать существующего</button>
                             }
                         </td>
                         <td class="ind-col-lg-1">

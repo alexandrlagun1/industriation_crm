@@ -19,3 +19,34 @@ function tabsSection() {
         });
     }
 };
+
+
+function customScroll() {
+    let customScroll = document.querySelector('.custom-select');
+    let customScrollBtn = document.querySelectorAll('.custom-select button');
+    for (let i = 0; i < customScrollBtn.length; i++) {
+        customScrollBtn[i].addEventListener('click', () => {
+            customScroll.scrollTop = 0;
+            console.log(customScrollBtn);
+        });
+    }
+}
+
+function hideModal() {
+    let bellBtn = document.querySelector('.oi.oi-bell');
+    let modalBody = document.querySelector('.modal');
+    let modal = document.querySelector('.modal-notification');
+    let body = document.querySelector('body');
+
+    bellBtn.addEventListener('click', () => {
+        modalBody.style.display = 'block';
+    });
+
+    body.addEventListener('click', (e) => {
+        if (e.target == modalBody) {
+            modalBody.style.display = 'none';
+        } else if (e.target == modal) {
+            e.preventDefault();
+        }
+    });
+}
