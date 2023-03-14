@@ -730,7 +730,7 @@
         }
         if (order.order_Pays?.Count == 0)
         {
-            order.pay_status_id = null;
+            order.pay_status_id = 4;
         }
 
         if (order.pay_conditions == 2 && order.order_status_id == 1)
