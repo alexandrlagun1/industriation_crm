@@ -2282,4 +2282,21 @@ video {
 	margin: auto;
 }
 
+.input-label.required {
+	position: relative;
+}
+
+.req {
+	position: absolute;
+	top: -8px;
+	color: #ef4741;
+	font-size: 20px;
+	font-weight: 600;
+	left: -11px;
+}
+
+.main-input:invalid {
+	border-color: #ef4741;
+}
+
 	/* ////////////////////////////////////////////////////////////////// */

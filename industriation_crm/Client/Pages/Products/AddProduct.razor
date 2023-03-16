@@ -55,7 +55,9 @@
             </div>
             <div class="ind-col-lg-7">
                 <div class="product-thumb">
-                    <img src='@("https://industriation.ru/image/"+@product.image)' />
+                    if(@product.image){
+                     <img src='@("https://industriation.ru/image/"+@product.image)' />
+                    }
                 </div>
             </div>
         </div>
