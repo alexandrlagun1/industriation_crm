@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 
 <head>
     <meta charset="utf-8" />
@@ -42,8 +42,19 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
-    <script src="js/print_froms.js"></script>
     <script src="./script.js"></script>
+    <script src="./jquery-3.6.4.min.js"></script>
+    <script src="js/print_froms.js"></script>
+
+    <script>
+        $('body').on('input', '[type="tel"]', function (e) {
+
+            let newVal = $(this).val().replace(/[^\d]/g, '');
+            $(this).val(newVal);
+            console.log(newVal);
+
+        });
+    </script>
 </body>
 </html>
 

@@ -38,7 +38,7 @@ else
                 <div class="input-label ind-col-lg-5">
                     ИНН:
                 </div>
-                <input type="number" class="main-input ind-col-lg-5 ind-col-md-7" @bind="clientFilter.inn">
+                <input type="number" class="main-input ind-col-lg-5 ind-col-md-7" @bind="clientFilter.inn" min="0">
             </div>
             <button @onclick="Search" class="score mt-20 mb-20">Поиск</button>
 

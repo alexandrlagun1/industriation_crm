@@ -221,7 +221,7 @@
                     </div>
                     <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">ИНН</div>
-                        <input type="number" class="main-input" @bind="client.org_inn">
+                        <input type="number" class="main-input" @bind="client.org_inn" min="0">
                     </div>
                 </div>
                 <div class="section-field">
@@ -233,14 +233,14 @@
                     {
                         <div class="ind-col-lg-5 ind-col-md-10 input-field">
                             <div class="input-label">ОГРН</div>
-                            <input type="number" class="main-input" @bind="client.org_ogrn">
+                            <input type="number" class="main-input" @bind="client.org_ogrn" min="0">
                         </div>
                     }
                     @if (client.client_type == 2)
                     {
                         <div class="ind-col-lg-5 ind-col-md-10 input-field">
                             <div class="input-label">ОГРНИП</div>
-                            <input type="number" class="main-input" @bind="client.org_ogrnip">
+                            <input type="number" class="main-input" @bind="client.org_ogrnip" min="0">
                         </div>
                     }
                 </div>
@@ -249,7 +249,7 @@
                     <div class="section-field">
                         <div class="ind-col-lg-5 ind-col-md-10 input-field">
                             <div class="input-label">КПП</div>
-                            <input type="number" class="main-input" @bind="client.org_kpp">
+                            <input type="number" class="main-input" @bind="client.org_kpp" min="0">
                         </div>
                     </div>
                 }
@@ -260,11 +260,11 @@
                 <div class="section-field">
                     <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">БИК</div>
-                        <input type="number" class="main-input" @bind="client.bank_bik">
+                        <input type="number" class="main-input" @bind="client.bank_bik" min="0">
                     </div>
                     <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">Корреспондентский счет</div>
-                        <input type="number" class="main-input" @bind="client.bank_cor_schet">
+                        <input type="number" class="main-input" @bind="client.bank_cor_schet" min="0">
                     </div>
                 </div>
                 <div class="section-field">
@@ -274,7 +274,7 @@
                     </div>
                     <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label">Расчетный счет</div>
-                        <input type="number" class="main-input" @bind="client.bank_ras_schet">
+                        <input type="number" class="main-input" @bind="client.bank_ras_schet" min="0">
                     </div>
                 </div>
             </div>
@@ -319,11 +319,14 @@
                                         <img src="./icons/drag.png" alt="" class="drag" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
                                         @p?.product?.article
                                     </td>
-                                    <td class="ind-col-lg-3">
-                                        <a href="/product/edit/@p.product.id" class="table-link">
+                                    <td class="ind-col-lg-3 ta-left">
+                                        <a href="/product/edit/@p.product.id" class="product-line">
+                                            <div class="thumb">
+                                                <img src='@("https://industriation.ru/image/"+p.product.image)' />
+                                            </div>
                                             @p?.product?.name
 
-                                            <div class="table-link-modal">
+@*                                            <div class="table-link-modal">
                                                 <div class="ind-col-lg-2">
                                                     <img src='@("https://industriation.ru/image/"+p.product.image)' alt="" class="table-modal-img">
                                                 </div>
@@ -335,7 +338,7 @@
                                                         @p._product_price.Value.ToString("N", NumberMask.GetNi())
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div>*@
                                         </a>
                                     </td>
                                     <td class="ind-col-lg-2">
@@ -343,13 +346,13 @@
                                             От:
                                         </div>
                                         <div class="ind-col-lg-2">
-                                            <input type="number" class="table-input" @bind="p.from_delivery_period">
+                                            <input type="number" class="table-input" @bind="p.from_delivery_period" min="0">
                                         </div>
                                         <div class="ind-col-lg-1">
                                             До:
                                         </div>
                                         <div class="ind-col-lg-2">
-                                            <input type="number" class="table-input" @bind="p.to_delivery_period">
+                                            <input type="number" class="table-input" @bind="p.to_delivery_period" min="0">
                                         </div>
                                         <div class="ind-col-lg-4">
                                             <select name="" id="" class="table-input" @bind="p.delivery_period_type_id">
@@ -381,15 +384,15 @@
                                             <div class="price-modal" tabindex="0">
                                                 <div class="input-label mb-10">Цена</div>
                                                 <div class="row-f ind-col-lg-10">
-                                                    <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" />
+                                                    <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" min="0" />
                                                 </div>
                                                 <div class="input-label mt-10">Дополнительная скидка</div>
                                                 <div class="row-f">
                                                     <div class="ind-col-lg-5 discount-input">
-                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" />₽
+                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" />₽
                                                     </div>
                                                     <div class="ind-col-lg-5 discount-input">
-                                                        <input type="number" class="main-input" @bind="@p.percent_discount" />%
+                                                        <input type="number" class="main-input" @bind="@p.percent_discount" min="0" />%
 
                                                     </div>
                                                 </div>
@@ -427,11 +430,11 @@
                             <label>Разовая скидка</label>
                         </div>
                         <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
-                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex1" type="number" @bind="@current_order_check._ruble_discount">
+                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex1" type="number" min="0" @bind="@current_order_check._ruble_discount">
                             ₽
                         </div>
                         <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
-                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex2" type="number" @bind="@current_order_check._percent_discount">
+                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex2" type="number" min="0" @bind="@current_order_check._percent_discount">
                             %
                         </div>
 
@@ -498,7 +501,7 @@
                         </div>
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Стоимость</div>
-                            <input type="number" step="0.01" class="main-input" @bind="order.delivery._price">
+                            <input type="number" step="0.01" class="main-input" @bind="order.delivery._price" min="0">
                         </div>
 
                         <div class="ind-col-lg-10 input-field">
@@ -531,9 +534,9 @@
         <div class="main-section ind-col-lg-5 ind-col-md-10">
             <div class="main-section-label">Оплата</div>
             <div class="section-field">
-                <input type="number" step="0.01" class="main-input" @bind="pay"></input>
-                <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
-            </div>
+                <input type="number" step="0.01" class="main-input" @bind="pay" min="0"></input>
+        <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
+        </div>
             <div class="input-field">
                 <div class="input-label">Условия оплаты</div>
                 <select type="text" class="main-input" @bind="@order.pay_conditions">

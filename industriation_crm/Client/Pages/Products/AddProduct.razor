@@ -11,43 +11,53 @@
     
     <div class="main-section">
         <div class="main-section-label">Основная информация о продукте</div>
-        <div class="mb-3">
-            <div class="ind-col-lg-5 input-field">
-                <div class="input-label">Наименование</div>
-                <InputText class="main-input" @bind-Value="product.name" />
+        <div class="row-f">
+            <div class="ind-col-lg-3">
+                <div class="ind-col-lg-10">
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Наименование</div>
+                        <InputText class="main-input" @bind-Value="product.name" />
+                    </div>
+                </div>
+                <div class="ind-col-lg-10">
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Артикул</div>
+                        <InputText class="main-input" @bind-Value="product.article" />
+                    </div>
+                </div>
+                <div class="ind-col-lg-10">
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Цена</div>
+                        <InputNumber class="main-input" @bind-Value="product.price" />
+                    </div>
+                </div>
+                <div class="ind-col-lg-10">
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Производитель</div>
+                        <InputText class="main-input" @bind-Value="product.manufacturer" />
+                    </div>
+                </div>
+                <div class="ind-col-lg-10">
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Ед. изм.</div>
+                        <div class="section-field ind-col-lg-5">
+                            <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5" @bind="product.unit">
+                                <option>
+                                    шт
+                                </option>
+                                <option>
+                                    м
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="mb-3">
-            <div class="ind-col-lg-5 input-field">
-                <div class="input-label">Артикул</div>
-                <InputText class="main-input" @bind-Value="product.article" />
-            </div>
-        </div>
-        <div class="mb-3">
-            <div class="ind-col-lg-5 input-field">
-                <div class="input-label">Цена</div>
-                <InputNumber class="main-input" @bind-Value="product.price" />
-            </div>
-        </div>
-        <div class="mb-3">
-            <div class="ind-col-lg-5 input-field">
-                <div class="input-label">Производитель</div>
-                <InputText class="main-input" @bind-Value="product.manufacturer" />
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <div class="ind-col-lg-5 input-field">
-                <div class="input-label">Ед. изм.</div>
-                <div class="section-field ind-col-lg-5">
-                    <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5" @bind="product.unit">
-                        <option>
-                            шт
-                        </option>
-                        <option>
-                            м
-                        </option>
-                    </select>
+            <div class="ind-col-lg-7">
+                <div class="product-thumb">
+                    if(@product.image){
+                     <img src='@("https://industriation.ru/image/"+@product.image)' />
+                    }
                 </div>
             </div>
         </div>

@@ -59,12 +59,18 @@
             <div class="section-field">
                 <div class="ind-col-lg-5 ind-col-md-10">
                     <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Фамилия</div>
-                        <input type="text" class="main-input" @bind-value="main_contact.surname" />
+                        <div class="input-label required">
+                            Фамилия
+                            <div class="req">*</div>
+                        </div>
+                        <input type="text" required class="main-input" @bind-value="main_contact.surname" />
                     </div>
                     <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Имя</div>
-                        <input type="text" class="main-input" @bind-value="main_contact.name" />
+                        <div class="input-label required">
+                            Имя
+                            <div class="req">*</div>
+                        </div>
+                        <input type="text" required class="main-input" @bind-value="main_contact.name" />
                     </div>
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">Отчество</div>
@@ -85,12 +91,15 @@
                         <input type="email" class="main-input" @bind-value="main_contact.dop_email" />
                     </div>
                     <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Телефон</div>
-                        <input type="tel" class="main-input" @bind-value="main_contact.phone" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
                         <div class="input-label">ФИО получателя</div>
                         <input type="tel" class="main-input" @bind-value="client.delivery_cont" />
+                    </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label required">
+                            Телефон
+                            <div class="req">*</div>
+                        </div>
+                        <input type="tel" maxlength="20" required class="main-input" @bind-value="main_contact.phone" data-value="" />
                     </div>
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">Телефон получателя</div>
@@ -117,22 +126,25 @@
                     </div>
                     <div class="ind-col-lg-5 ind-col-md-10">
                         <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">ИНН</div>
-                            <input type="number" class="main-input" @bind-value="client.org_inn" />
+                            <div class="input-label required">
+                                ИНН
+                                <div class="req">*</div>
+                            </div>
+                            <input type="number" required min="0" class="main-input" @bind-value="client.org_inn" />
                             <button class="close dadata" @onclick="GetClientByDaData" type="button">D</button>
                         </div>
                         @if (client.client_type == 1)
                         {
                             <div class="ind-col-lg-10 input-field">
                                 <div class="input-label">ОГРН</div>
-                                <input type="number" class="main-input" @bind-value="client.org_ogrn" />
+                                <input type="number" min="0" class="main-input" @bind-value="client.org_ogrn" />
                             </div>
                         }
                         else if (client.client_type == 2)
                         {
                             <div class="ind-col-lg-10 input-field">
                                 <div class="input-label">ОГРНИП</div>
-                                <input type="number" class="main-input" @bind-value="client.org_ogrnip" />
+                                <input type="number" min="0" class="main-input" @bind-value="client.org_ogrnip" />
                             </div>
                         }
                     </div>
@@ -141,7 +153,7 @@
                         <div class="ind-col-lg-5 ind-col-md-10">
                             <div class="ind-col-lg-10 input-field">
                                 <div class="input-label">КПП</div>
-                                <input type="number" class="main-input" @bind-value="client.org_kpp" />
+                                <input type="number" min="0" class="main-input" @bind-value="client.org_kpp" />
                             </div>
                         </div>
                     }
@@ -153,7 +165,7 @@
                     <div class="ind-col-lg-5 ind-col-md-10">
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">БИК</div>
-                            <input type="number" class="main-input" @bind="client.bank_bik" />
+                            <input type="number" min="0" class="main-input" @bind="client.bank_bik" />
                         </div>
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Наименование банка</div>
@@ -163,11 +175,11 @@
                     <div class="ind-col-lg-5 ind-col-md-10">
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Корреспондентский счет</div>
-                            <input type="number" class="main-input" @bind="client.bank_cor_schet" />
+                            <input type="number" min="0" class="main-input" @bind="client.bank_cor_schet" />
                         </div>
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Расчетный счет</div>
-                            <input type="number" class="main-input" @bind="client.bank_ras_schet" />
+                            <input type="number" min="0" class="main-input" @bind="client.bank_ras_schet" />
                         </div>
                     </div>
                 </div>
@@ -274,7 +286,6 @@
     protected int? main_contact_id { get; set; }
 
     protected int? role;
-
 
     protected int GetClientDiscount
     {
