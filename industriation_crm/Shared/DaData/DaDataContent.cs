@@ -22,10 +22,15 @@ namespace industriation_crm.Shared.DaData
         public string? ogrn { get; set; }
         public string? kpp { get; set; }
         public address? address { get; set; }
+        public name? name { get; set; }
     }
     public class address
     {
         public string? value { get; set; }
+    }
+    public class name
+    {
+        public string? full_with_opf { get; set;}
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using industriation_crm.Server.Interfaces;
+﻿using Duende.IdentityServer.Extensions;
+using industriation_crm.Server.Interfaces;
 using industriation_crm.Server.Models;
 using industriation_crm.Server.Retail;
 using industriation_crm.Shared.FilterModels;
@@ -33,19 +34,29 @@ namespace industriation_crm.Server.Services
             {
                 ProductReturnData productReturnData = new ProductReturnData();
                 List<product> products = new();
-                int count = 0;
+                var query = _dbContext.product.Where(p=>p != null);
+                if (!String.IsNullOrEmpty(productFilter.name))
+                {
+                    query = query.Where(p=>p.name.Contains(productFilter.name));
+                }
+                if (!String.IsNullOrEmpty(productFilter.article))
+                {
+                    query = query.Where(p => p.article.Contains(productFilter.article));
+                }
+                if(productFilter.price_from != null && productFilter.price_from > 0)
+                {
+                    query = query.Where(p => p.price >= productFilter.price_from);
+                }
+                if (productFilter.price_to != null)
+                {
+                    query = query.Where(p => p.price <= productFilter.price_to);
+                }
                 if (productFilter.category_id != 1)
                 {
-                    count = _dbContext.product.Where(p => productFilter.child_categories.Contains(p.category_id) && p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Count();
-                    products = _dbContext.product.Where(p => productFilter.child_categories.Contains(p.category_id) && p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Skip(productFilter.product_on_page * (productFilter.current_page - 1)).Take(productFilter.product_on_page).ToList();
+                    query = query.Where(p => productFilter.child_categories.Contains(p.category_id));
                 }
-                else
-                {
-                    count = _dbContext.product.Where(p =>  p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Count();
-                    products = _dbContext.product.Where(p =>  p.price >= productFilter.price_from && p.price <= productFilter.price_to && p.article.Contains(productFilter.article) && p.name.Contains(productFilter.name)).Skip(productFilter.product_on_page * (productFilter.current_page - 1)).Take(productFilter.product_on_page).ToList();
-                }
-                productReturnData.count = count;
-                productReturnData.products = products.ToList();
+                productReturnData.count = query.Count();
+                productReturnData.products = query.Skip(productFilter.product_on_page * (productFilter.current_page - 1)).Take(productFilter.product_on_page).ToList();
 
                 return productReturnData;
             }

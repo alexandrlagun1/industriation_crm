@@ -199,11 +199,6 @@ else
         productFilter.product_on_page = count_on_page;
         productFilter.category_id = currentCategory.id;
 
-        if (productFilter.price_to == null)
-            productFilter.price_to = 10000000;
-        if (productFilter.price_from == null)
-            productFilter.price_from = 0;
-
         var response = await Http.PostAsJsonAsync("api/Product/FindByFilter", productFilter);
         var responseBody = await response.Content.ReadAsStringAsync();
         ProductReturnData? productReturnData = JsonConvert.DeserializeObject<ProductReturnData>(responseBody);

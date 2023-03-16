@@ -30,7 +30,10 @@ namespace industriation_crm.Server.Controllers.DaData
             }
             
             client.org_ogrn = Convert.ToInt64(daDataContent?.suggestions?[0]?.data?.ogrn);
-            client.org_name = daDataContent?.suggestions?[0]?.value;
+            if (String.IsNullOrEmpty(daDataContent?.suggestions?[0]?.data?.name?.full_with_opf))
+                client.org_name = daDataContent?.suggestions?[0]?.value;
+            else
+                client.org_name = daDataContent?.suggestions?[0]?.data?.name?.full_with_opf;
             client.org_address = daDataContent?.suggestions?[0]?.data?.address?.value;
             client.org_kpp = Convert.ToInt64(daDataContent?.suggestions?[0]?.data?.kpp);
             return client;

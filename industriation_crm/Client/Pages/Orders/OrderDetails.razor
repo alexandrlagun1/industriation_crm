@@ -131,6 +131,42 @@ else
                 <input type="date" @bind="ordersFilter.order_date_to" class="main-input ind-col-lg-5"></input>
             </div>
         </div>
+        <div class="section-field ind-col-lg-10">
+            <div class="ind-col-lg-5 input-field ind-col-md-10">
+                <div class="input-label ind-col-lg-5">
+                    Дата отгрузки от:
+                </div>
+                <input type="date" @bind="ordersFilter.delivey_from" class="main-input ind-col-lg-5"></input>
+            </div>
+            <div class="ind-col-lg-5 input-field ind-col-md-10">
+                <div class="input-label ind-col-lg-5">
+                    Дата отгрузки до:
+                </div>
+                <input type="date" @bind="ordersFilter.delivey_to" class="main-input ind-col-lg-5"></input>
+            </div>
+        </div>
+        <div class="section-field ind-col-lg-10">
+            <div class="ind-col-lg-5 input-field ind-col-md-10">
+                <div class="input-label ind-col-lg-5">
+                    Дата оплаты:
+                </div>
+                <input type="date" @bind="ordersFilter.pay_from" class="main-input ind-col-lg-5"></input>
+            </div>
+            <div class="ind-col-lg-5 input-field ind-col-md-10">
+                <div class="input-label ind-col-lg-5">
+                    Артикул товара в заказе:
+                </div>
+                <input @bind="ordersFilter.product_article" class="main-input ind-col-lg-5"></input>
+            </div>
+        </div>
+        <div class="section-field ind-col-lg-10">
+            <div class="ind-col-lg-5 input-field ind-col-md-10">
+                <div class="input-label ind-col-lg-5">
+                    Email клиента:
+                </div>
+                <input @bind="ordersFilter.client_email" class="main-input ind-col-lg-5"></input>
+            </div>
+        </div>
         <button @onclick="GetOrders" class="score mb-20 mt-20">Поиск</button>
         <div class="section-field">
             <table class="order-table ind-col-lg-10">
@@ -162,13 +198,13 @@ else
                                     @order.id
                                 </a>
                             </td>
-                            <td class="ind-col-lg-2">@order.main_contact?.full_name</td>
+                            <td class="ind-col-lg-2"><a href="/contact/edit/@order.client_id/@order.main_contact?.id/false" target="_blank">@order.main_contact?.full_name</a>  </td>
                             @if (role == 1)
                             {
                                 <td class="ind-col-lg-2">
-                                    @if (@order.client?.client_type == 1)
+                                    @if (@order.client?.client_type == 1 || @order.client?.client_type == 2)
                                     {
-                                        @order.client?.org_name
+                                        <a href="/client/edit/@order.client?.id" target="_blank">@order.client?.org_name</a>  
                                     }
                                     @if (@order.client?.client_type == 0)
                                     {

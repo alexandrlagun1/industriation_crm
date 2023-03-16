@@ -46,7 +46,7 @@ builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddRazorPages();
 
-
+builder.Services.AddLocalization();
 //Авторизация
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
@@ -85,6 +85,10 @@ app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseRequestLocalization(new RequestLocalizationOptions()
+    .AddSupportedCultures(new[] { "ru-RU" })
+    .AddSupportedUICultures(new[] { "ru-RU" }));
 
 //Авторизация
 app.UseCors("CorsSpecs");

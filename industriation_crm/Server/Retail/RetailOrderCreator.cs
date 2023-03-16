@@ -63,7 +63,7 @@ namespace industriation_crm.Server.Retail
                 delivery_type = "dostavka-do-terminala-tk";
             }
 
-            if (client.client_type == 1)
+            if (client.client_type == 1 || client.client_type == 2)
             {
                 order_type = "eshop-legal";
                 contragent_type = "legal-entity";
@@ -78,12 +78,17 @@ namespace industriation_crm.Server.Retail
             if (order.delivery.shipment_date != null)
                 date = "\"date\":\"" + order.delivery.shipment_date.Value.ToString("yyyy-MM-dd") + "\",";
 
-            int client_id = GetClient(client.org_inn);
-            string customer = "";
+            int client_id = 0;
+            if((client.client_type == 1 || client.client_type == 2) && client.org_inn != null)
+                client_id = GetClient(client.org_inn);
 
+            string customer = "";
             if (client_id != 0)
                 customer = "\"customer\":{\"id\":" + client_id + "},";
 
+            string contragent = "";
+            if (client.client_type == 1 || client.client_type == 2)
+                contragent = ",\"contragent\":{\"contragentType\":\"" + contragent_type + "\",\"INN\":\"" + client.org_inn + "\",\"OGRN\":\"" + client.org_ogrn + "\", \"KPP\": \"" + client.org_kpp + "\",\"legalName\":\"" + client?.org_name?.Replace("\"", "'") + "\", \"legalAddress\":\"" + client?.org_address?.Replace("\"", "'") + "\",\"BIK\":\"" + client?.bank_bik + "\",\"bank\":\"" + client?.bank_name?.Replace("\"", "'") + "\",\"corrAccount\":\"" + client?.bank_cor_schet + "\",\"bankAccount\":\"" + client?.bank_ras_schet + "\"}";
             dict.Add("order",
                 "{" +
                 customer
@@ -95,8 +100,8 @@ namespace industriation_crm.Server.Retail
                 + "\",\"externalId\":\"" + order.id + "C"
                 + "\",\"orderType\":\"" + order_type
                 + "\",\"phone\":\"" + contact?.phone
-                + "\",\"email\":\"" + contact?.email
-                + "\",\"contragent\":{\"contragentType\":\"" + contragent_type + "\",\"INN\":\"" + client.org_inn + "\",\"OGRN\":\"" + client.org_ogrn + "\", \"KPP\": \"" + client.org_kpp + "\",\"legalName\":\"" + client?.org_name?.Replace("\"", "'") + "\", \"legalAddress\":\"" + client?.org_address?.Replace("\"", "'") + "\",\"BIK\":\"" + client?.bank_bik + "\",\"bank\":\"" + client?.bank_name?.Replace("\"", "'") + "\",\"corrAccount\":\"" + client?.bank_cor_schet + "\",\"bankAccount\":\"" + client?.bank_ras_schet + "\"}"
+                + "\",\"email\":\"" + contact?.email + "\""
+                + contragent
                 + ",\"delivery\":{\"code\":\"" + delivery_type + "\"," + date + "\"address\": {\"text\":\"" + order.delivery.address + "\"}}"
                 + ",\"items\":[" + items + "]"
                 + "}");
@@ -166,11 +171,17 @@ namespace industriation_crm.Server.Retail
             if (order.delivery.shipment_date != null)
                 date = "\"date\":\"" + order.delivery.shipment_date.Value.ToString("yyyy-MM-dd") + "\",";
 
-            int client_id = GetClient(client.org_inn);
-            string customer = "";
+            int client_id = 0;
+            if ((client.client_type == 1 || client.client_type == 2) && client.org_inn != null)
+                client_id = GetClient(client.org_inn);
 
+            string customer = "";
             if (client_id != 0)
-                customer = "{\"customer\":{\"id\":" + client_id + "},";
+                customer = "\"customer\":{\"id\":" + client_id + "},";
+
+            string contragent = "";
+            if (client.client_type == 1 || client.client_type == 2)
+                contragent = ",\"contragent\":{\"contragentType\":\"" + contragent_type + "\",\"INN\":\"" + client.org_inn + "\",\"OGRN\":\"" + client.org_ogrn + "\", \"KPP\": \"" + client.org_kpp + "\",\"legalName\":\"" + client?.org_name?.Replace("\"", "'") + "\", \"legalAddress\":\"" + client?.org_address?.Replace("\"", "'") + "\",\"BIK\":\"" + client?.bank_bik + "\",\"bank\":\"" + client?.bank_name?.Replace("\"", "'") + "\",\"corrAccount\":\"" + client?.bank_cor_schet + "\",\"bankAccount\":\"" + client?.bank_ras_schet + "\"}";
 
             dict.Add("order",
                 customer + "\"firstName\":\"" + contact?.name
@@ -178,8 +189,8 @@ namespace industriation_crm.Server.Retail
                 + "\",\"patronymic\":\"" + contact?.patronymic
                 + "\",\"orderType\":\"" + order_type
                 + "\",\"phone\":\"" + contact?.phone
-                + "\",\"email\":\"" + contact?.email
-                + "\",\"contragent\":{\"contragentType\":\"" + contragent_type + "\",\"INN\":\"" + client.org_inn + "\",\"OGRN\":\"" + client.org_ogrn + "\", \"KPP\": \"" + client.org_kpp + "\",\"legalName\":\"" + client?.org_name?.Replace("\"", "'") + "\", \"legalAddress\":\"" + client?.org_address + "\",\"BIK\":\"" + client?.bank_bik + "\",\"bank\":\"" + client?.bank_name + "\",\"corrAccount\":\"" + client?.bank_cor_schet + "\",\"bankAccount\":\"" + client?.bank_ras_schet + "\"}"
+                + "\",\"email\":\"" + contact?.email + "\""
+                + contragent
                 + ",\"delivery\":{\"code\":\"" + delivery_type + "\"," + date + "\"address\": {\"text\":\"" + order.delivery.address + "\"}}"
                 + ",\"items\":[" + items + "]"
                 + "}");

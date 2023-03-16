@@ -103,7 +103,7 @@ namespace industriation_crm.Shared.Models
                 if (product_To_Orders == null)
                     return null;
                 else
-                    return product_To_Orders?.Where(p => p.is_delete_from_order == false).Select(p => p._total_price).Sum();
+                    return Math.Round(Convert.ToDouble(product_To_Orders?.Where(p => p.is_delete_from_order == false).Select(p => p._total_price).Sum()), 2);
             }
         }
 
@@ -613,7 +613,7 @@ namespace industriation_crm.Shared.Models
             get
             {
                 if (product_price != null)
-                    return product_price;
+                    return Math.Round(Convert.ToDouble(product_price), 2);
                 else
                     return 0;
             }
@@ -674,7 +674,7 @@ namespace industriation_crm.Shared.Models
             {
                 if (price == null)
                     return 0;
-                return price;
+                return Math.Round(Convert.ToDouble(price), 2);
             }
             set
             {

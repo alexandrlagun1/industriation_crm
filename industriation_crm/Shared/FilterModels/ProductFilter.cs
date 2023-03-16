@@ -14,10 +14,10 @@ namespace industriation_crm.Shared.FilterModels
     }
     public class ProductFilter
     {
-        public string? name { get; set; } = "";
-        public string? article { get; set; } = "";
-        public double? price_from { get; set; } = 0;
-        public double? price_to { get; set; } = 10000000;
+        public string? name { get; set; }
+        public string? article { get; set; }
+        public double? price_from { get; set; }
+        public double? price_to { get; set; }
         public int current_page { get; set; }
         public int product_on_page { get; set; }
         public int category_id { get; set; }
