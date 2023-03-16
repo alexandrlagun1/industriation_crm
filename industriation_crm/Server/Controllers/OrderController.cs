@@ -47,7 +47,7 @@ namespace industriation_crm.Server.Controllers
         {
 
             int order_id = _IOrder.AddOrder(order);
-            if (order?.retail_synchro == true)
+            if (order?.retail_synchro == true && order?.user_id != 17)
                 RetailOrderCreator.CreateOrder(order);
             return order_id;
         }

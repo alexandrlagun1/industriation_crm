@@ -403,7 +403,7 @@
                                         }
                                     </td>
 
-                                    <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" /></td>
+                                    <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" min="0"/></td>
                                     <td class="ind-col-lg-1">@p?._discount_total_price.Value.ToString("N", NumberMask.GetNi()) ₽</td>
                                     <td class="ind-col-lg-1">
                                         @p?._total_price.Value.ToString("N", NumberMask.GetNi()) ₽
