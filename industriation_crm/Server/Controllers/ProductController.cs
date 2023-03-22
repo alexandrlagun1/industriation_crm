@@ -2,6 +2,7 @@
 using industriation_crm.Shared.Models;
 using industriation_crm.Shared.FilterModels;
 using Microsoft.AspNetCore.Mvc;
+using industriation_crm.Server.Retail;
 
 namespace industriation_crm.Server.Controllers
 {
@@ -28,6 +29,7 @@ namespace industriation_crm.Server.Controllers
         public void Post(product product)
         {
             _IProduct.AddProduct(product);
+            RetailOrderCreator.AddProduct(product);
         }
         [HttpPut]
         public void Put(product product)

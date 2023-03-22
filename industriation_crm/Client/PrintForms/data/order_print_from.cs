@@ -23,6 +23,7 @@ namespace industriation_crm.Client.PrintForms
         public string? fio { get; set; } = "Отдел продаж";
         public string? phone { get; set; } = "8 800 550-72-52";
         public string? email { get; set; } = "info@industriation.ru";
+        public string? currency { get; set; } = "рублейй";
 
     }
     public class order_data

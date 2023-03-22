@@ -151,7 +151,11 @@ namespace industriation_crm.Server.Services
             OrdersReturnData ordersReturnData = new OrdersReturnData();
             try
             {
-                var query = _dbContext.order.Where(o => o.order_Checks.Where(c => c.product_To_Orders.Select(p => p.product).Where(p => p.article.Contains(ordersFilter.product_article)).FirstOrDefault() != null).FirstOrDefault() != null && o.stage_id >= ordersFilter.stage && ordersFilter.pay_status.Contains(o.pay_status) && ordersFilter.managers.Contains(o.user) && ordersFilter.order_status.Contains(o.order_status) && o.main_contact.full_name.Contains(ordersFilter.client) );
+                var query = _dbContext.order.Where(o => o.stage_id >= ordersFilter.stage && ordersFilter.pay_status.Contains(o.pay_status) && ordersFilter.managers.Contains(o.user) && ordersFilter.order_status.Contains(o.order_status));
+                if(!String.IsNullOrEmpty(ordersFilter.product_article))
+                    query = query.Where(o => o.order_Checks.Where(c => c.product_To_Orders.Select(p => p.product).Where(p => p.article.Contains(ordersFilter.product_article)).FirstOrDefault() != null).FirstOrDefault() != null);
+                if (ordersFilter.client != null)
+                    query = query.Where(o=>o.main_contact.full_name.Contains(ordersFilter.client));
                 if (ordersFilter.pay_from != null)
                     query = query.Where(o => o.order_Pays.Where(p => p.date >= ordersFilter.pay_from).FirstOrDefault() != null);
                 if (ordersFilter.order_id != null)
@@ -164,8 +168,8 @@ namespace industriation_crm.Server.Services
                     query = query.Where(o => o.delivery.shipment_date >= ordersFilter.delivey_from);
                 if (ordersFilter.delivey_to != null)
                     query = query.Where(o => o.delivery.shipment_date <= ordersFilter.delivey_to);
-                //if(String.IsNullOrEmpty(ordersFilter.client_email))
-                //    query = query.Where(o => o.client.contacts.Select(c=>c.email).Contains(ordersFilter.client_email));
+                if (!String.IsNullOrEmpty(ordersFilter.client_email))
+                    query = query.Where(o => o.client.contacts.Select(c => c.email).Contains(ordersFilter.client_email));
                 ordersReturnData.count = query.Count();
                 ordersReturnData.orders = query
                     .Include(o => o.user).Include(o => o.client).Include(o => o.order_status).Include(o => o.main_contact).Include(o => o.stage).Include(o => o.supplier_manager).Include(o => o.pay_status)

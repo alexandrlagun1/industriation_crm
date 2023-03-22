@@ -86,9 +86,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseRequestLocalization(new RequestLocalizationOptions()
-    .AddSupportedCultures(new[] { "ru-RU" })
-    .AddSupportedUICultures(new[] { "ru-RU" }));
+//app.UseRequestLocalization(new RequestLocalizationOptions()
+//    .AddSupportedCultures(new[] { "ru-RU" })
+//    .AddSupportedUICultures(new[] { "ru-RU" }));
 
 //Авторизация
 app.UseCors("CorsSpecs");

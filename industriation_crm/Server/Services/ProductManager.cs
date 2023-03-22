@@ -21,6 +21,8 @@ namespace industriation_crm.Server.Services
             {
                 _dbContext.product.Add(product);
                 _dbContext.SaveChanges();
+                product.external_id = product.id + 1000000;
+                _dbContext.SaveChanges();
             }
             catch
             {

@@ -55,7 +55,7 @@
             </div>
             <div class="ind-col-lg-7">
                 <div class="product-thumb">
-                    if(@product.image){
+                    @if(!String.IsNullOrEmpty(@product.image)){
                      <img src='@("https://industriation.ru/image/"+@product.image)' />
                     }
                 </div>

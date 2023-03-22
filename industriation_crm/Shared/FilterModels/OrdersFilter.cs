@@ -10,8 +10,8 @@ namespace industriation_crm.Shared.FilterModels
     public class OrdersFilter
     {
         public List<user?>? managers { get; set; } = new();
-        public string? client { get; set; } = "";
-        public string? product_article { get; set; } = "";
+        public string? client { get; set; }
+        public string? product_article { get; set; }
         public string? client_email { get; set; }
         public List<order_status>? order_status { get; set; }
         public List<pay_status>? pay_status { get; set; }

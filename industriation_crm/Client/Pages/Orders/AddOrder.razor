@@ -303,7 +303,14 @@
                             <td class="ind-col-lg-1">Артикул продукта</td>
                             <td class="ind-col-lg-3">Наименование</td>
                             <td class="ind-col-lg-2">Срок доставки</td>
-                            <td class="ind-col-lg-1">Цена</td>
+                            <td class="ind-col-lg-1">
+                                Цена
+                                <select name="" id="" class="table-input" @bind="current_order_check.currency">
+                                    <option>₽</option>
+                                    <option>$</option>
+                                    <option>€</option>
+                                </select>
+                                </td>
                             <td class="ind-col-lg-1">Количество</td>
                             <td class="ind-col-lg-1">Скидка</td>
                             <td class="ind-col-lg-1">Стоимость</td>
@@ -314,9 +321,9 @@
                         {
                             @foreach (var p in current_order_check!.product_To_Orders.Where(pr => pr.is_delete_from_order == false).OrderBy(p => p.product_postition))
                             {
-                                <tr class="order-row">
-                                    <td class="ind-col-lg-1" id="model">
-                                        <img src="./icons/drag.png" alt="" class="drag" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
+                            <tr class="order-row" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
+                                    <td class="ind-col-lg-1" id="model" draggable="false" ondragstart="event.preventDefault()">
+                                        <img src="./icons/drag.png" alt="" class="drag">
                                         @p?.product?.article
                                     </td>
                                     <td class="ind-col-lg-3 ta-left">
@@ -367,15 +374,15 @@
                                         <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">
                                             @if (p.ruble_discount == 0 && p.percent_discount == 0)
                                             {
-                                                <span>@p._product_price.Value.ToString("N", NumberMask.GetNi()) ₽</span>
+                                                <span>@p._product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</span>
                                             }
                                             else
                                             {
                                                 <div class="prev-price">
-                                                    @p._product_price.Value.ToString("N", NumberMask.GetNi()) ₽
+                                                    @p._product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
                                                 </div>
                                                 <div class="price-with-discount">
-                                                    @p._product_price_with_discount.Value.ToString("N", NumberMask.GetNi()) ₽
+                                                    @p._product_price_with_discount.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
                                                 </div>
                                             }
                                         </button>
@@ -389,7 +396,7 @@
                                                 <div class="input-label mt-10">Дополнительная скидка</div>
                                                 <div class="row-f">
                                                     <div class="ind-col-lg-5 discount-input">
-                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" />₽
+                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" />@current_order_check.currency
                                                     </div>
                                                     <div class="ind-col-lg-5 discount-input">
                                                         <input type="number" class="main-input" @bind="@p.percent_discount" min="0" />%
@@ -404,9 +411,9 @@
                                     </td>
 
                                     <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" min="0"/></td>
-                                    <td class="ind-col-lg-1">@p?._discount_total_price.Value.ToString("N", NumberMask.GetNi()) ₽</td>
+                                    <td class="ind-col-lg-1">@p?._discount_total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</td>
                                     <td class="ind-col-lg-1">
-                                        @p?._total_price.Value.ToString("N", NumberMask.GetNi()) ₽
+                                        @p?._total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
                                         <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
                                             <img src="./icons/delete-icon.svg" class="delete-button">
                                         </button>
@@ -431,7 +438,7 @@
                         </div>
                         <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
                             <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex1" type="number" min="0" @bind="@current_order_check._ruble_discount">
-                            ₽
+                            @current_order_check.currency
                         </div>
                         <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
                             <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex2" type="number" min="0" @bind="@current_order_check._percent_discount">
@@ -452,7 +459,7 @@
                                 Стоимость товаров:
                             </div>
                             <div class="ind-col-lg-3" style="text-align: right;">
-                                @current_order_check?._total_product_price.Value.ToString("N", NumberMask.GetNi()) ₽
+                                @current_order_check?._total_product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
                             </div>
                         </div>
                     </div>
@@ -463,7 +470,7 @@
                                 Стоимость доставки:
                             </div>
                             <div class="ind-col-lg-3" style="text-align: right;">
-                                @order.delivery._price.Value.ToString("N", NumberMask.GetNi()) ₽
+                                @order.delivery._price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
                             </div>
                         </div>
                     </div>
@@ -474,7 +481,7 @@
                                 Итог:
                             </div>
                             <div class="ind-col-lg-3" style="text-align: right;">
-                                @order.products_with_delivery_price.Value.ToString("N", NumberMask.GetNi()) ₽
+                                @order.products_with_delivery_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
                             </div>
                         </div>
                     </div>
@@ -553,7 +560,7 @@
             }
             <div class="input-field">
                 <div class="input-label">К оплате:</div>
-                <label>@order._price_summ.Value.ToString("N", NumberMask.GetNi()) ₽</label>
+                <label>@order._price_summ.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</label>
             </div>
             <hr class="custom-hr" />
 
@@ -571,7 +578,7 @@
                         <div class="input-label">
                             Сумма
                         </div>
-                        <label>@p.price ₽</label>
+                        <label>@p.price @current_order_check.currency</label>
                     </div>
                     @*<div class="input-field">
             <div class="input-label">

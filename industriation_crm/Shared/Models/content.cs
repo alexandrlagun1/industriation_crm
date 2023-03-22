@@ -49,6 +49,7 @@ namespace industriation_crm.Shared.Models
         public double? ruble_discount { get; set; }
         public double? price_summ { get; set; }
         public double? current_pay_summ { get; set; }
+        public string? currency { get; set; } = "₽";
         public int? current { get; set; } = 0;
         public int? order_id { get; set; }
         public int? is_pay { get; set; }

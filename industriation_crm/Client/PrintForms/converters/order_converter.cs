@@ -1,5 +1,6 @@
 ﻿
 using industriation_crm.Shared.Models;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace industriation_crm.Client.PrintForms
@@ -31,6 +32,11 @@ namespace industriation_crm.Client.PrintForms
             {
                 order_Print_From.order_data.driving_directions = "";
             }
+            if (order?._current_check.currency == "$")
+                order_Print_From.currency = "долларов";
+            if (order?._current_check.currency == "€")
+                order_Print_From.currency = "евро";
+
             order_Print_From.order_data.simpla.inn = order.client?.org_inn.ToString();
             order_Print_From.order_data.simpla.kpp = order.client?.org_kpp.ToString();
             order_Print_From.order_data.simpla.address = order.client?.org_address;
