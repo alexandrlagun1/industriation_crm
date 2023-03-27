@@ -66,10 +66,9 @@ function customScroll() {
 //                e.target.setAttribute('data-value', e.target.value);
 //                console.log(e.target.value);
 //            });
-            
+
 //        }
 //    }
 
 //    validPhone();
 //});
-
