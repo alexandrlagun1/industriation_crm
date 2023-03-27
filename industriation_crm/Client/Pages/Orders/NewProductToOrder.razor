@@ -97,6 +97,7 @@
                         <tbody class="ind-col-lg-10">
                             @foreach (var p in productPackages)
                             {
+                                
                                 <tr class="order-row">
                                     <td class="ind-col-lg-1">@p.product.article</td>
                                     <td class="ind-col-lg-4">@p.product.name</td>
@@ -202,6 +203,7 @@
     protected async Task AddProduct(ProductPackage productPackage)
     {
         product_to_order product_To_Order = new product_to_order();
+        product_To_Order.tr_class = "product_new";
         product_To_Order.product_id = productPackage.product.id;
         //product_To_Order.order_id = orderId;
         product_To_Order.count = productPackage.count;
