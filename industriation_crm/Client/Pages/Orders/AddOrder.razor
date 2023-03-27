@@ -134,7 +134,6 @@
                         @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
 
 
-
                     </a>
                     <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
@@ -144,25 +143,17 @@
                         <label class="@contactClass" for="btnradio2">Контактные лица</label>
                     </div>
                 </div>
-            @if (viewContacts == false)
+                @if (viewContacts == false)
             {
                 <div class="section-field">
                     <div class="ind-col-lg-5 ind-col-md-10">
                         <div class="ind-col-lg-10 input-field">
-                            <div class="input-label required">
-                                Фамилия
-                                <div class="req">*</div>
-                            </div>
-
-                            <input type="text" required class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
+                            <div class="input-label">Фамилия</div>
+                            <input type="text" class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
                         </div>
                         <div class="ind-col-lg-10 input-field">
-                            <div class="input-label required">
-                                Имя
-                                <div class="req">*</div>
-                            </div>
-
-                            <input type="text" required class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
+                            <div class="input-label">Имя</div>
+                            <input type="text" class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
                         </div>
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Отчество</div>
@@ -175,11 +166,8 @@
                             <input type="email" class="main-input" value="@order?.main_contact?.email" @oninput="@((ChangeEventArgs e) => {order.main_contact.email = e.Value.ToString();clientChange = true;})">
                         </div>
                         <div class="ind-col-lg-10 input-field">
-                            <div class="input-label required">
-                                Номер телефона
-                            <div class="req">*</div>    
-                            </div>
-                            <input type="tel" required class="main-input" value="@order?.main_contact?.phone" @oninput="@((ChangeEventArgs e) => {order.main_contact.phone = e.Value.ToString();clientChange = true;})">
+                            <div class="input-label">Номер телефона</div>
+                            <input type="tel" class="main-input" value="@order?.main_contact?.phone" @oninput="@((ChangeEventArgs e) => {order.main_contact.phone = e.Value.ToString();clientChange = true;})">
                         </div>
                     </div>
                 </div>
@@ -235,12 +223,8 @@
                         <input type="text" class="main-input" @bind="client.org_name">
                     </div>
                     <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label required">
-                            ИНН
-                        <div class="req">*</div>   
-                        </div>
-                        
-                        <input type="number" required class="main-input" @bind="client.org_inn" min="0">
+                        <div class="input-label">ИНН</div>
+                        <input type="number" class="main-input" @bind="client.org_inn" min="0">
                     </div>
                 </div>
                 <div class="section-field">
@@ -352,22 +336,22 @@
                                             </div>
                                             @p?.product?.name
 
-                                            @*<div class="table-link-modal">
-                                <div class="ind-col-lg-2">
-                                <img src='@("https://industriation.ru/image/"+p.product.image)' alt="" class="table-modal-img">
-                                </div>
-                                <div class="ind-col-lg-8">
-                                <div class="table-modal-title">
-                                @p?.product?.name
-                                </div>
-                                <div class="table-modal-price">
-                                @p._product_price.Value.ToString("N", NumberMask.GetNi())
-                                </div>
-                                </div>
-                                </div>*@
+@*                                            <div class="table-link-modal">
+                                                <div class="ind-col-lg-2">
+                                                    <img src='@("https://industriation.ru/image/"+p.product.image)' alt="" class="table-modal-img">
+                                                </div>
+                                                <div class="ind-col-lg-8">
+                                                    <div class="table-modal-title">
+                                                        @p?.product?.name
+                                                    </div>
+                                                    <div class="table-modal-price">
+                                                        @p._product_price.Value.ToString("N", NumberMask.GetNi())
+                                                    </div>
+                                                </div>
+                                            </div>*@
                                         </a>
                                     </td>
-                                    <td class="ind-col-lg-2" data-attr="td-nondrag">
+                                    <td class="ind-col-lg-2">
                                         <div class="ind-col-lg-1">
                                             От:
                                         </div>
@@ -389,7 +373,7 @@
                                             </select>
                                         </div>
                                     </td>
-                                    <td class="ind-col-lg-1" data-attr="td-nondrag">
+                                    <td class="ind-col-lg-1">
                                         <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">
                                             @if (p.ruble_discount == 0 && p.percent_discount == 0)
                                             {
@@ -521,12 +505,8 @@
                             </select>
                         </div>
                         <div class="ind-col-lg-10 input-field">
-                            <div class="input-label required">
-                                Зафиксированная дата отгрузки на момент оплаты
-                                <div class="req">*</div>    
-                            </div>
-
-                            <input type="date" required class="main-input" @bind="@order.delivery.shipment_date">
+                            <div class="input-label">Зафиксированная дата отгрузки на момент оплаты</div>
+                            <input type="date" class="main-input" @bind="@order.delivery.shipment_date">
                         </div>
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Стоимость</div>
@@ -564,8 +544,8 @@
             <div class="main-section-label">Оплата</div>
             <div class="section-field">
                 <input type="number" step="0.01" class="main-input" @bind="pay" min="0"></input>
-                <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
-            </div>
+        <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
+        </div>
             <div class="input-field">
                 <div class="input-label">Условия оплаты</div>
                 <select type="text" class="main-input" @bind="@order.pay_conditions">
@@ -703,7 +683,7 @@
             StateHasChanged();
         });
 
-        ChangeParaContentActionAsync = LocalChangeParaContentValueAsync;
+
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         role = Convert.ToInt32(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role).Value);
         user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
@@ -784,7 +764,7 @@
 
         if (order?.id != 0)
         {
-            await Http.PutAsJsonAsync("api/Order", order);
+            await PutOrder();
         }
         else
         {
@@ -866,40 +846,18 @@
         }
     }
 
-    private static Func<JsonElement[], Task> ChangeParaContentActionAsync;
-    private async Task LocalChangeParaContentValueAsync(JsonElement[] arr1)
-    {
-        for (int i = 0; i < arr1.Count(); i++)
-        {
-            var oldPostition = Convert.ToInt32(arr1[i].GetString());
-            current_order_check.product_To_Orders.Where(p => p.product_postition == oldPostition).FirstOrDefault().new_position = i+1;
-
-        }
-        foreach(var p in current_order_check.product_To_Orders){
-            p.product_postition = p.new_position;
-        }
-        StateHasChanged();
-    }
-    [JSInvokable]
-    public static async Task Test(JsonElement[] arr1, JsonElement[] arr2)
-    {
-        await ChangeParaContentActionAsync?.Invoke(arr1);
-
-    }
     //Методы Drag&Drop
 
     protected void OnDragStart(product_to_order _product_to_order)
     {
         drag_product_to_order = _product_to_order;
     }
-
     protected void OnDrop(product_to_order _product_to_order)
     {
         int? position = _product_to_order.product_postition;
         _product_to_order.product_postition = drag_product_to_order.product_postition;
         drag_product_to_order.product_postition = position;
         drag_product_to_order = null;
-        Console.WriteLine(position);
     }
     protected void ClosePriceModal(KeyboardEventArgs e, product_to_order product)
     {

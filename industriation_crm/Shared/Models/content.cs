@@ -263,39 +263,6 @@ namespace industriation_crm.Shared.Models
         public int id { get; set; }
         [NotMapped]
         public bool retail_synchro { get; set; } = true;
-        public string order_status_name 
-        { 
-            get 
-            {
-                if (order_status_id == 1)
-                    return "td-order-new";
-                else if(order_status_id == 2)
-                    return "td-v-schet";
-                else if (order_status_id == 3)
-                    return "td-trade-confirm";
-                else if (order_status_id == 4)
-                    return "td-peres";
-                else if (order_status_id == 5)
-                    return "td-part-order";
-                else if (order_status_id == 6)
-                    return "td-order";
-                else if (order_status_id == 7)
-                    return "td-cancel";
-                else if (order_status_id == 8)
-                    return "td-return";
-                else if (order_status_id == 9)
-                    return "td-on-sklad";
-                else if (order_status_id == 10)
-                    return "td-to-dost";
-                else if (order_status_id == 11)
-                    return "td-delivered";
-                else if (order_status_id == 12)
-                    return "td-close";
-                else
-                    return "";
-            }
-            
-        }
         public int? client_id { get; set; }
         public int? user_id { get; set; }
         public int? order_status_id { get; set; } = 1;
@@ -509,10 +476,7 @@ namespace industriation_crm.Shared.Models
     }
     public class product_to_order
     {
-        [NotMapped]
-        public int new_position { get; set; }
-        [NotMapped]
-        public string tr_class { get; set; } = "";
+
         [NotMapped]
         public bool is_add_from_order { get; set; }
         [NotMapped]

@@ -25,7 +25,7 @@
     </script>
 </head>
 
-<body>
+<body onmouseout="hideModal()">
     <div id="app">
         <div class="loading-block-ind">
             <img src="https://industriation.ru/Catalog/view/theme/default/img/main_logo.svg" alt="" style="width: 350px;" class="blink">
@@ -43,66 +43,17 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="./script.js"></script>
-    <script src="./RowSorter.js"></script>
     <script src="./jquery-3.6.4.min.js"></script>
     <script src="js/print_froms.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 
-   <script>
-        $('body').on('input', '[type="tel"]', function () {
+    <script>
+        $('body').on('input', '[type="tel"]', function (e) {
 
             let newVal = $(this).val().replace(/[^\d]/g, '');
             $(this).val(newVal);
             console.log(newVal);
 
         });
-
-        //скрытие модалок доделать
-        //jQuery(function ($) {
-        //    $(document).click(function (e) {
-        //        var div = $(".modal-notification");
-        //        if (!div.is(e.target) && div.has(e.target).length === 0) {
-        //            $('body').find(".modal").css({ display: "none" });
-        //        }
-        //    });
-        //});
-
-        //$('body').on('click', '.oi-bell', function () {
-        //    $('body').find(".header-bar.modal").css({ display: "block" });
-        //});
-
-       $('body').on('mousemove', '#sortable', function (e) {  
-
-           if (e.target.getAttribute('data-attr') != 'td-drag') {
-               //return false;
-               e.stopPropagation();
-           }
-
-           $("#sortable").sortable({
-               stop: 
-                   function CStoJSCall() {                       
-                       let arrPrev = [];
-                       let arrNew = [];
-                       for (let i = 0; i < $(this).find('tr').length; i++) {
-
-                           $(this).find('tr:eq(' + i + ')').attr('data-id-new', (i + 1));
-                           arrPrev.push($(this).find('tr:eq(' + i + ')').attr('data-id'));
-                           arrNew.push($(this).find('tr:eq(' + i + ')').attr('data-id-new'));
-
-                       }
-                       DotNet.invokeMethodAsync('industriation_crm.Client', 'Test', arrPrev, arrNew);
-                       for (let i = 0; i < $(this).find('tr').length; i++) {
-                          $(this).find('tr:eq(' + i + ')').attr('data-id', (i + 1));
-                       }
-                   }
-           });
-       });
-
-       $('body').on('click', '.product_new', function () {
-           $(this).removeClass('product_new');
-       });
-       
     </script>
 </body>
 </html>
