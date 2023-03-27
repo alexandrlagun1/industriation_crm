@@ -221,7 +221,7 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                List<order> orders = _dbContext.order.Where(o => o.client_id == clientId).Include(o => o.order_Checks).ThenInclude(o => o.product_To_Orders).ThenInclude(p => p.product).ToList(); ;
+                List<order> orders = _dbContext.order.Where(o => o.client_id == clientId).Include(o=>o.pay_status).Include(o=>o.order_Pays).Include(o => o.order_Checks).ThenInclude(o => o.product_To_Orders).ThenInclude(p => p.product).Include(o => o.order_Checks).ThenInclude(o => o.product_To_Orders).ThenInclude(p=>p.delivery_period_type).ToList(); ;
                 return orders;
 
             }

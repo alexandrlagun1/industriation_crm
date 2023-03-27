@@ -3,6 +3,7 @@ using industriation_crm.Server.Models;
 using industriation_crm.Shared.FilterModels;
 using industriation_crm.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace industriation_crm.Server.Services
 {
@@ -68,20 +69,20 @@ namespace industriation_crm.Server.Services
             ClientReturnData ordersReturnData = new ClientReturnData();
             try
             {
+                var query = _dbContext.client.Where(c => c.org_inn.ToString().Contains(clientFilter.inn) && c.contacts.Where(co => co.main_contact == 1 && co.full_name.Contains(clientFilter.client)).FirstOrDefault() != null);
                 if (clientFilter.role == 6)
-                {
-                    ordersReturnData.count = _dbContext.client.Where(c => c.is_supplier == 1 && c.org_inn.ToString().Contains(clientFilter.inn) && c.contacts.Where(co => co.main_contact == 1 && co.full_name.Contains(clientFilter.client)).FirstOrDefault() != null).Count();
-                    ordersReturnData.clients = _dbContext.client.Where(c => c.is_supplier == 1 && c.org_inn.ToString().Contains(clientFilter.inn) && c.contacts.Where(co => co.main_contact == 1 && co.full_name.Contains(clientFilter.client)).FirstOrDefault() != null)
-                        .Include(c => c.user).Include(c => c.orders).Include(c => c.contacts).OrderByDescending(c => c.add_date)
+                    query = query.Where(c => c.is_supplier == 1);
+                if(!String.IsNullOrEmpty(clientFilter.client_email))
+                    query = query.Where(c => c.contacts.Select(c => c.email).Contains(clientFilter.client_email));
+                if (!String.IsNullOrEmpty(clientFilter.client_phone))
+                    query = query.Where(c => c.contacts.Select(c => c.phone).Contains(clientFilter.client_phone));
+                if (!String.IsNullOrEmpty(clientFilter.tag))
+                    query = query.Where(c => c.tag.Contains(clientFilter.tag));
+
+                ordersReturnData.count = query.Count();
+                ordersReturnData.clients = query.Include(c => c.user).Include(c => c.orders).Include(c => c.contacts).OrderByDescending(c => c.add_date)
                         .Skip(clientFilter.client_on_page * (clientFilter.current_page - 1)).Take(clientFilter.client_on_page).ToList();
-                }
-                else
-                {
-                    ordersReturnData.count = _dbContext.client.Where(c => c.org_inn.ToString().Contains(clientFilter.inn) && c.contacts.Where(co => co.main_contact == 1 && co.full_name.Contains(clientFilter.client)).FirstOrDefault() != null).Count();
-                    ordersReturnData.clients = _dbContext.client.Where(c => c.org_inn.ToString().Contains(clientFilter.inn) && c.contacts.Where(co => co.main_contact == 1 && co.full_name.Contains(clientFilter.client)).FirstOrDefault() != null)
-                        .Include(c => c.user).Include(c => c.orders).Include(c => c.contacts).OrderByDescending(c => c.add_date)
-                        .Skip(clientFilter.client_on_page * (clientFilter.current_page - 1)).Take(clientFilter.client_on_page).ToList();
-                }
+
                 foreach (var c in ordersReturnData.clients)
                 {
                     if (c.user != null)

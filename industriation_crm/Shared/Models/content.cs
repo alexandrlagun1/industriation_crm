@@ -210,6 +210,7 @@ namespace industriation_crm.Shared.Models
         public string? bank_cor_schet { get; set; }
         public string? bank_ras_schet { get; set; }
         public string? bank_name { get; set; }
+        public string? tag { get; set; }
         public DateTime? add_date { get; set; } = DateTime.Now;
 
         [ForeignKey("client_id")]

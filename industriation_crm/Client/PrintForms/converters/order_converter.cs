@@ -7,12 +7,26 @@ namespace industriation_crm.Client.PrintForms
 {
     public static class order_converter
     {
-        public static order_print_form ConvertOrderPrintForm(order? order, string pch)
+        public static order_print_form ConvertOrderPrintForm(order? order, string pch, int schet_type)
         {
             order_print_form order_Print_From = new order_print_form();
             order_Print_From.order_id = $"{order.id.ToString()}-{order._current_check.check_number}";
             order_Print_From.pch = pch;
 
+            if(schet_type == 2)
+            {
+                order_Print_From.banck = "ФИЛИАЛ \"РОСТОВСКИЙ\" АО \"АЛЬФА-БАНК\"";
+                order_Print_From.bik = "046015207";
+                order_Print_From.ks = "30101810500000000207";
+                order_Print_From.rs = "40702810726080002059";
+            }
+            if(schet_type == 3)
+            {
+                order_Print_From.banck = "ФИЛИАЛ \"ЦЕНТРАЛЬНЫЙ\" БАНКА ВТБ (ПАО)\r\n";
+                order_Print_From.bik = "044525411";
+                order_Print_From.ks = "30101810145250000411";
+                order_Print_From.rs = "40702810507240993243";
+            }
             string order_date = $"{order?.order_date?.ToString("dd")} {order?.order_date?.ToString("MMMM")} {order?.order_date?.ToString("yyyy")}";
             string order_date_dote = $"{order?.order_date?.ToString("dd")}.{order?.order_date?.ToString("MM")}.{order?.order_date?.ToString("yyyy")}";
 
@@ -34,8 +48,10 @@ namespace industriation_crm.Client.PrintForms
             }
             if (order?._current_check.currency == "$")
                 order_Print_From.currency = "долларов";
-            if (order?._current_check.currency == "€")
+            else if (order?._current_check.currency == "€")
                 order_Print_From.currency = "евро";
+            else
+                order_Print_From.currency = "рублей";
 
             order_Print_From.order_data.simpla.inn = order.client?.org_inn.ToString();
             order_Print_From.order_data.simpla.kpp = order.client?.org_kpp.ToString();

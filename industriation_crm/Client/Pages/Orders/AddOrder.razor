@@ -3,6 +3,8 @@
 @page "/order/add/{clientId:int}/{progressDiscount:int}"
 @using System.Globalization
 @using System.Security.Claims
+@using industriation_crm.Client.PrintForms.converters;
+@using industriation_crm.Client.PrintForms.data;
 @using industriation_crm.Server.DataTranslation
 @using industriation_crm.Shared.Models
 @using industriation_crm.Client.PrintForms
@@ -77,14 +79,14 @@
         <div class="main-section  flex">
             <div class="main-section-label">Печать документов</div>
             <div class="section-field ind-col-lg-5">
-                <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5">
-                    <option>
-                        Альфабанк
-                    </option>
-                    <option>
+                <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5" @bind="@schet_type">
+                    <option value="1">
                         Сбербанк
                     </option>
-                    <option>
+                    <option value="2">
+                        Альфабанк
+                    </option>
+                    <option value="3">
                         ВТБ
                     </option>
                 </select>
@@ -95,17 +97,17 @@
             <div class="section-field ind-col-lg-5">
                 <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5">
                     <option>
-                        Альфабанк
-                    </option>
-                    <option>
                         Сбербанк
                     </option>
+                    <option>
+                        Альфабанк
+                    </option>  
                     <option>
                         ВТБ
                     </option>
                 </select>
-                <button class="score mr-5" type="button">Договор</button>
-                <button class="score" type="button">Договор без печати</button>
+                <button class="score mr-5" type="button" @onclick='()=>GetDogovorPrintForm("1")'>Договор</button>
+                <button class="score" type="button" @onclick='()=>GetDogovorPrintForm("0")'>Договор без печати</button>
             </div>
         </div>
 
@@ -321,9 +323,9 @@
                         {
                             @foreach (var p in current_order_check!.product_To_Orders.Where(pr => pr.is_delete_from_order == false).OrderBy(p => p.product_postition))
                             {
-                            <tr class="order-row" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
-                                    <td class="ind-col-lg-1" id="model" draggable="false" ondragstart="event.preventDefault()">
-                                        <img src="./icons/drag.png" alt="" class="drag">
+                            <tr class="order-row" >
+                                    <td class="ind-col-lg-1" id="model">
+                                        <img src="./icons/drag.png" alt="" class="drag" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
                                         @p?.product?.article
                                     </td>
                                     <td class="ind-col-lg-3 ta-left">
@@ -632,6 +634,7 @@
     protected order_check? current_order_check { get; set; } = new order_check { check_number = 1, is_add = true, current = 1 };
     protected double? pay { get; set; }
 
+    protected int schet_type = 1;
     protected bool showAlert { get; set; }
     protected int alert_type = 0;
     protected string alert_text = "";
@@ -804,7 +807,24 @@
         //}
         current_order_check = order_Check;
     }
+    protected async Task GetDogovorPrintForm(string pch){
+        if (orderId == 0)
+        {
+            alert_text = "Перед получением договора сохраните заказ!";
+            alert_type = 1;
+            showAlert = true;
+        }
+        else
+        {
+            dogovor_print_form dogovor_print_form = dogovor_converter.ConvertDogovorPrintForm(order, pch);
 
+            var response = await Http.PostAsJsonAsync($"api/PrintForms/GetDogovorPrintForm", dogovor_print_form);
+            var fileStream = await response.Content.ReadAsStreamAsync();
+
+            using var streamRef = new DotNetStreamReference(stream: fileStream);
+            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"Договор {order?.id} от {order?.order_date?.ToString("dd.MM.yyyy")}.pdf", streamRef);
+        }
+    }
     //Печатные формы
     protected async Task GetOrderPrintForm(string pch)
     {
@@ -816,7 +836,7 @@
         }
         else
         {
-            order_print_form order_Print_From = order_converter.ConvertOrderPrintForm(order, pch);
+            order_print_form order_Print_From = order_converter.ConvertOrderPrintForm(order, pch, schet_type);
 
             var response = await Http.PostAsJsonAsync($"api/PrintForms", order_Print_From);
             var fileStream = await response.Content.ReadAsStreamAsync();

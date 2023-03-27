@@ -1,7 +1,7 @@
 ﻿@using System.Security.Claims;
 @inject HttpClient Http
 @inject AuthenticationStateProvider AuthenticationStateProvider
-
+@using industriation_crm.NumberMask
 
 <div class="row-f">
     <div class="ind-col-lg-4">
@@ -49,6 +49,10 @@
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">Телефон</div>
                         @main_contact?.phone
+                    </div>
+                    <div class="ind-col-lg-10 input-field">
+                        <div class="input-label">Тэг</div>
+                        @client.tag
                     </div>
                 </div>
             </div>
@@ -190,7 +194,7 @@
                     @foreach (var o in _client_Orders!)
                     {
                         <div class="client-order ind-col-lg-10">
-                            <a href='/order/edit/@o.id' role="button"> Заказ @o?.id</a>
+                            <a href='/order/edit/@o.id' role="button"> Заказ @o?.id (@o.pay_status?.name)</a>
                             @if (o?._current_check != null)
                             {
                                 @foreach (var p in o?._current_check?.product_To_Orders)
@@ -202,12 +206,29 @@
                                         </div>
                                         <div class="item-price">
                                             <div class="count"> Колличество: <b>@p.count @p.product?.unit</b> </div>
-                                            <div class="price"> Цена: <b>@p._product_price_with_discount ₽ за 1шт.</b> </div>
-                                            <div class="summ"> Сумма: <b>@p._total_price ₽</b> </div>
+                                            <div class="price"> Цена: <b>@p._product_price_with_discount.Value.ToString("N", NumberMask.GetNi()) @o._current_check.currency за 1шт.</b> </div>
+                                            <div class="summ"> Сумма: <b>@p._total_price.Value.ToString("N", NumberMask.GetNi()) @o._current_check.currency</b> </div>
+                                            <div>Срок поставки: <b>@p.from_delivery_period-@p.to_delivery_period @p.delivery_period_type?.name</b></div>
                                         </div>
                                     </div>
 
                                 }
+                                    <div>
+                                        Оплаты:
+                                        @if (o.order_Pays != null)
+                                        {
+                                            @foreach (var p in o.order_Pays)
+                                            {
+                                                <div>
+                                                   Дата: <b>@p.date</b>
+                                                </div>
+                                                <div>
+                                                Сумма: <b>@p.price.Value.ToString("N", NumberMask.GetNi()) @o._current_check.currency</b>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                    
                             }
 
                         </div>
@@ -283,7 +304,7 @@
     [Parameter]
     public int client_discount { get; set; }
     [Parameter]
-    public string next_lvl_discount{ get; set; }
+    public string next_lvl_discount { get; set; }
     protected int order_pay_status { get; set; } = 0;
     protected contact? main_contact { get; set; }
     [Parameter]
@@ -313,7 +334,7 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
 
-        
+
         tasks = await Http.GetFromJsonAsync<List<task>>($"api/Task/GetTasksByClientId/{client.id}");
         executors = await Http.GetFromJsonAsync<List<user>>("api/User?type=all");
 

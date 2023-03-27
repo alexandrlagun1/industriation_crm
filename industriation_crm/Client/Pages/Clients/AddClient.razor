@@ -9,260 +9,289 @@
 
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
-
-@if (showAlert)
+@if (load)
 {
-    <Alert text="@alertText" CloseAlert="CloseAlert" type="alertType"></Alert>
-}
-<div class="buttons-bar mb-10">
-    <button @onclick="()=>showClientData = false" class="score">Редактирование</button>
-    <button @onclick="()=>showClientData = true" class="score">Данные</button>
-
-</div>
-<EditForm Model="@client" OnValidSubmit="SaveClient">
-    <DataAnnotationsValidator />
-    <div class="main-title">@Title</div>
-    <hr />
-    @if (showClientData)
-    {
-        <ClientData client="client" progress_client_discount="progress_client_discount" client_Orders="client_Orders" client_discount="GetClientDiscount" next_lvl_discount="@next_lvl_discount"> </ClientData>
-    }
-    else
-    {
-        @if (role == 1)
-        {
-            <div class="main-section">
-                <div class="main-section-label">Основные данные</div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">Закрепленный менеджер</div>
-                        <InputSelect class="main-input" @bind-Value="client.user_id">
-                            @foreach (var m in managers)
-                            {
-                                <option value="@m.id">@m.name</option>
-                            }
-                        </InputSelect>
-                    </div>
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">Тип клиента</div>
-                        <InputSelect class="main-input" @bind-Value="client.client_type">
-                            <option value="0">Физическое лицо</option>
-                            <option value="1">Юридическое лицо</option>
-                            <option value="2">Индивидуальный предприниматель</option>
-                        </InputSelect>
-                    </div>
-                </div>
-            </div>
-        }
-        <div class="main-section">
-            <div class="main-section-label">Клиент</div>
-            <div class="section-field">
-                <div class="ind-col-lg-5 ind-col-md-10">
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label required">
-                            Фамилия
-                            <div class="req">*</div>
-                        </div>
-                        <input type="text" required class="main-input" @bind-value="main_contact.surname" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label required">
-                            Имя
-                            <div class="req">*</div>
-                        </div>
-                        <input type="text" required class="main-input" @bind-value="main_contact.name" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Отчество</div>
-                        <input type="text" class="main-input" @bind-value="main_contact.patronymic" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Адрес доставки</div>
-                        <input type="text" class="main-input" @bind-value="client.delivery_adr" />
-                    </div>
-                </div>
-                <div class="ind-col-lg-5 ind-col-md-10">
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">E-mail</div>
-                        <input type="email" class="main-input" @bind-value="main_contact.email" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Доп. E-mail</div>
-                        <input type="email" class="main-input" @bind-value="main_contact.dop_email" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">ФИО получателя</div>
-                        <input type="tel" class="main-input" @bind-value="client.delivery_cont" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label required">
-                            Телефон
-                            <div class="req">*</div>
-                        </div>
-                        <input type="tel" maxlength="20" required class="main-input" @bind-value="main_contact.phone" data-value="" />
-                    </div>
-                    <div class="ind-col-lg-10 input-field">
-                        <div class="input-label">Телефон получателя</div>
-                        <input type="tel" class="main-input" @bind-value="client.delivery_cont_phone" />
-                    </div>
-                </div>
-            </div>
+    <div class="loading-block-ind">
+        <img src="https://industriation.ru/Catalog/view/theme/default/img/main_logo.svg" alt="" style="width: 350px;" class="blink">
+        <div style="margin-top: 10px; font-size: 18px; color: #333; font-weight: 600; width: 350px; text-align: center;">
+            <hr />
+            Подождите пожалуйста
         </div>
+    </div>
+}
+else
+{
+    @if (showAlert)
+    {
+        <Alert text="@alertText" CloseAlert="CloseAlert" type="alertType"></Alert>
+    }
+    <div class="buttons-bar mb-10">
+        <button @onclick="()=>showClientData = false" class="score">Редактирование</button>
+        <button @onclick="()=>showClientData = true" class="score">Данные</button>
 
-        @if (client.client_type == 1 || client.client_type == 2)
+    </div>
+    <EditForm Model="@client" OnValidSubmit="SaveClient">
+        <DataAnnotationsValidator />
+        <div class="main-title">@Title</div>
+        <hr />
+        @if (showClientData)
         {
-            <div class="main-section">
-                <div class="main-section-label">Реквизиты организации</div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 ind-col-md-10">
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Полное наименование</div>
-                            <input type="text" class="main-input" @bind-value="client.org_name" />
-                        </div>
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Адрес регистрации</div>
-                            <input type="text" class="main-input" @bind-value="client.org_address" />
-                        </div>
-                    </div>
-                    <div class="ind-col-lg-5 ind-col-md-10">
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label required">
-                                ИНН
-                                <div class="req">*</div>
-                            </div>
-                            <input type="number" required min="0" class="main-input" @bind-value="client.org_inn" />
-                            <button class="close dadata" @onclick="GetClientByDaData" type="button">D</button>
-                        </div>
-                        @if (client.client_type == 1)
-                        {
-                            <div class="ind-col-lg-10 input-field">
-                                <div class="input-label">ОГРН</div>
-                                <input type="number" min="0" class="main-input" @bind-value="client.org_ogrn" />
-                            </div>
-                        }
-                        else if (client.client_type == 2)
-                        {
-                            <div class="ind-col-lg-10 input-field">
-                                <div class="input-label">ОГРНИП</div>
-                                <input type="number" min="0" class="main-input" @bind-value="client.org_ogrnip" />
-                            </div>
-                        }
-                    </div>
-                    @if (client.client_type == 1)
-                    {
-                        <div class="ind-col-lg-5 ind-col-md-10">
-                            <div class="ind-col-lg-10 input-field">
-                                <div class="input-label">КПП</div>
-                                <input type="number" min="0" class="main-input" @bind-value="client.org_kpp" />
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
-            <div class="main-section">
-                <div class="main-section-label">Банковские реквизиты</div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 ind-col-md-10">
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">БИК</div>
-                            <input type="number" min="0" class="main-input" @bind="client.bank_bik" />
-                        </div>
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Наименование банка</div>
-                            <input type="text" class="main-input" @bind="client.bank_name" />
-                        </div>
-                    </div>
-                    <div class="ind-col-lg-5 ind-col-md-10">
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Корреспондентский счет</div>
-                            <input type="number" min="0" class="main-input" @bind="client.bank_cor_schet" />
-                        </div>
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Расчетный счет</div>
-                            <input type="number" min="0" class="main-input" @bind="client.bank_ras_schet" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            @if (clientId != 0)
+            <ClientData client="client" progress_client_discount="progress_client_discount" client_Orders="client_Orders" client_discount="GetClientDiscount" next_lvl_discount="@next_lvl_discount"> </ClientData>
+        }
+        else
+        {
+            @if (role == 1)
             {
                 <div class="main-section">
-                    <div class="main-section-label">Контакты</div>
+                    <div class="main-section-label">Основные данные</div>
                     <div class="section-field">
-                        <a href='/contact/add/@clientId' class="btn btn-primary" role="button">
-                            Добавить контактное лицо
-                        </a>
-                    </div>
-                    <br />
-                    <div class="section-field">
-
-                        <table class="order-table ind-col-lg-10">
-                            <thead class="table-success ind-col-lg-10">
-                                <tr class="order-row ind-col-lg-10">
-                                    <td class="ind-col-lg-1">ID контакта</td>
-                                    <td class="ind-col-lg-3">ФИО</td>
-                                    <td class="ind-col-lg-3">Email</td>
-                                    <td class="ind-col-lg-1">Основной контакт</td>
-                                    <td class="ind-col-lg-2">Действия</td>
-                                </tr>
-                            </thead>
-                            <tbody class="ind-col-lg-10">
-                                @foreach (var c in contacts.Where(c => c.is_active == 1))
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Закрепленный менеджер</div>
+                            <InputSelect class="main-input" @bind-Value="client.user_id">
+                                @foreach (var m in managers)
                                 {
-                                    <tr class="order-row ind-col-lg-10">
-                                        <td class="ind-col-lg-1">@c.id</td>
-                                        <td class="ind-col-lg-3">@c.full_name</td>
-                                        <td class="ind-col-lg-3">@c.email</td>
-                                        <td class="ind-col-lg-1"><input class="form-check-input" type="radio" @onchange="()=>ChangeMainContact(c)" name="maincontact" checked="@GetIsMain(c.main_contact)"></td>
-                                        <td class="ind-col-lg-2">
-                                            <div class="ind-col-lg-5">
-                                                <a href='/contact/edit/@clientId/@c.id/@true' class="score" role="button">
-                                                    <div class="hidden-md">Изменить</div>
-                                                    <div class="hidden-lg ind-col-md-10">
-                                                        <img src="./icons/edit.svg" class="h20-w20">
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            <div class="ind-col-lg-5">
-                                                <button type="button" class="close" role="button" @onclick="()=>RemoveContact(c)">
-                                                    <div class="hidden-md">Удалить</div>
-                                                    <div class="hidden-lg ind-col-md-10">
-                                                        <img src="./icons/delete-white.svg" class="h20-w20">
-                                                    </div>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <option value="@m.id">@m.name</option>
                                 }
-                            </tbody>
-                        </table>
+                            </InputSelect>
+                        </div>
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Тип клиента</div>
+                            <InputSelect class="main-input" @bind-Value="client.client_type">
+                                <option value="0">Физическое лицо</option>
+                                <option value="1">Юридическое лицо</option>
+                                <option value="2">Индивидуальный предприниматель</option>
+                            </InputSelect>
+                        </div>
                     </div>
                 </div>
             }
+            <div class="main-section">
+                <div class="main-section-label">Клиент</div>
+                <div class="section-field">
+                    <div class="ind-col-lg-5 ind-col-md-10">
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label required">
+                                Фамилия
+                                <div class="req">*</div>
+                            </div>
+                            <input type="text" required class="main-input" @bind-value="main_contact.surname" />
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label required">
+                                Имя
+                                <div class="req">*</div>
+                            </div>
+                            <input type="text" required class="main-input" @bind-value="main_contact.name" />
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Отчество</div>
+                            <input type="text" class="main-input" @bind-value="main_contact.patronymic" />
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Тэг</div>
+                            <input type="text" class="main-input" @bind-value="client.tag" />
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Адрес доставки</div>
+                            <input type="text" class="main-input" @bind-value="client.delivery_adr" />
+                        </div>
+                    </div>
+                    <div class="ind-col-lg-5 ind-col-md-10">
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">E-mail</div>
+                            <input type="email" class="main-input" @bind-value="main_contact.email" />
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Доп. E-mail</div>
+                            <input type="email" class="main-input" @bind-value="main_contact.dop_email" />
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">ФИО получателя</div>
+                            <input type="tel" class="main-input" @bind-value="client.delivery_cont" />
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label">Телефон получателя</div>
+                            <input type="tel" class="main-input" @bind-value="client.delivery_cont_phone" />
+                        </div>
+                        <div class="ind-col-lg-10 input-field">
+                            <div class="input-label required">
+                                Телефон
+                                <div class="req">*</div>
+                            </div>
+                            <input type="tel" maxlength="20" required class="main-input" @bind-value="main_contact.phone" data-value="" />
+                        </div>
+
+                        @foreach (var phone in main_contact?.contact_phones?.Where(p => p.isRemove == false))
+                        {
+                            <div class="mb-3">
+                                <div class="ind-col-lg-5 input-field">
+                                    <div class="input-label">Доп. телефон</div>
+                                    <InputText type="tel" class="form-control main-input mr-10" @bind-Value="phone.phone" />
+                                    <button type="button" class="close" @onclick="()=>phone.isRemove = true"><span class=" oi oi-trash" aria-hidden="true"></span></button>
+                                </div>
+                                <ValidationMessage For="@(() => phone.phone)" />
+                            </div>
+                        }
+                        <button type="button" class="score" @onclick="AddPhone">Добавить номер</button>
+                    </div>
+                </div>
+            </div>
+
+            @if (client.client_type == 1 || client.client_type == 2)
+            {
+                <div class="main-section">
+                    <div class="main-section-label">Реквизиты организации</div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-5 ind-col-md-10">
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">Полное наименование</div>
+                                <input type="text" class="main-input" @bind-value="client.org_name" />
+                            </div>
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">Адрес регистрации</div>
+                                <input type="text" class="main-input" @bind-value="client.org_address" />
+                            </div>
+                        </div>
+                        <div class="ind-col-lg-5 ind-col-md-10">
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label required">
+                                    ИНН
+                                    <div class="req">*</div>
+                                </div>
+                                <input type="number" required min="0" class="main-input" @bind-value="client.org_inn" />
+                                <button class="close dadata" @onclick="GetClientByDaData" type="button">D</button>
+                            </div>
+                            @if (client.client_type == 1)
+                            {
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">ОГРН</div>
+                                    <input type="number" min="0" class="main-input" @bind-value="client.org_ogrn" />
+                                </div>
+                            }
+                            else if (client.client_type == 2)
+                            {
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">ОГРНИП</div>
+                                    <input type="number" min="0" class="main-input" @bind-value="client.org_ogrnip" />
+                                </div>
+                            }
+                        </div>
+                        @if (client.client_type == 1)
+                        {
+                            <div class="ind-col-lg-5 ind-col-md-10">
+                                <div class="ind-col-lg-10 input-field">
+                                    <div class="input-label">КПП</div>
+                                    <input type="number" min="0" class="main-input" @bind-value="client.org_kpp" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="main-section">
+                    <div class="main-section-label">Банковские реквизиты</div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-5 ind-col-md-10">
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">БИК</div>
+                                <input type="number" min="0" class="main-input" @bind="client.bank_bik" />
+                            </div>
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">Наименование банка</div>
+                                <input type="text" class="main-input" @bind="client.bank_name" />
+                            </div>
+                        </div>
+                        <div class="ind-col-lg-5 ind-col-md-10">
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">Корреспондентский счет</div>
+                                <input type="number" min="0" class="main-input" @bind="client.bank_cor_schet" />
+                            </div>
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">Расчетный счет</div>
+                                <input type="number" min="0" class="main-input" @bind="client.bank_ras_schet" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (clientId != 0)
+                {
+                    <div class="main-section">
+                        <div class="main-section-label">Контакты</div>
+                        <div class="section-field">
+                            <a href='/contact/add/@clientId' class="btn btn-primary" role="button">
+                                Добавить контактное лицо
+                            </a>
+                        </div>
+                        <br />
+                        <div class="section-field">
+
+                            <table class="order-table ind-col-lg-10">
+                                <thead class="table-success ind-col-lg-10">
+                                    <tr class="order-row ind-col-lg-10">
+                                        <td class="ind-col-lg-1">ID контакта</td>
+                                        <td class="ind-col-lg-3">ФИО</td>
+                                        <td class="ind-col-lg-3">Email</td>
+                                        <td class="ind-col-lg-1">Основной контакт</td>
+                                        <td class="ind-col-lg-2">Действия</td>
+                                    </tr>
+                                </thead>
+                                <tbody class="ind-col-lg-10">
+                                    @foreach (var c in contacts.Where(c => c.is_active == 1))
+                                    {
+                                        <tr class="order-row ind-col-lg-10">
+                                            <td class="ind-col-lg-1">@c.id</td>
+                                            <td class="ind-col-lg-3">@c.full_name</td>
+                                            <td class="ind-col-lg-3">@c.email</td>
+                                            <td class="ind-col-lg-1"><input class="form-check-input" type="radio" @onchange="()=>ChangeMainContact(c)" name="maincontact" checked="@GetIsMain(c.main_contact)"></td>
+                                            <td class="ind-col-lg-2">
+                                                <div class="ind-col-lg-5">
+                                                    <a href='/contact/edit/@clientId/@c.id/@true' class="score" role="button">
+                                                        <div class="hidden-md">Изменить</div>
+                                                        <div class="hidden-lg ind-col-md-10">
+                                                            <img src="./icons/edit.svg" class="h20-w20">
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                                <div class="ind-col-lg-5">
+                                                    <button type="button" class="close" role="button" @onclick="()=>RemoveContact(c)">
+                                                        <div class="hidden-md">Удалить</div>
+                                                        <div class="hidden-lg ind-col-md-10">
+                                                            <img src="./icons/delete-white.svg" class="h20-w20">
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            }
         }
-    }
-    <div class="bottom-buttons ind-col-lg-10">
-        <button type="submit" class="save">Сохранить</button>
-        <button type="button" class="close" @onclick="Cancel">Закрыть</button>
-        @if (clientId != 0)
-        {
+        <div class="bottom-buttons ind-col-lg-10">
+            <button type="submit" class="save">Сохранить</button>
+            <button type="button" class="close" @onclick="Cancel">Закрыть</button>
+            @if (clientId != 0)
+            {
 
-            <a class="score" type="button" href='/order/add/@clientId/@GetClientDiscount' role="button">
-                Добавить заказ
-            </a>
-        }
-    </div>
+                <a class="score" type="button" href='/order/add/@clientId/@GetClientDiscount' role="button">
+                    Добавить заказ
+                </a>
+            }
+        </div>
 
 
-</EditForm>
+    </EditForm>
+}
 @code {
     protected List<order>? client_Orders { get; set; }
     protected progress_client_discount? progress_client_discount { get; set; }
     protected bool showAlert { get; set; }
     protected string alertText { get; set; }
     protected int? alertType { get; set; } = 1;
-
+    bool load = true;
 
     protected bool showClientData { get; set; } = false;
     [Parameter]
@@ -286,6 +315,12 @@
     protected int? main_contact_id { get; set; }
 
     protected int? role;
+
+    protected void AddPhone()
+    {
+        contact_phone contact_Phone = new contact_phone();
+        main_contact?.contact_phones?.Add(contact_Phone);
+    }
 
     protected int GetClientDiscount
     {
@@ -329,6 +364,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        load = true;
         if (phone != null)
         {
             main_contact = new();
@@ -360,6 +396,7 @@
                 Title = $"Клиент {client.contacts.Where(c => c.main_contact == 1).FirstOrDefault()?.full_name}";
             }
         }
+        load = false;
 
     }
     protected void CloseAlert()
@@ -437,6 +474,9 @@
         {
             main_contact_id = contacts.Where(c => c.main_contact == 1).FirstOrDefault().id;
         }
+        alertText = "Клиент успешно сохранен!";
+        alertType = 0;
+        showAlert = true;
 
     }
 

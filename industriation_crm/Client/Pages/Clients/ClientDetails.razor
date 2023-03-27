@@ -29,16 +29,40 @@ else
         </div>
         <div class="main-section">
             <div class="ind-col-lg-5 ind-col-md-7 input-field">
-                <div class="input-label ind-col-lg-5">
+                <div class="input-label ind-col-lg-5" >
                     ФИО клиента:
                 </div>
-                <input type="text" class="main-input ind-col-lg-5 ind-col-md-7" @bind="clientFilter.client">
+                <input type="text" class="main-input ind-col-lg-5 ind-col-md-7" @bind-value="clientFilter.client" @onkeydown="SearchEnter" @bind-value:event="oninput">
             </div>
             <div class="ind-col-lg-5 ind-col-md-7 input-field">
                 <div class="input-label ind-col-lg-5">
                     ИНН:
                 </div>
-                <input type="number" class="main-input ind-col-lg-5 ind-col-md-7" @bind="clientFilter.inn" min="0">
+                <input type="number" class="main-input ind-col-lg-5 ind-col-md-7" @bind-value="clientFilter.inn" @onkeydown="SearchEnter" @bind-value:event="oninput" min="0">
+            </div>
+            <div class="section-field ind-col-lg-10">
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Email клиента:
+                    </div>
+                    <input @bind-value="clientFilter.client_email" class="main-input ind-col-lg-5" @onkeydown="SearchEnter" @bind-value:event="oninput"></input>
+                </div>
+            </div>
+            <div class="section-field ind-col-lg-10">
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Телефон клиента:
+                    </div>
+                    <input @bind-value="clientFilter.client_phone" class="main-input ind-col-lg-5" @onkeydown="SearchEnter" @bind-value:event="oninput"></input>
+                </div>
+            </div>
+            <div class="section-field ind-col-lg-10">
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Тэг:
+                    </div>
+                    <input @bind-value="clientFilter.tag" class="main-input ind-col-lg-5" @onkeydown="SearchEnter" @bind-value:event="oninput"></input>
+                </div>
             </div>
             <button @onclick="Search" class="score mt-20 mb-20">Поиск</button>
 
@@ -51,7 +75,6 @@ else
                             <td class="ind-col-lg-2">ФИО</td>
                             <td class="ind-col-lg-2">Тип клиента</td>
                             <td class="ind-col-lg-2">Закрепленный менеджер</td>
-                            @*                            <td class="ind-col-lg-1">Действия</td>*@
                         </tr>
                     </thead>
                     <tbody>
@@ -149,6 +172,14 @@ else
 
     protected List<client> clientList = new();
     protected int role { get; set; }
+    private async Task SearchEnter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await Search();
+        }
+
+    }
     protected async Task SelectClient(client client)
     {
             await SelectOrderClient.InvokeAsync(client);

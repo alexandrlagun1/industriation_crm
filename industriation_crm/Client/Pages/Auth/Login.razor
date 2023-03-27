@@ -15,18 +15,18 @@
         <div class="section-field">
             <div class="input-field ind-col-lg-10">
                 <label for="txtEmail" class="ind-col-lg-3 login-input-label">Логин</label>
-                <input @bind="user.login" type="text" class="ind-col-lg-7 main-input" id="txtEmail" />
+                <input @bind="user.login" @onkeydown="@Enter" type="text" class="ind-col-lg-7 main-input" id="txtEmail" />
             </div>
         </div>
 
         <div class="section-field">
             <div class="input-field ind-col-lg-10">
                 <label for="txtPassword" class="ind-col-lg-3 login-input-label">Пароль</label>
-                <input @bind="user.password" type="password" class="ind-col-lg-7 main-input" id="txtPassword" />
+                <input @bind="user.password" @onkeydown="@Enter" type="password" class="ind-col-lg-7 main-input" id="txtPassword" />
             </div>
         </div>
         <div class="field-section ind-col-lg-10">
-            <button type="button" @onclick="UserLogin" class="score" style="margin: 15px 0 auto auto; padding: 5px 20px; display: flex;">Вход</button>
+            <button type="button" @onclick="UserLogin"  class="score" style="margin: 15px 0 auto auto; padding: 5px 20px; display: flex;">Вход</button>
         </div>
     </div>
 </div>
@@ -42,5 +42,13 @@
             await _localStorageService.SetItemAsStringAsync("isauthenticated", "true");
             _navigationManager.NavigateTo("/", true);
         }
+    }
+    private async Task Enter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await UserLogin();
+        }
+       
     }
 }
