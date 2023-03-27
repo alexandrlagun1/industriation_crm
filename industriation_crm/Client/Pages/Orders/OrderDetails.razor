@@ -168,8 +168,70 @@ else
             </div>
         </div>
         <button @onclick="GetOrders" class="score mb-20 mt-20">Поиск</button>
+        <div class="section-fied flex mb-20 orderds-checkboxes">
+                <div class="custom-box">
+                <label class="td-order-new label-for-custom-checkbox" for="Новый"></label>
+                    <input class="custom-checkbox" id="Новый" type="checkbox">
+                    <div class="name"> - Новый</div>
+                </div>
+                <div class="custom-box">
+                <label class="td-v-schet label-for-custom-checkbox" for="Выставлен счет"></label>
+                    <input class="custom-checkbox" id="Выставлен счет" type="checkbox">
+                    <div class="name"> - Выставлен счет</div>
+                </div>
+                <div class="custom-box">
+                <label class="td-trade-confirm label-for-custom-checkbox" for="Сделка состоялась"></label>
+                    <input class="custom-checkbox" id="Сделка состоялась" type="checkbox">
+                    <div class="name"> - Сделка состоялась</div>
+                </div>
+                <div class="custom-box">
+                    <label class="td-peres label-for-custom-checkbox" for="Пересогласование"></label>
+                    <input class="custom-checkbox" id="Пересогласование" type="checkbox">
+                    <div class="name"> - Пересогласование</div>
+                </div>
+                <div class="custom-box">
+                    <label class="td-part-order label-for-custom-checkbox" for="Частично заказан"></label>
+                    <input class="custom-checkbox" id="Частично заказан" type="checkbox">
+                    <div class="name"> - Частично заказан</div>
+                </div>
+                <div class="custom-box">
+                <label class="td-order label-for-custom-checkbox" for="Заказан"></label>
+                    <input class="custom-checkbox" id="Заказан" type="checkbox">
+                    <div class="name"> - Заказан</div>
+                </div>
+                <div class="custom-box">
+                <label class="td-cancel label-for-custom-checkbox" for="Отменен"></label>
+                    <input class="custom-checkbox" id="Отменен" type="checkbox">
+                    <div class="name"> - Отменен</div>
+                </div>
+                <div class="custom-box">
+                <label class="td-return label-for-custom-checkbox" for="Возврат"></label>
+                    <input class="custom-checkbox" id="Возврат" type="checkbox">
+                    <div class="name"> - Возврат</div>
+                </div>
+                <div class="custom-box">
+                <label class="td-on-sklad label-for-custom-checkbox" for="На складе"></label>
+                    <input class="custom-checkbox" id="На складе" type="checkbox">
+                    <div class="name"> - На складе</div>
+                </div>
+                <div class="custom-box">
+                <label class="td-to-dost label-for-custom-checkbox" for="Передан в доставку"></label>
+                    <input class="custom-checkbox" id="Передан в доставку" type="checkbox">
+                    <div class="name"> - Передан в доставку</div>
+                </div>
+                <div class="custom-box">
+                <label class="td-delivered label-for-custom-checkbox" for="Доставлен"></label>
+                    <input class="custom-checkbox" id="Доставлен" type="checkbox">
+                    <div class="name"> - Доставлен</div>
+                </div>
+                <div class="custom-box">
+                <label class="td-close label-for-custom-checkbox" for="Закрыт"></label>
+                    <input class="custom-checkbox" id="Закрыт" type="checkbox">
+                    <div class="name"> - Закрыт</div>
+                </div>
+        </div>
         <div class="section-field">
-            <table class="order-table ind-col-lg-10">
+            <table id="orders-table" class="order-table ind-col-lg-10">
                 <thead class="ind-col-lg-10">
                     <tr class="order-row ind-col-lg-10">
                         <td class="ind-col-lg-1">Номер заказа</td>
@@ -186,13 +248,13 @@ else
                         <td class="ind-col-lg-1">Статус оплаты</td>
                         <td class="ind-col-lg-1">Статус заказа</td>
                         <td class="ind-col-lg-1">Этап</td>
-                        @*                        <td class="ind-col-lg-1">Действия</td>*@
+                        @*<td class="ind-col-lg-1">Действия</td>*@
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var order in ordersReturnData?.orders!)
-                    {
-                        <tr class="order-row ind-col-lg-10">
+                    {   
+                        <tr class="order-row ind-col-lg-10" >
                             <td class="ind-col-lg-1">
                                 <a href='/order/edit/@order.id'>
                                     @order.id
@@ -220,7 +282,7 @@ else
                             }
                             <td class="ind-col-lg-2">@order.user?.name</td>
                             <td class="ind-col-lg-1">@order.pay_status?.name</td>
-                            <td class="ind-col-lg-1">@order.order_status?.name</td>
+                            <td class="ind-col-lg-1 @order?.order_status_name" data-status="@order.order_status?.name">@order.order_status?.name</td>
                             <td class="ind-col-lg-1">@order.stage?.name</td>
                             @*                            <td class="ind-col-lg-1">
                     <a href='/order/edit/@order.id' class="score" role="button">
