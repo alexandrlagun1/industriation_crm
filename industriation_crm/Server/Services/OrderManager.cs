@@ -151,7 +151,13 @@ namespace industriation_crm.Server.Services
             OrdersReturnData ordersReturnData = new OrdersReturnData();
             try
             {
-                var query = _dbContext.order.Where(o => o.stage_id >= ordersFilter.stage && ordersFilter.pay_status.Contains(o.pay_status) && ordersFilter.managers.Contains(o.user) && ordersFilter.order_status.Contains(o.order_status));
+                var query = _dbContext.order.Where(o => o.stage_id >= ordersFilter.stage);
+                if(ordersFilter.pay_status != null && ordersFilter.pay_status.Count() != 0)
+                    query = query.Where(o => ordersFilter.pay_status.Contains(o.pay_status_id));
+                if (ordersFilter.managers != null && ordersFilter.managers.Count() != 0)        
+                    query = query.Where(o => ordersFilter.managers.Contains(o.user_id));
+                if(ordersFilter.order_status != null && ordersFilter.order_status.Count() != 0)
+                    query = query.Where(o => ordersFilter.order_status.Contains(o.order_status_id));
                 if(!String.IsNullOrEmpty(ordersFilter.product_article))
                     query = query.Where(o => o.order_Checks.Where(c => c.product_To_Orders.Select(p => p.product).Where(p => p.article.Contains(ordersFilter.product_article)).FirstOrDefault() != null).FirstOrDefault() != null);
                 if (ordersFilter.client != null)

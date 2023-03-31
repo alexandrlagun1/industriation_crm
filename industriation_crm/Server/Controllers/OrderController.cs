@@ -62,10 +62,6 @@ namespace industriation_crm.Server.Controllers
         public async Task<IActionResult> Bill(order order)
         {
             _IOrder.UpdateOrderDetails(order, true);
-
-
-
-
             return Ok();
         }
 

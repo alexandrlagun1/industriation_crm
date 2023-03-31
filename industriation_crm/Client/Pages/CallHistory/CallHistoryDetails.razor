@@ -1,14 +1,15 @@
 ﻿@page "/fetchcallhistorydetails"
 @using Newtonsoft.Json
+@using System.Security.Claims;
 @using industriation_crm.Shared.FilterModels
 @inject HttpClient Http
-
+@inject AuthenticationStateProvider AuthenticationStateProvider
 <div class="main-title">Звонки</div>
 
 @if (openSelectClient)
-    {
+{
     <industriation_crm.Client.Pages.Clients.ClientDetails contact_number="@contactNumber"></industriation_crm.Client.Pages.Clients.ClientDetails>
-    }
+}
 
 <div class="main-section">
     <div class="main-section-label">
@@ -16,7 +17,7 @@
     </div>
     <row-f>
         <div class="custom-select mr-20" onmouseover="customScroll()">
-            <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput">
+            <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput" @onkeydown="SearchEnter">
             </input>
             @foreach (var m in noSelectManagers!.Where(m => m.name.Contains(manager_search)))
             {
@@ -50,7 +51,7 @@
             <div class="input-label ind-col-lg-5">
                 Телефон клиента:
             </div>
-            <input type="text" class="main-input ind-col-lg-5" @bind="callHistoryFilter.phone">
+            <input type="text" class="main-input ind-col-lg-5" @bind="callHistoryFilter.phone" @bind:event="oninput" @onkeydown="SearchEnter">
         </div>
     </div>
     <div class="section-field ind-col-lg-10">
@@ -58,17 +59,17 @@
             <div class="input-label ind-col-lg-5">
                 Дата звонка от:
             </div>
-            <input type="date" @bind="callHistoryFilter.call_date_from" class="main-input ind-col-lg-5"></input>
+            <input type="date" @bind="callHistoryFilter.call_date_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="SearchEnter"></input>
         </div>
         <div class="ind-col-lg-5 input-field ind-col-md-10">
             <div class="input-label ind-col-lg-5">
                 Дата звонка до:
             </div>
-            <input type="date" @bind="callHistoryFilter.call_date_to" class="main-input ind-col-lg-5"></input>
+            <input type="date" @bind="callHistoryFilter.call_date_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="SearchEnter"></input>
         </div>
     </div>
-    <button @onclick="FindByFilter" class="score mb-20 mt-20">Поиск</button>
-
+    <button @onclick="Search" class="score mb-20 mt-20">Поиск</button>
+    <button @onclick="ClearFilter" class="close">X</button>
     <div class="section-field">
 
         <table class="order-table ind-col-lg-10">
@@ -200,12 +201,31 @@
     List<int> page_count = new List<int>();
     protected int count_on_page = 50;
     protected int current_page = 1;
-
+    protected int user_id { get; set; }
     protected string manager_search = "";
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
+        callHistoryFilter = await Http.GetFromJsonAsync<CallHistoryFilter>($"api/Filter/GetCallHistoryFilter/{user_id}");
+        callHistoryFilter.user_id = user_id;
+
         noSelectManagers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
+        if (noSelectManagers != null)
+        {
+            List<user> removedManagers = new();
+            foreach (var m in noSelectManagers)
+            {
+                if (callHistoryFilter.managers.Contains(m.id))
+                {
+                    removedManagers.Add(m);
+                    SelectManagers.Add(m);
+                }
+            }
+            foreach (var m in removedManagers)
+                noSelectManagers.Remove(m);
+        }
         await FindByFilter();
     }
     protected async Task FindByFilter()
@@ -215,10 +235,11 @@
             return;
         callHistoryFilter.calls_on_page = count_on_page;
 
-        if (SelectManagers.Count == 0)
-            callHistoryFilter.managers = noSelectManagers!;
-        else
-            callHistoryFilter.managers = SelectManagers!;
+        callHistoryFilter.managers = new();
+        foreach (var m in SelectManagers)
+        {
+            callHistoryFilter.managers.Add(m.id);
+        }
 
         var response = await Http.PostAsJsonAsync("api/CallHistory", callHistoryFilter);
         var responseBody = await response.Content.ReadAsStringAsync();
@@ -229,19 +250,41 @@
         page_count = new();
         for (int i = 1; i <= total_page; i++)
             page_count.Add(i);
+        await Http.PutAsJsonAsync("api/Filter/SaveCallHistoryFilter", callHistoryFilter);
         StateHasChanged();
+
+    }
+    protected async Task ClearFilter()
+    {
+        current_page = 1;
+        callHistoryFilter = new();
+        callHistoryFilter.user_id = user_id;
+        await FindByFilter();
     }
     protected void OpenSelectClient(string num)
     {
         contactNumber = num;
         openSelectClient = true;
     }
+    protected async Task Search()
+    {
+        current_page = 1;
+        await FindByFilter();
+    }
     protected async Task OnKeyDown(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter")
+        if (e.Key == "Enter" || e.Code == "NumpadEnter")
         {
             await FindByFilter();
         }
+    }
+    private async Task SearchEnter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await Search();
+        }
+
     }
     protected async Task PagPrev()
     {

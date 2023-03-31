@@ -22,5 +22,7 @@ namespace industriation_crm.Shared.FilterModels
         public int product_on_page { get; set; }
         public int category_id { get; set; }
         public List<int?>? child_categories { get; set; }
+
+        public int user_id { get; set; }
     }
 }

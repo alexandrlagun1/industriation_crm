@@ -48,7 +48,7 @@
                     </div>
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">Телефон</div>
-                        @main_contact?.phone
+                        @main_contact?.phone <button type="button" @onclick="()=>CallToClient(main_contact?.phone)">Звонок</button>
                     </div>
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">Тэг</div>
@@ -350,7 +350,12 @@
         main_contact = client?.contacts?.Where(c => c.main_contact == 1).FirstOrDefault();
 
     }
-
+    protected async Task CallToClient(string phone)
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
+        await Http.GetAsync($"api/Megafon?user_id={user_id}&phone={phone}");
+    }
     protected void openCreatetaskModal()
     {
         newTask = new();

@@ -12,9 +12,15 @@ namespace industriation_crm.Shared.Models
         public string? password { get; set; }
         public bool? retail_synch { get; set; } = true;
         public string? login { get; set; }
+        public string? email { get; set; }
         public int? retail_id { get; set; }
         public string? phone { get; set; }
         public string? megafon_login { get; set; }
+        public string? orders_filter { get; set; }
+        public string? clients_filter { get; set; }
+        public string? products_filter { get; set; }
+        public string? call_history_filter { get; set; }
+        public string? job_title { get; set; }
 
         [ForeignKey("role_id")]
         public virtual roles? roles { get; set; }
@@ -239,7 +245,7 @@ namespace industriation_crm.Shared.Models
     public class product
     {
         [Key]
-        public int id { get; set; }
+        public int? id { get; set; }
         public string? name { get; set; }
         public double? price { get; set; }
         public int? category_id { get; set; }
@@ -248,6 +254,8 @@ namespace industriation_crm.Shared.Models
         public string? article { get; set; }
         public string? unit { get; set; }
         public string? manufacturer { get; set; }
+        public int? quantity { get; set; }
+
     }
     public class order
     {

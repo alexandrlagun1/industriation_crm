@@ -36,16 +36,16 @@ namespace industriation_crm.Server.Services
             {
                 ProductReturnData productReturnData = new ProductReturnData();
                 List<product> products = new();
-                var query = _dbContext.product.Where(p=>p != null);
+                var query = _dbContext.product.Where(p => p != null);
                 if (!String.IsNullOrEmpty(productFilter.name))
                 {
-                    query = query.Where(p=>p.name.Contains(productFilter.name));
+                    query = query.Where(p => p.name.Contains(productFilter.name));
                 }
                 if (!String.IsNullOrEmpty(productFilter.article))
                 {
                     query = query.Where(p => p.article.Contains(productFilter.article));
                 }
-                if(productFilter.price_from != null && productFilter.price_from > 0)
+                if (productFilter.price_from != null && productFilter.price_from > 0)
                 {
                     query = query.Where(p => p.price >= productFilter.price_from);
                 }
@@ -68,7 +68,7 @@ namespace industriation_crm.Server.Services
             }
         }
 
-       
+
 
         public product GetProductData(int id)
         {
@@ -107,8 +107,30 @@ namespace industriation_crm.Server.Services
         {
             try
             {
-                _dbContext.Entry(product).State = EntityState.Modified;
-                _dbContext.SaveChanges();
+                if (product.id != null)
+                {
+                    _dbContext.Entry(product).State = EntityState.Modified;
+                    _dbContext.SaveChanges();
+                }
+                else
+                {
+                    var db_product = _dbContext.product.Where(p => p.external_id == product.external_id).FirstOrDefault();
+                    if (db_product != null)
+                    {
+                        if (product.price != null)
+                            db_product.price = product.price;
+                        if (product.quantity != null)
+                            db_product.quantity = product.quantity;
+                        if (product.article != null)
+                            db_product.article = product.article;
+                        if (product.manufacturer != null)
+                            db_product.manufacturer = product.manufacturer;
+                        if (product.name != null)
+                            db_product.name = product.name;
+                        _dbContext.Entry(db_product).State = EntityState.Modified;
+                        _dbContext.SaveChanges();
+                    }
+                }
             }
             catch
             {

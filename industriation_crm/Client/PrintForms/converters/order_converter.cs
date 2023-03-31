@@ -2,7 +2,7 @@
 using industriation_crm.Shared.Models;
 using System.Globalization;
 using System.Text.RegularExpressions;
-
+using industriation_crm.NumberMask;
 namespace industriation_crm.Client.PrintForms
 {
     public static class order_converter
@@ -12,7 +12,11 @@ namespace industriation_crm.Client.PrintForms
             order_print_form order_Print_From = new order_print_form();
             order_Print_From.order_id = $"{order.id.ToString()}-{order._current_check.check_number}";
             order_Print_From.pch = pch;
-
+            order_Print_From.fio = $"{order.user?.job_title} {order.user?.name}";
+            if (!String.IsNullOrEmpty(order.user?.phone))
+                order_Print_From.phone = industriation_crm.Masks.PhoneMask.GetNumber(order.user?.phone);
+            if (!String.IsNullOrEmpty(order?.user?.email))
+                order_Print_From.email = order.user.email;
             if(schet_type == 2)
             {
                 order_Print_From.banck = "ФИЛИАЛ \"РОСТОВСКИЙ\" АО \"АЛЬФА-БАНК\"";
@@ -64,23 +68,23 @@ namespace industriation_crm.Client.PrintForms
                 product.name = p.product?.name;
                 product.quantity = p.count.ToString();
                 product.model = p.product?.article;
-                product.price = (p._product_price_with_discount / 1.2).Value.ToString("0.00");
-                product.total = (p._total_price / 1.2).Value.ToString("0.00");
+                product.price = (p._product_price_with_discount / 1.2).Value.ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
+                product.total = (p._total_price / 1.2).Value.ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
 
                 if (p.delivery_period_type_id == 1)
                 {
-                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочий день)";
-                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочий день)";
+                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetDaysFormat(p.to_delivery_period)}";
+                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetDaysFormat(p.to_delivery_period)}";
                 }
                 if (p.delivery_period_type_id == 2)
                 {
-                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочая неделя)";
-                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочая неделя)";
+                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetWeekFormat(p.to_delivery_period)}";
+                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetWeekFormat(p.to_delivery_period)}";
                 }
                 if (p.delivery_period_type_id == 3)
                 {
-                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочий месяц)";
-                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} (рабочий месяц)";
+                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetMonthFormat(p.to_delivery_period)}";
+                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetMonthFormat(p.to_delivery_period)}";
                 }
                 product.unit = p.product?.unit;
                 order_Print_From.order_data.products.Add(product);
@@ -92,8 +96,8 @@ namespace industriation_crm.Client.PrintForms
             sub_total.title = "Сумма без НДС";
             if (order?._current_check?._total_product_price != null)
             {
-                sub_total.value_total = (order?._current_check?._total_product_price.Value / 1.2)!.Value.ToString("0"); 
-                sub_total.value = (order?._current_check?._total_product_price.Value / 1.2)!.Value.ToString("0.00");
+                sub_total.value_total = (order?._current_check?._total_product_price.Value / 1.2)!.Value.ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
+                sub_total.value = (order?._current_check?._total_product_price.Value / 1.2)!.Value.ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
             }
             sub_total.sort_order = "1";
             order_Print_From.order_data.totals_info.Add(sub_total);
@@ -104,8 +108,8 @@ namespace industriation_crm.Client.PrintForms
             shipping.title = "Самовывоз";
             if (order.delivery?._price != null)
             {
-                shipping.value_total =(order.delivery._price.Value / 1.2).ToString("0");
-                shipping.value = (order.delivery._price.Value / 1.2).ToString("0.00");
+                shipping.value_total =(order.delivery._price.Value / 1.2).ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
+                shipping.value = (order.delivery._price.Value / 1.2).ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
             }
             shipping.sort_order = "2";
             order_Print_From.order_data.totals_info.Add(shipping);
@@ -117,8 +121,8 @@ namespace industriation_crm.Client.PrintForms
             double? products_with_delivery_price = order?._current_check._total_product_price + order?.delivery?._price;
             if (products_with_delivery_price != null)
             {
-                tax.value = (products_with_delivery_price.Value - products_with_delivery_price.Value / 1.2).ToString("0.00");
-                tax.value_total =  (products_with_delivery_price.Value - products_with_delivery_price.Value / 1.2).ToString("0");
+                tax.value = (products_with_delivery_price.Value - products_with_delivery_price.Value / 1.2).ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
+                tax.value_total =  (products_with_delivery_price.Value - products_with_delivery_price.Value / 1.2).ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
             }
             tax.sort_order = "3";
             order_Print_From.order_data.totals_info.Add(tax);
@@ -129,9 +133,9 @@ namespace industriation_crm.Client.PrintForms
             total.title = "Итого с НДС";
             if (products_with_delivery_price != null)
             {
-                total.value = products_with_delivery_price.Value.ToString("0.00");
-                total.value_total =  products_with_delivery_price.Value.ToString("0");
-                order_Print_From.summ = products_with_delivery_price.Value.ToString("0.00");
+                total.value = products_with_delivery_price.Value.ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
+                total.value_total =  products_with_delivery_price.Value.ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
+                order_Print_From.summ = products_with_delivery_price.Value.ToString("N", industriation_crm.NumberMask.NumberMask.GetNi());
             }
             total.sort_order = "9";
             order_Print_From.order_data.totals_info.Add(total);

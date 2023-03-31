@@ -44,17 +44,20 @@ namespace industriation_crm.Server.Services
         public CallHistoryReturnData GetCallHistoryDetails(CallHistoryFilter callHistoryFilter)
         {
             CallHistoryReturnData callHistoryReturnData = new CallHistoryReturnData();
-            if (callHistoryFilter.call_date_from == null)
-                callHistoryFilter.call_date_from = DateTime.MinValue;
-            if (callHistoryFilter.call_date_to == null)
-                callHistoryFilter.call_date_to = DateTime.MaxValue;
+            
 
             try
             {
+                var query = _dbContext.call_history.Where(c => c.type!.Contains(callHistoryFilter.type!) && c.client_number!.Contains(callHistoryFilter.phone!));
+                if(callHistoryFilter.managers != null && callHistoryFilter.managers.Count() != 0)
+                    query = query.Where(c => callHistoryFilter.managers.Contains(c.user_id));
+                if (callHistoryFilter.call_date_from != null)
+                    query = query.Where(c => c.date_time > callHistoryFilter.call_date_from);
+                if (callHistoryFilter.call_date_to != null)
+                    query = query.Where(c => c.date_time < callHistoryFilter.call_date_to);
+                callHistoryReturnData.count = query.Count();
 
-                callHistoryReturnData.count = _dbContext.call_history.Where(c => c.type!.Contains(callHistoryFilter.type!) && callHistoryFilter.managers!.Contains(c.user) && c.client_number!.Contains(callHistoryFilter.phone!) && c.date_time >= callHistoryFilter.call_date_from && c.date_time <= callHistoryFilter.call_date_to).Count();
-
-                callHistoryReturnData.call_historyes = _dbContext.call_history.Where(c=>c.type!.Contains(callHistoryFilter.type!) && callHistoryFilter.managers!.Contains(c.user) && c.client_number!.Contains(callHistoryFilter.phone!) && c.date_time >= callHistoryFilter.call_date_from && c.date_time <= callHistoryFilter.call_date_to)
+                callHistoryReturnData.call_historyes = query
                     .Include(c=>c.contact).Include(c=>c.user)
                     .OrderByDescending(o => o.date_time)
                         .Skip(callHistoryFilter.calls_on_page * (callHistoryFilter.current_page - 1)).Take(callHistoryFilter.calls_on_page).ToList();

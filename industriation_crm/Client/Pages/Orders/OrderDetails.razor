@@ -40,7 +40,7 @@ else
             Менеджер:
             <div class="custom-select mr-20" onmouseover="customScroll()">
 
-                <input type="text" class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput" @onkeydown="OnKeyDown">
+                <input type="text" class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput" @onkeydown="FindOnKeyDown">
                 </input>
                 @foreach (var m in noSelectManagers.Where(m => m.name.Contains(manager_search)))
                 {
@@ -62,7 +62,7 @@ else
         <row-f>
             Статус заказа:
             <div class="custom-select mr-20" onmouseover="customScroll()">
-                <input type="text" class="custom-input" contenteditable="true" @bind="order_status_search" @bind:event="oninput" @onkeydown="OnKeyDown">
+                <input type="text" class="custom-input" contenteditable="true" @bind="order_status_search" @bind:event="oninput" @onkeydown="FindOnKeyDown">
                 </input>
                 @foreach (var s in noSelectOrderStatuses.Where(s => s.name.Contains(order_status_search)))
                 {
@@ -84,7 +84,7 @@ else
         <row-f>
             Статус оплаты:
             <div class="custom-select mr-20" onmouseover="customScroll()">
-                <input type="text" class="custom-input" contenteditable="true" @bind="pay_status_search" @bind:event="oninput" @onkeydown="OnKeyDown">
+                <input type="text" class="custom-input" contenteditable="true" @bind="pay_status_search" @bind:event="oninput" @onkeydown="FindOnKeyDown">
                 </input>
                 @foreach (var s in noSelectPayStatuses.Where(s => s.name.Contains(pay_status_search)))
                 {
@@ -108,13 +108,13 @@ else
                 <div class="input-label ind-col-lg-5">
                     Номер заказа:
                 </div>
-                <input type="number" @bind="ordersFilter.order_id" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="OnKeyDown"></input>
+                <input type="number" @bind="ordersFilter.order_id" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
             </div>
             <div class="ind-col-lg-5 input-field ind-col-md-10">
                 <div class="input-label ind-col-lg-5">
                     Покупатель:
                 </div>
-                <input type="text" @bind="ordersFilter.client" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="OnKeyDown"></input>
+                <input type="text" @bind="ordersFilter.client" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
             </div>
         </div>
         <div class="section-field ind-col-lg-10">
@@ -122,13 +122,13 @@ else
                 <div class="input-label ind-col-lg-5">
                     Дата заказа от:
                 </div>
-                <input type="date" @bind="ordersFilter.order_date_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="OnKeyDown"></input>
+                <input type="date" @bind="ordersFilter.order_date_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
             </div>
             <div class="ind-col-lg-5 input-field ind-col-md-10">
                 <div class="input-label ind-col-lg-5">
                     Дата заказа до:
                 </div>
-                <input type="date" @bind="ordersFilter.order_date_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="OnKeyDown"></input>
+                <input type="date" @bind="ordersFilter.order_date_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
             </div>
         </div>
         <div class="section-field ind-col-lg-10">
@@ -136,13 +136,13 @@ else
                 <div class="input-label ind-col-lg-5">
                     Дата отгрузки от:
                 </div>
-                <input type="date" @bind="ordersFilter.delivey_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="OnKeyDown"></input>
+                <input type="date" @bind="ordersFilter.delivey_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
             </div>
             <div class="ind-col-lg-5 input-field ind-col-md-10">
                 <div class="input-label ind-col-lg-5">
                     Дата отгрузки до:
                 </div>
-                <input type="date" @bind="ordersFilter.delivey_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="OnKeyDown"></input>
+                <input type="date" @bind="ordersFilter.delivey_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
             </div>
         </div>
         <div class="section-field ind-col-lg-10">
@@ -150,13 +150,13 @@ else
                 <div class="input-label ind-col-lg-5">
                     Дата оплаты:
                 </div>
-                <input type="date" @bind="ordersFilter.pay_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="OnKeyDown"></input>
+                <input type="date" @bind="ordersFilter.pay_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
             </div>
             <div class="ind-col-lg-5 input-field ind-col-md-10">
                 <div class="input-label ind-col-lg-5">
                     Артикул товара в заказе:
                 </div>
-                <input @bind="ordersFilter.product_article" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="OnKeyDown"></input>
+                <input @bind="ordersFilter.product_article" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
             </div>
         </div>
         <div class="section-field ind-col-lg-10">
@@ -164,10 +164,11 @@ else
                 <div class="input-label ind-col-lg-5">
                     Email клиента:
                 </div>
-                <input @bind="ordersFilter.client_email" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="OnKeyDown"></input>
+                <input @bind="ordersFilter.client_email" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
             </div>
         </div>
-        <button @onclick="GetOrders" class="score mb-20 mt-20">Поиск</button>
+        <button @onclick="FindByFilter" class="score mb-20 mt-20">Поиск</button>
+        <button @onclick="ClearFilter" class="close">X</button>
         <div class="section-field">
             <table class="order-table ind-col-lg-10">
                 <thead class="ind-col-lg-10">
@@ -204,7 +205,7 @@ else
                                 <td class="ind-col-lg-2">
                                     @if (@order.client?.client_type == 1 || @order.client?.client_type == 2)
                                     {
-                                        <a href="/client/edit/@order.client?.id" target="_blank">@order.client?.org_name</a>  
+                                        <a href="/client/edit/@order.client?.id" target="_blank">@order.client?.org_name</a>
                                     }
                                     @if (@order.client?.client_type == 0)
                                     {
@@ -273,29 +274,78 @@ else
 
 
     protected int role { get; set; }
-
+    protected int user_id { get; set; }
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         role = Convert.ToInt32(authState.User.FindFirst(ClaimTypes.Role).Value);
+        user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
+        ordersFilter = await Http.GetFromJsonAsync<OrdersFilter>($"api/Filter/GetOrdersFilter/{user_id}");
+
+        ordersFilter.user_id = user_id;
         noSelectManagers = await Http.GetFromJsonAsync<List<user>>("api/User?type=managers");
+        if (noSelectManagers != null)
+        {
+            List<user> removedManagers = new();
+            foreach (var m in noSelectManagers)
+            {
+                if (ordersFilter.managers.Contains(m.id))
+                {
+                    removedManagers.Add(m);
+                    SelectManagers.Add(m);
+                }
+            }
+            foreach (var m in removedManagers)
+                noSelectManagers.Remove(m);
+        }
         noSelectOrderStatuses = await Http.GetFromJsonAsync<List<order_status>>("api/OrderStatus");
+        if (noSelectOrderStatuses != null)
+        {
+            List<order_status> removedOrderStatuses = new();
+            foreach (var s in noSelectOrderStatuses)
+            {
+                if (ordersFilter.order_status.Contains(s.id))
+                {
+                    removedOrderStatuses.Add(s);
+                    SelectOrderStatuses.Add(s);
+                }
+            }
+            foreach (var s in removedOrderStatuses)
+                noSelectOrderStatuses.Remove(s);
+        }
         noSelectPayStatuses = await Http.GetFromJsonAsync<List<pay_status>>("api/PayStatus");
+        if (noSelectPayStatuses != null)
+        {
+            List<pay_status> removedPayStatuses = new();
+            foreach (var s in noSelectPayStatuses)
+            {
+                if (ordersFilter.pay_status.Contains(s.id))
+                {
+                    removedPayStatuses.Add(s);
+                    SelectPayStatuses.Add(s);
+                }
+            }
+            foreach (var s in removedPayStatuses)
+                noSelectPayStatuses.Remove(s);
+        }
         await GetOrders();
     }
     public void EditOrder(int order_id)
     {
         NavigationManager.NavigateTo($"/order/edit/{order_id}");
     }
-    protected async Task Search()
+    protected async Task FindOnKeyDown(KeyboardEventArgs e)
     {
-        current_page = 1;
-        await GetOrders();
+
+        if (e.Key == "Enter" || e.Code == "NumpadEnter")
+        {
+            await FindByFilter();
+        }
     }
     protected async Task OnKeyDown(KeyboardEventArgs e)
     {
 
-        if (e.Key == "Enter")
+        if (e.Key == "Enter" || e.Code == "NumpadEnter")
         {
             await GetOrders();
         }
@@ -316,6 +366,29 @@ else
             await GetOrders();
         }
     }
+    protected async Task ClearFilter()
+    {
+        current_page = 1;
+        foreach(var m in SelectManagers)
+        {
+            noSelectManagers.Add(m);
+        }
+        SelectManagers = new();
+        foreach(var s in SelectOrderStatuses)
+            noSelectOrderStatuses.Add(s);
+        SelectOrderStatuses = new();
+        foreach(var s in SelectPayStatuses)
+            noSelectPayStatuses.Add(s);
+        SelectPayStatuses = new();
+        ordersFilter = new();
+        ordersFilter.user_id = user_id;
+        await GetOrders();
+    }
+    protected async Task FindByFilter()
+    {
+        current_page = 1;
+        await GetOrders();
+    }
     protected async Task GetOrders()
     {
         load = true;
@@ -328,21 +401,21 @@ else
         else if (role == 6)
             ordersFilter.stage = 2;
 
-
-        if (SelectManagers.Count == 0)
-            ordersFilter.managers = noSelectManagers;
-        else
-            ordersFilter.managers = SelectManagers;
-
-        if (SelectOrderStatuses.Count == 0)
-            ordersFilter.order_status = noSelectOrderStatuses;
-        else
-            ordersFilter.order_status = SelectOrderStatuses;
-
-        if (SelectPayStatuses.Count == 0)
-            ordersFilter.pay_status = noSelectPayStatuses;
-        else
-            ordersFilter.pay_status = SelectPayStatuses;
+        ordersFilter.managers = new();
+        foreach (var m in SelectManagers)
+        {
+            ordersFilter.managers.Add(m.id);
+        }
+        ordersFilter.order_status = new();
+        foreach (var s in SelectOrderStatuses)
+        {
+            ordersFilter.order_status.Add(s.id);
+        }
+        ordersFilter.pay_status = new();
+        foreach (var s in SelectPayStatuses)
+        {
+            ordersFilter.pay_status.Add(s.id);
+        }
 
         var response = await Http.PostAsJsonAsync("api/Order/GetOrders", ordersFilter);
         string responseBody = await response.Content.ReadAsStringAsync();
@@ -352,6 +425,8 @@ else
         page_count = new();
         for (int i = 1; i <= total_page; i++)
             page_count.Add(i);
+
+        await Http.PutAsJsonAsync("api/Filter/SaveOrdersFilter", ordersFilter);
         load = false;
 
     }

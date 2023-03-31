@@ -32,20 +32,20 @@ else
                 <div class="input-label ind-col-lg-5" >
                     ФИО клиента:
                 </div>
-                <input type="text" class="main-input ind-col-lg-5 ind-col-md-7" @bind-value="clientFilter.client" @onkeydown="SearchEnter" @bind-value:event="oninput">
+                <input type="text" class="main-input ind-col-lg-5 ind-col-md-7" @bind-value="clientFilter.client" @onkeydown="FindOnKeyDown" @bind-value:event="oninput">
             </div>
             <div class="ind-col-lg-5 ind-col-md-7 input-field">
                 <div class="input-label ind-col-lg-5">
                     ИНН:
                 </div>
-                <input type="number" class="main-input ind-col-lg-5 ind-col-md-7" @bind-value="clientFilter.inn" @onkeydown="SearchEnter" @bind-value:event="oninput" min="0">
+                <input type="number" class="main-input ind-col-lg-5 ind-col-md-7" @bind-value="clientFilter.inn" @onkeydown="FindOnKeyDown" @bind-value:event="oninput" min="0">
             </div>
             <div class="section-field ind-col-lg-10">
                 <div class="ind-col-lg-5 input-field ind-col-md-10">
                     <div class="input-label ind-col-lg-5">
                         Email клиента:
                     </div>
-                    <input @bind-value="clientFilter.client_email" class="main-input ind-col-lg-5" @onkeydown="SearchEnter" @bind-value:event="oninput"></input>
+                    <input @bind-value="clientFilter.client_email" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
                 </div>
             </div>
             <div class="section-field ind-col-lg-10">
@@ -53,7 +53,7 @@ else
                     <div class="input-label ind-col-lg-5">
                         Телефон клиента:
                     </div>
-                    <input @bind-value="clientFilter.client_phone" class="main-input ind-col-lg-5" @onkeydown="SearchEnter" @bind-value:event="oninput"></input>
+                    <input @bind-value="clientFilter.client_phone" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
                 </div>
             </div>
             <div class="section-field ind-col-lg-10">
@@ -61,11 +61,11 @@ else
                     <div class="input-label ind-col-lg-5">
                         Тэг:
                     </div>
-                    <input @bind-value="clientFilter.tag" class="main-input ind-col-lg-5" @onkeydown="SearchEnter" @bind-value:event="oninput"></input>
+                    <input @bind-value="clientFilter.tag" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
                 </div>
             </div>
             <button @onclick="Search" class="score mt-20 mb-20">Поиск</button>
-
+            <button @onclick="ClearFilter" class="close">X</button>
             <div class="section-field">
                 <table class="order-table ind-col-lg-10">
                     <thead class="ind-col-lg-10">
@@ -172,7 +172,8 @@ else
 
     protected List<client> clientList = new();
     protected int role { get; set; }
-    private async Task SearchEnter(KeyboardEventArgs e)
+    protected int user_id { get; set; }
+    private async Task FindOnKeyDown(KeyboardEventArgs e)
     {
         if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
@@ -188,6 +189,9 @@ else
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         role = Convert.ToInt32(authState.User.FindFirst(ClaimTypes.Role).Value);
+        user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
+        clientFilter = await Http.GetFromJsonAsync<ClientFilter>($"api/Filter/GetClientsFilter/{user_id}");
+        clientFilter.user_id = user_id;
         await GetClient();
     }
     protected async Task Search()
@@ -195,10 +199,18 @@ else
         current_page = 1;
         await GetClient();
     }
+    protected async Task ClearFilter()
+    {
+        current_page = 1;
+        clientFilter = new();
+        clientFilter.user_id = user_id;
+        await GetClient();
+    }
+
     protected async Task OnKeyDown(KeyboardEventArgs e)
     {
 
-        if (e.Key == "Enter")
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
             await GetClient();
         }
@@ -236,6 +248,8 @@ else
         page_count = new();
         for (int i = 1; i <= total_page; i++)
             page_count.Add(i);
+
+        await Http.PutAsJsonAsync("api/Filter/SaveClientsFilter", clientFilter);
 
 
     }

@@ -17,6 +17,8 @@ namespace industriation_crm.Shared.FilterModels
         public string? client_phone { get; set; }
         public string? tag { get; set; }
         public int role { get; set; }
+
+        public int? user_id { get; set; }
     }
     public class ClientReturnData
     {

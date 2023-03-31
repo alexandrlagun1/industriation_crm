@@ -393,20 +393,19 @@
                                             <div class="price-modal" tabindex="0">
                                                 <div class="input-label mb-10">Цена</div>
                                                 <div class="row-f ind-col-lg-10">
-                                                    <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" min="0" />
+                                                    <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />
                                                 </div>
                                                 <div class="input-label mt-10">Дополнительная скидка</div>
                                                 <div class="row-f">
                                                     <div class="ind-col-lg-5 discount-input">
-                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" />@current_order_check.currency
+                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)"/>@current_order_check.currency
                                                     </div>
                                                     <div class="ind-col-lg-5 discount-input">
-                                                        <input type="number" class="main-input" @bind="@p.percent_discount" min="0" />%
-
+                                                        <input type="number" class="main-input" @bind="@p.percent_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />%
                                                     </div>
                                                 </div>
                                                 <div class="discount-buttons mt-10">
-                                                    <button class="score" @onclick="() => p.showPriceModal = false">Закрыть</button>
+                                                    <button type="button" class="score" @onclick="() => p.showPriceModal = false">Закрыть</button>
                                                 </div>
                                             </div>
                                         }
@@ -859,7 +858,13 @@
         drag_product_to_order.product_postition = position;
         drag_product_to_order = null;
     }
-
+    protected void ClosePriceModal(KeyboardEventArgs e, product_to_order product)
+    {
+        if (e.Key == "Enter" || e.Code == "NumpadEnter")
+        {
+            product.showPriceModal = false;
+        }
+    }
     protected async Task ReturnOrderToManager()
     {
         order!.stage_id = 1;

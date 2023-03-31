@@ -1,9 +1,11 @@
 ﻿@page "/fetchproductdetails"
 @using System.Text
+@using System.Security.Claims;
 @using industriation_crm.Shared.Models
 @using industriation_crm.Shared.FilterModels
 @using Newtonsoft.Json
 @inject HttpClient Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
 <div class="main-title">Продукты</div>
@@ -45,30 +47,30 @@ else
                 <div class="input-label">
                     Наименование товара:
                 </div>
-                <input type="text" class="main-input" @bind="productFilter.name" />
+                <input type="text" class="main-input" @bind="productFilter.name" @onkeydown="SearchEnter" @bind:event="oninput" />
             </div>
             <div class="ind-col-lg-2-5 pad-0-10-0-0">
                 <div class="input-label">
                     Артикул:
                 </div>
-                <input class="main-input" @bind="productFilter.article" />
+                <input class="main-input" @bind="productFilter.article" @onkeydown="SearchEnter" @bind:event="oninput" />
             </div>
             <div class="ind-col-lg-2-5 pad-0-10-0-0">
                 <div class="input-label">
                     Цена от:
                 </div>
-                <input type="number" class="main-input" @bind="productFilter.price_from" />
+                <input type="number" class="main-input" @bind="productFilter.price_from" @onkeydown="SearchEnter" @bind:event="oninput" />
             </div>
             <div class="ind-col-lg-2-5 pad-0-10-0-0">
                 <div class="input-label">
                     Цена до:
                 </div>
-                <input type="number" class="main-input" @bind="productFilter.price_to" />
+                <input type="number" class="main-input" @bind="productFilter.price_to" @onkeydown="SearchEnter" @bind:event="oninput" />
             </div>
         </div>
         <div class="section-field pad-0-5">
             <button class="score mr-20" @onclick="FilterButtonClick">Поиск</button>
-            <button class="close" @onclick="CleanFilter">Очистить фильтр</button>
+            <button @onclick="ClearFilter" class="close">X</button>
         </div>
     </div>
 
@@ -87,7 +89,7 @@ else
                         <td class="ind-col-lg-5 ind-col-md-3">Наименование</td>
                         <td class="ind-col-lg-1 ind-col-md-2">Количество</td>
                         <td class="ind-col-lg-1 ind-col-md-1">Цена</td>
-@*                        <td class="ind-col-lg-1 ind-col-md-1">Действия</td>*@
+                        @*                        <td class="ind-col-lg-1 ind-col-md-1">Действия</td>*@
                     </tr>
                 </thead>
                 <tbody class="ind-col-lg-10">
@@ -106,14 +108,14 @@ else
                             </td>
                             <td class="ind-col-lg-1 ind-col-md-2">100</td>
                             <td class="ind-col-lg-1 ind-col-md-1">@product.price</td>
-@*                            <td class="ind-col-lg-1 ind-col-md-1">
-                                <a href='/product/edit/@product.id' class="score" role="button">
-                                    <div class="hidden-md">Изменить</div>
-                                    <div class="hidden-lg ind-col-md-10">
-                                        <img src="./icons/edit.svg" class="h20-w20">
-                                    </div>
-                                </a>
-                            </td>*@
+                            @*                            <td class="ind-col-lg-1 ind-col-md-1">
+                    <a href='/product/edit/@product.id' class="score" role="button">
+                    <div class="hidden-md">Изменить</div>
+                    <div class="hidden-lg ind-col-md-10">
+                    <img src="./icons/edit.svg" class="h20-w20">
+                    </div>
+                    </a>
+                    </td>*@
                         </tr>
                     }
                 </tbody>
@@ -145,11 +147,12 @@ else
     protected List<category>? categoriesList = new();
     protected List<product>? productList = new();
     protected product product = new();
+    protected int user_id { get; set; }
 
     protected async Task OnKeyDown(KeyboardEventArgs e)
     {
 
-        if (e.Key == "Enter")
+        if (e.Key == "Enter" || e.Code == "NumpadEnter")
         {
             await FindByFilter();
         }
@@ -158,7 +161,17 @@ else
     protected override async Task OnInitializedAsync()
     {
         categoriesList = await Http.GetFromJsonAsync<List<category>>("api/Category");
-        currentCategory = categoriesList.Where(c => c.parent_id == 0).FirstOrDefault();
+
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
+        productFilter = await Http.GetFromJsonAsync<ProductFilter>($"api/Filter/GetProductsFilter/{user_id}");
+        if (productFilter?.category_id > 0)
+            currentCategory = categoriesList.Where(c => c.id == productFilter.category_id).FirstOrDefault();
+        else
+            currentCategory = categoriesList.Where(c => c.parent_id == 0).FirstOrDefault();
+        productFilter.user_id = user_id;
+
         await FindByFilter();
     }
     protected async Task GetProducts(category category)
@@ -169,7 +182,14 @@ else
         current_page = 1;
         await FindByFilter();
     }
+    private async Task SearchEnter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await FilterButtonClick();
+        }
 
+    }
     protected async Task PagPrev()
     {
         if (current_page > 1)
@@ -205,10 +225,12 @@ else
         productList = productReturnData?.products;
 
         int total_page = Convert.ToInt32(Math.Ceiling(productReturnData!.count / Convert.ToDouble(count_on_page)));
-        
+
         page_count = new();
         for (int i = 1; i <= total_page; i++)
             page_count.Add(i);
+
+        await Http.PutAsJsonAsync("api/Filter/SaveProductsFilter", productFilter);
         StateHasChanged();
     }
     protected List<category> GetCategoryTree(List<category> categoryTree, category category)
@@ -218,13 +240,15 @@ else
             GetCategoryTree(categoryTree, categoriesList.Where(c => c.id == category.parent_id).FirstOrDefault());
         return categoryTree;
     }
-    protected async Task CleanFilter()
+    protected async Task ClearFilter()
     {
         productFilter = new();
         currentCategory = categoriesList.Where(c => c.id == 1).FirstOrDefault();
         current_page = 1;
+        productFilter.user_id = user_id;
         await FindByFilter();
     }
+
     protected void GetChildCategories(int category_id)
     {
         productFilter.child_categories.Add(category_id);

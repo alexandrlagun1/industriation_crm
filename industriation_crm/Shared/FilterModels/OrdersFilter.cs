@@ -9,12 +9,12 @@ namespace industriation_crm.Shared.FilterModels
 {
     public class OrdersFilter
     {
-        public List<user?>? managers { get; set; } = new();
+        public List<int?>? managers { get; set; } = new();
         public string? client { get; set; }
         public string? product_article { get; set; }
         public string? client_email { get; set; }
-        public List<order_status>? order_status { get; set; }
-        public List<pay_status>? pay_status { get; set; }
+        public List<int?>? order_status { get; set; } = new();
+        public List<int?>? pay_status { get; set; } = new();
         public DateTime? pay_from { get; set; }
         public DateTime? order_date_from { get; set; }
         public DateTime? order_date_to { get; set; }
@@ -24,6 +24,8 @@ namespace industriation_crm.Shared.FilterModels
         public int current_page { get; set; }
         public int? order_id { get; set; }
         public int stage { get; set; }
+
+        public int user_id { get; set; }//Для сохранения и получения фильтра из бд
     }
     public class OrdersReturnData
     {
