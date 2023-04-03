@@ -805,7 +805,7 @@ header {
 	padding: 20px 15px;
 	position: fixed;
 	height: 100%;
-	z-index: 11112;
+	z-index: 333;
 	border-right: 1px solid #dee2e6;
 	left: -178px;
 	max-width: 250px;
@@ -2441,7 +2441,7 @@ tbody .order-row.product_new:hover td {
 	background-color: #fff;
 	position: sticky;
 	top: 59px;
-	z-index: 1111;
+	z-index: 111;
 	border: 1px solid #ddd;
 	padding: 5px 10px;
 	flex-wrap: wrap;

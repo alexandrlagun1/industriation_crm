@@ -167,7 +167,8 @@ else
                 <input @bind="ordersFilter.client_email" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
             </div>
         </div>
-        <button @onclick="GetOrders" class="score mb-20 mt-20">Поиск</button>
+        <button @onclick="FindByFilter" class="score mb-20 mt-20">Поиск</button>
+        <button @onclick="ClearFilter" class="close">X</button>
         <div class="section-fied flex mb-20 orderds-checkboxes">
                 <div class="custom-box">
                 <label class="td-order-new label-for-custom-checkbox" for="Новый"></label>
