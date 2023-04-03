@@ -41,6 +41,7 @@ builder.Services.AddScoped<ITask, TaskManager>();
 builder.Services.AddScoped<ICallHistory, CallHistoryManager>();
 builder.Services.AddScoped<IOrderStatus, OrderStatusManager>();
 builder.Services.AddScoped<IPayStatus, PayStatusManager>();
+builder.Services.AddScoped<IOrderCheck, OrderCheckManager>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);

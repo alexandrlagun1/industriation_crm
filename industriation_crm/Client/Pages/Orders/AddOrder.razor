@@ -299,6 +299,9 @@
 
                 }
                 <button type="button" class="add-item" @onclick="AddCheck">+</button>
+                <button type="button" class="delete-button" @onclick="RemoveCheck">
+                    <img src="./icons/delete-icon.svg" class="delete-button">
+                </button>
                 <table class="order-table ind-col-lg-10">
                     <thead class="table-success ind-col-lg-10">
                         <tr class="order-row ind-col-lg-10">
@@ -796,6 +799,28 @@
 
         current_order_check = order_Check;
 
+    }
+    protected async Task RemoveCheck()
+    {
+        if (order?.order_Checks?.Count > 1)
+        {
+            var new_current_check = order?.order_Checks.Where(c => c.id != current_order_check.id).FirstOrDefault();
+            new_current_check.current = 1;
+            if (current_order_check.id != 0)
+            {
+                await Http.PutAsJsonAsync<order_check>($"api/OrderCheck", new_current_check);
+                await Http.DeleteAsync($"api/OrderCheck/{current_order_check.id}");
+            }
+            current_order_check.product_To_Orders = new();
+            order.order_Checks.Remove(current_order_check);
+            current_order_check = new_current_check;
+        }
+        else
+        {
+            alert_text = "Один заказ должен имень как минимум один счет!";
+            alert_type = 1;
+            showAlert = true;
+        }
     }
     protected void ChangeCurrentCheck(order_check order_Check)
     {

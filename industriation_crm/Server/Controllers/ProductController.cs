@@ -46,10 +46,5 @@ namespace industriation_crm.Server.Controllers
             }
             return NotFound();
         }
-        [HttpPut("UpdateProductByExternalId/{externalId}")]
-        public void UpdateProductByExternalId(int externalId)
-        {
-
-        }
     }
 }
