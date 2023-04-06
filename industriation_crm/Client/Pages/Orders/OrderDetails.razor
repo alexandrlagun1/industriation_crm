@@ -23,6 +23,44 @@
 }
 else
 {
+    @if (view_filter_settings)
+    {
+        <div class="modal" tabindex="-1" style="display:block" role="dialog">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
+                <div class="modal-content b-s">
+                    <div class="modal-header">
+                        <div class="container">
+                            <div class="row-f ind-col-lg-10">
+                                <div class="main-title ind-col-lg-9">Настройка фильтра</div>
+                                <div class="ind-col-lg-1 row-f">
+                                    <div class="ind-col-lg-1 a-i-c">
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="CloseFilterSettings"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="section-field">
+                            <input type="checkbox" @bind="ordersFilter.filterView.client_view"> ФИО Клиента
+                            <input type="checkbox" @bind="ordersFilter.filterView.client_email_view"> Email
+                            <input type="checkbox" @bind="ordersFilter.filterView.delivey_from_view"> Дата доставки от
+                            <input type="checkbox" @bind="ordersFilter.filterView.delivey_to_view"> Дата доставки до
+                            <input type="checkbox" @bind="ordersFilter.filterView.pay_status_view"> Статус оплаты
+                            <input type="checkbox" @bind="ordersFilter.filterView.managers_view"> Менеджеры
+                            <input type="checkbox" @bind="ordersFilter.filterView.order_date_from_view">  Дата заказа от
+                            <input type="checkbox" @bind="ordersFilter.filterView.order_date_to_view"> Дата заказа до
+                            <input type="checkbox" @bind="ordersFilter.filterView.order_id_view"> Идентификатор заказа
+                            <input type="checkbox" @bind="ordersFilter.filterView.product_article_view"> Артикул продуктов
+                            <input type="checkbox" @bind="ordersFilter.filterView.pay_from_view"> Дата оплаты от
+                        </div>
+                        <br />
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     @if (view_client_select)
     {
         <industriation_crm.Client.Pages.Clients.ClientDetails SelectOrderClient="CreateOrder" CallType="1"></industriation_crm.Client.Pages.Clients.ClientDetails>
@@ -36,200 +74,182 @@ else
         <div class="main-section-label">
             Фильтр:
         </div>
-        <row-f>
-            Менеджер:
-            <div class="custom-select mr-20" onmouseover="customScroll()">
 
-                <input type="text" class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput" @onkeydown="FindOnKeyDown">
-                </input>
-                @foreach (var m in noSelectManagers.Where(m => m.name.Contains(manager_search)))
-                {
-                    <button @onclick="()=>{noSelectManagers.Remove(m); SelectManagers.Add(m);}">
-                        <div class="name">@m.name</div>
-                    </button>
-                }
-            </div>
-            <div class="manager-field">
-                @foreach (var m in SelectManagers)
-                {
-                    <button @onclick="()=>{SelectManagers.Remove(m); noSelectManagers.Add(m);}">
-                        <div class="name">@m.name</div>
-                        <img src="./icons/delete-icon.svg" />
-                    </button>
-                }
-            </div>
-        </row-f>
-        <row-f>
-            Статус заказа:
-            <div class="custom-select mr-20" onmouseover="customScroll()">
-                <input type="text" class="custom-input" contenteditable="true" @bind="order_status_search" @bind:event="oninput" @onkeydown="FindOnKeyDown">
-                </input>
-                @foreach (var s in noSelectOrderStatuses.Where(s => s.name.Contains(order_status_search)))
-                {
-                    <button @onclick="()=>{noSelectOrderStatuses.Remove(s); SelectOrderStatuses.Add(s);}">
-                        <div class="name">@s.name</div>
-                    </button>
-                }
-            </div>
-            <div class="manager-field">
-                @foreach (var s in SelectOrderStatuses)
-                {
-                    <button @onclick="()=>{SelectOrderStatuses.Remove(s); noSelectOrderStatuses.Add(s);}">
-                        <div class="name">@s.name</div>
-                        <img src="./icons/delete-icon.svg" />
-                    </button>
-                }
-            </div>
-        </row-f>
-        <row-f>
-            Статус оплаты:
-            <div class="custom-select mr-20" onmouseover="customScroll()">
-                <input type="text" class="custom-input" contenteditable="true" @bind="pay_status_search" @bind:event="oninput" @onkeydown="FindOnKeyDown">
-                </input>
-                @foreach (var s in noSelectPayStatuses.Where(s => s.name.Contains(pay_status_search)))
-                {
-                    <button @onclick="()=>{noSelectPayStatuses.Remove(s); SelectPayStatuses.Add(s);}">
-                        <div class="name">@s.name</div>
-                    </button>
-                }
-            </div>
-            <div class="manager-field">
-                @foreach (var s in SelectPayStatuses)
-                {
-                    <button @onclick="()=>{SelectPayStatuses.Remove(s); noSelectPayStatuses.Add(s);}">
-                        <div class="name">@s.name</div>
-                        <img src="./icons/delete-icon.svg" />
-                    </button>
-                }
-            </div>
-        </row-f>
+        @if (ordersFilter.filterView.managers_view)
+        {
+            <row-f>
+                Менеджер:
+                <div class="custom-select mr-20" onmouseover="customScroll()">
+                    <input type="text" class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput" @onkeydown="FindOnKeyDown">
+                    </input>
+                    @foreach (var m in noSelectManagers.Where(m => m.name.Contains(manager_search)))
+                    {
+                        <button @onclick="()=>{noSelectManagers.Remove(m); SelectManagers.Add(m);}">
+                            <div class="name">@m.name</div>
+                        </button>
+                    }
+                </div>
+                <div class="manager-field">
+                    @foreach (var m in SelectManagers)
+                    {
+                        <button @onclick="()=>{SelectManagers.Remove(m); noSelectManagers.Add(m);}">
+                            <div class="name">@m.name</div>
+                            <img src="./icons/delete-icon.svg" />
+                        </button>
+                    }
+                </div>
+            </row-f>
+        }
+        @*<row-f>
+    Статус заказа:
+    <div class="custom-select mr-20" onmouseover="customScroll()">
+    <input type="text" class="custom-input" contenteditable="true" @bind="order_status_search" @bind:event="oninput" @onkeydown="FindOnKeyDown">
+    </input>
+    @foreach (var s in noSelectOrderStatuses.Where(s => s.name.Contains(order_status_search)))
+    {
+    <button @onclick="()=>{noSelectOrderStatuses.Remove(s); SelectOrderStatuses.Add(s);}">
+    <div class="name">@s.name</div>
+    </button>
+    }
+    </div>
+    <div class="manager-field">
+    @foreach (var s in SelectOrderStatuses)
+    {
+    <button @onclick="()=>{SelectOrderStatuses.Remove(s); noSelectOrderStatuses.Add(s);}">
+    <div class="name">@s.name</div>
+    <img src="./icons/delete-icon.svg" />
+    </button>
+    }
+    </div>
+    </row-f>*@
+        @if (ordersFilter.filterView.pay_status_view)
+        {
+            <row-f>
+                Статус оплаты:
+                <div class="custom-select mr-20" onmouseover="customScroll()">
+                    <input type="text" class="custom-input" contenteditable="true" @bind="pay_status_search" @bind:event="oninput" @onkeydown="FindOnKeyDown">
+                    </input>
+                    @foreach (var s in noSelectPayStatuses.Where(s => s.name.Contains(pay_status_search)))
+                    {
+                        <button @onclick="()=>{noSelectPayStatuses.Remove(s); SelectPayStatuses.Add(s);}">
+                            <div class="name">@s.name</div>
+                        </button>
+                    }
+                </div>
+                <div class="manager-field">
+                    @foreach (var s in SelectPayStatuses)
+                    {
+                        <button @onclick="()=>{SelectPayStatuses.Remove(s); noSelectPayStatuses.Add(s);}">
+                            <div class="name">@s.name</div>
+                            <img src="./icons/delete-icon.svg" />
+                        </button>
+                    }
+                </div>
+            </row-f>
+        }
         <div class="section-field ind-col-lg-10">
-            <div class="ind-col-lg-5 input-field ind-col-md-10">
-                <div class="input-label ind-col-lg-5">
-                    Номер заказа:
+            @if (ordersFilter.filterView.order_id_view)
+            {
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Номер заказа:
+                    </div>
+                    <input type="number" @bind="ordersFilter.order_id" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
-                <input type="number" @bind="ordersFilter.order_id" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
-            </div>
-            <div class="ind-col-lg-5 input-field ind-col-md-10">
-                <div class="input-label ind-col-lg-5">
-                    Покупатель:
+            }
+            @if (ordersFilter.filterView.client_view)
+            {
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Покупатель:
+                    </div>
+                    <input type="text" @bind="ordersFilter.client" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
-                <input type="text" @bind="ordersFilter.client" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
-            </div>
+            }
         </div>
         <div class="section-field ind-col-lg-10">
-            <div class="ind-col-lg-5 input-field ind-col-md-10">
-                <div class="input-label ind-col-lg-5">
-                    Дата заказа от:
+            @if (ordersFilter.filterView.order_date_from_view)
+            {
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Дата заказа от:
+                    </div>
+                    <input type="date" @bind="ordersFilter.order_date_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
-                <input type="date" @bind="ordersFilter.order_date_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
-            </div>
-            <div class="ind-col-lg-5 input-field ind-col-md-10">
-                <div class="input-label ind-col-lg-5">
-                    Дата заказа до:
+            }
+            @if (ordersFilter.filterView.order_date_to_view)
+            {
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Дата заказа до:
+                    </div>
+                    <input type="date" @bind="ordersFilter.order_date_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
-                <input type="date" @bind="ordersFilter.order_date_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
-            </div>
+            }
         </div>
         <div class="section-field ind-col-lg-10">
-            <div class="ind-col-lg-5 input-field ind-col-md-10">
-                <div class="input-label ind-col-lg-5">
-                    Дата отгрузки от:
+            @if (ordersFilter.filterView.delivey_from_view)
+            {
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Дата отгрузки от:
+                    </div>
+                    <input type="date" @bind="ordersFilter.delivey_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
-                <input type="date" @bind="ordersFilter.delivey_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
-            </div>
-            <div class="ind-col-lg-5 input-field ind-col-md-10">
-                <div class="input-label ind-col-lg-5">
-                    Дата отгрузки до:
+            }
+            @if (ordersFilter.filterView.delivey_to_view)
+            {
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Дата отгрузки до:
+                    </div>
+                    <input type="date" @bind="ordersFilter.delivey_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
-                <input type="date" @bind="ordersFilter.delivey_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
-            </div>
+            }
         </div>
         <div class="section-field ind-col-lg-10">
-            <div class="ind-col-lg-5 input-field ind-col-md-10">
-                <div class="input-label ind-col-lg-5">
-                    Дата оплаты:
+            @if (ordersFilter.filterView.pay_from_view)
+            {
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Дата оплаты:
+                    </div>
+                    <input type="date" @bind="ordersFilter.pay_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
-                <input type="date" @bind="ordersFilter.pay_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
-            </div>
-            <div class="ind-col-lg-5 input-field ind-col-md-10">
-                <div class="input-label ind-col-lg-5">
-                    Артикул товара в заказе:
+            }
+            @if (ordersFilter.filterView.product_article_view)
+            {
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Артикул товара в заказе:
+                    </div>
+                    <input @bind="ordersFilter.product_article" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
-                <input @bind="ordersFilter.product_article" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
-            </div>
+            }
         </div>
         <div class="section-field ind-col-lg-10">
-            <div class="ind-col-lg-5 input-field ind-col-md-10">
-                <div class="input-label ind-col-lg-5">
-                    Email клиента:
+            @if (ordersFilter.filterView.client_email_view)
+            {
+                <div class="ind-col-lg-5 input-field ind-col-md-10">
+                    <div class="input-label ind-col-lg-5">
+                        Email клиента:
+                    </div>
+                    <input @bind="ordersFilter.client_email" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
-                <input @bind="ordersFilter.client_email" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
-            </div>
+            }
         </div>
         <button @onclick="FindByFilter" class="score mb-20 mt-20">Поиск</button>
         <button @onclick="ClearFilter" class="close">X</button>
+        <button @onclick="()=>view_filter_settings = true" class="score mt-20 mb-20">Настройки фильтра</button>
         <div class="section-fied flex mb-20 orderds-checkboxes">
+            @foreach (var s in allOrderStatuses)
+            {
                 <div class="custom-box">
-                <label class="td-order-new label-for-custom-checkbox" for="Новый"></label>
-                    <input class="custom-checkbox" id="Новый" type="checkbox">
-                    <div class="name"> - Новый</div>
+                    <label class="@s.style label-for-custom-checkbox" for="@s.name"></label>
+                    <input class="custom-checkbox" id="@s.name" type="checkbox" @bind="s.is_check" @bind:event="oninput" @onkeydown="FindOnKeyDown">
+                    <div class="name"> - @s.name</div>
                 </div>
-                <div class="custom-box">
-                <label class="td-v-schet label-for-custom-checkbox" for="Выставлен счет"></label>
-                    <input class="custom-checkbox" id="Выставлен счет" type="checkbox">
-                    <div class="name"> - Выставлен счет</div>
-                </div>
-                <div class="custom-box">
-                <label class="td-trade-confirm label-for-custom-checkbox" for="Сделка состоялась"></label>
-                    <input class="custom-checkbox" id="Сделка состоялась" type="checkbox">
-                    <div class="name"> - Сделка состоялась</div>
-                </div>
-                <div class="custom-box">
-                    <label class="td-peres label-for-custom-checkbox" for="Пересогласование"></label>
-                    <input class="custom-checkbox" id="Пересогласование" type="checkbox">
-                    <div class="name"> - Пересогласование</div>
-                </div>
-                <div class="custom-box">
-                    <label class="td-part-order label-for-custom-checkbox" for="Частично заказан"></label>
-                    <input class="custom-checkbox" id="Частично заказан" type="checkbox">
-                    <div class="name"> - Частично заказан</div>
-                </div>
-                <div class="custom-box">
-                <label class="td-order label-for-custom-checkbox" for="Заказан"></label>
-                    <input class="custom-checkbox" id="Заказан" type="checkbox">
-                    <div class="name"> - Заказан</div>
-                </div>
-                <div class="custom-box">
-                <label class="td-cancel label-for-custom-checkbox" for="Отменен"></label>
-                    <input class="custom-checkbox" id="Отменен" type="checkbox">
-                    <div class="name"> - Отменен</div>
-                </div>
-                <div class="custom-box">
-                <label class="td-return label-for-custom-checkbox" for="Возврат"></label>
-                    <input class="custom-checkbox" id="Возврат" type="checkbox">
-                    <div class="name"> - Возврат</div>
-                </div>
-                <div class="custom-box">
-                <label class="td-on-sklad label-for-custom-checkbox" for="На складе"></label>
-                    <input class="custom-checkbox" id="На складе" type="checkbox">
-                    <div class="name"> - На складе</div>
-                </div>
-                <div class="custom-box">
-                <label class="td-to-dost label-for-custom-checkbox" for="Передан в доставку"></label>
-                    <input class="custom-checkbox" id="Передан в доставку" type="checkbox">
-                    <div class="name"> - Передан в доставку</div>
-                </div>
-                <div class="custom-box">
-                <label class="td-delivered label-for-custom-checkbox" for="Доставлен"></label>
-                    <input class="custom-checkbox" id="Доставлен" type="checkbox">
-                    <div class="name"> - Доставлен</div>
-                </div>
-                <div class="custom-box">
-                <label class="td-close label-for-custom-checkbox" for="Закрыт"></label>
-                    <input class="custom-checkbox" id="Закрыт" type="checkbox">
-                    <div class="name"> - Закрыт</div>
-                </div>
+            }
         </div>
         <div class="section-field">
             <table id="orders-table" class="order-table ind-col-lg-10">
@@ -254,8 +274,8 @@ else
                 </thead>
                 <tbody>
                     @foreach (var order in ordersReturnData?.orders!)
-                    {   
-                        <tr class="order-row ind-col-lg-10" >
+                    {
+                        <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1">
                                 <a href='/order/edit/@order.id'>
                                     @order.id
@@ -285,14 +305,6 @@ else
                             <td class="ind-col-lg-1">@order.pay_status?.name</td>
                             <td class="ind-col-lg-1 @order?.order_status_name" data-status="@order.order_status?.name">@order.order_status?.name</td>
                             <td class="ind-col-lg-1">@order.stage?.name</td>
-                            @*                            <td class="ind-col-lg-1">
-                    <a href='/order/edit/@order.id' class="score" role="button">
-                    <div class="hidden-md">Изменить</div>
-                    <div class="hidden-lg ind-col-md-10">
-                    <img src="./icons/edit.svg" class="h20-w20">
-                    </div>
-                    </a>
-                    </td>*@
                         </tr>
                     }
                 </tbody>
@@ -320,6 +332,7 @@ else
     protected string pay_status_search = "";
     protected int count_on_page = 50;
     protected int current_page = 1;
+    protected bool view_filter_settings { get; set; }
     List<int> page_count = new List<int>();
     protected OrdersFilter ordersFilter = new();
     protected OrdersReturnData ordersReturnData = new();
@@ -329,11 +342,11 @@ else
 
     protected List<user> SelectManagers = new();
     protected List<user> noSelectManagers = new();
-    protected List<order_status> SelectOrderStatuses = new();
-    protected List<order_status> noSelectOrderStatuses = new();
+    //protected List<order_status> SelectOrderStatuses = new();
+    //protected List<order_status> noSelectOrderStatuses = new();
     protected List<pay_status> SelectPayStatuses = new();
     protected List<pay_status> noSelectPayStatuses = new();
-
+    protected List<order_status> allOrderStatuses = new();
 
     protected int role { get; set; }
     protected int user_id { get; set; }
@@ -360,21 +373,26 @@ else
             foreach (var m in removedManagers)
                 noSelectManagers.Remove(m);
         }
-        noSelectOrderStatuses = await Http.GetFromJsonAsync<List<order_status>>("api/OrderStatus");
-        if (noSelectOrderStatuses != null)
+        allOrderStatuses = await Http.GetFromJsonAsync<List<order_status>>("api/OrderStatus");
+        foreach (var s in ordersFilter.order_status)
         {
-            List<order_status> removedOrderStatuses = new();
-            foreach (var s in noSelectOrderStatuses)
-            {
-                if (ordersFilter.order_status.Contains(s.id))
-                {
-                    removedOrderStatuses.Add(s);
-                    SelectOrderStatuses.Add(s);
-                }
-            }
-            foreach (var s in removedOrderStatuses)
-                noSelectOrderStatuses.Remove(s);
+            allOrderStatuses.Where(status => status.id == s).FirstOrDefault().is_check = true;
         }
+        //noSelectOrderStatuses = await Http.GetFromJsonAsync<List<order_status>>("api/OrderStatus");
+        //if (noSelectOrderStatuses != null)
+        //{
+        //    List<order_status> removedOrderStatuses = new();
+        //    foreach (var s in noSelectOrderStatuses)
+        //    {
+        //        if (ordersFilter.order_status.Contains(s.id))
+        //        {
+        //            removedOrderStatuses.Add(s);
+        //            SelectOrderStatuses.Add(s);
+        //        }
+        //    }
+        //    foreach (var s in removedOrderStatuses)
+        //        noSelectOrderStatuses.Remove(s);
+        //}
         noSelectPayStatuses = await Http.GetFromJsonAsync<List<pay_status>>("api/PayStatus");
         if (noSelectPayStatuses != null)
         {
@@ -395,6 +413,26 @@ else
     public void EditOrder(int order_id)
     {
         NavigationManager.NavigateTo($"/order/edit/{order_id}");
+    }
+    protected async void OrderStatusCheckboxChange(ChangeEventArgs e, int status_id)
+    {
+        //if(Convert.ToBoolean(e.Value) == true)
+        //{
+        //    var order_status = noSelectOrderStatuses.Where(s=>s.id == status_id).FirstOrDefault();
+        //    if (order_status != null) {
+        //        noSelectOrderStatuses.Remove(order_status);
+        //        SelectOrderStatuses.Add(order_status);
+        //    }
+        //}
+        //if(Convert.ToBoolean(e.Value) == false)
+        //{
+        //    var order_status = SelectOrderStatuses.Where(s => s.id == status_id).FirstOrDefault();
+        //    if (order_status != null)
+        //    {
+        //        SelectOrderStatuses.Remove(order_status);
+        //        noSelectOrderStatuses.Add(order_status);
+        //    }
+        //}
     }
     protected async Task FindOnKeyDown(KeyboardEventArgs e)
     {
@@ -428,21 +466,39 @@ else
             await GetOrders();
         }
     }
+    protected async Task CloseFilterSettings()
+    {
+        view_filter_settings = false;
+        await Http.PutAsJsonAsync("api/Filter/SaveOrdersFilter", ordersFilter);
+    }
     protected async Task ClearFilter()
     {
         current_page = 1;
-        foreach(var m in SelectManagers)
+        foreach (var m in SelectManagers)
         {
             noSelectManagers.Add(m);
         }
         SelectManagers = new();
-        foreach(var s in SelectOrderStatuses)
-            noSelectOrderStatuses.Add(s);
-        SelectOrderStatuses = new();
-        foreach(var s in SelectPayStatuses)
+        allOrderStatuses.ForEach(s => s.is_check = false);
+
+        foreach (var s in SelectPayStatuses)
             noSelectPayStatuses.Add(s);
         SelectPayStatuses = new();
-        ordersFilter = new();
+
+        ordersFilter.pay_from = null;
+        ordersFilter.client = null;
+        ordersFilter.client_email = null;
+        ordersFilter.order_id = null;
+        ordersFilter.delivey_from = null;
+        ordersFilter.delivey_to = null;
+        ordersFilter.product_article = null;
+        ordersFilter.order_date_from = null;
+        ordersFilter.order_date_to = null;
+
+        ordersFilter.managers = new();
+        ordersFilter.order_status = new();
+        ordersFilter.pay_status = new();
+
         ordersFilter.user_id = user_id;
         await GetOrders();
     }
@@ -469,7 +525,7 @@ else
             ordersFilter.managers.Add(m.id);
         }
         ordersFilter.order_status = new();
-        foreach (var s in SelectOrderStatuses)
+        foreach (var s in allOrderStatuses.Where(s => s.is_check == true))
         {
             ordersFilter.order_status.Add(s.id);
         }

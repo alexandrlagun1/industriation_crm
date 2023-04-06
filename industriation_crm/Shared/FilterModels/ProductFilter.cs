@@ -23,6 +23,14 @@ namespace industriation_crm.Shared.FilterModels
         public int category_id { get; set; }
         public List<int?>? child_categories { get; set; }
 
+        public ProductFilterView filterView { get; set; } = new();
         public int user_id { get; set; }
+    }
+    public class ProductFilterView
+    {
+        public bool name_view { get; set; } = true;
+        public bool article_view { get; set; } = true;
+        public bool price_from_view { get; set; } = true;
+        public bool price_to_view { get; set; } = true;
     }
 }

@@ -439,7 +439,15 @@ else
 
         if (clientId != 0)
         {
-            await Http.PutAsJsonAsync("api/Client", client);
+            var clientResponse = await Http.PutAsJsonAsync("api/Client", client);
+            string message = await clientResponse.Content.ReadAsStringAsync();
+            if(message != null)
+            {
+                alertText = message;
+                showAlert = true;
+                return;
+            }
+
             if (main_contact != null)
                 await Http.PutAsJsonAsync("api/Contact", main_contact);
         }
@@ -457,7 +465,7 @@ else
             clientId = await clientResponse.Content.ReadFromJsonAsync<int>();
             if (clientId == 0)
             {
-                alertText = "Клиент с таким ИНН уже заведен!";
+                alertText = "Клиент с таким ИНН уже ceсуществует!";
                 showAlert = true;
                 return;
             }

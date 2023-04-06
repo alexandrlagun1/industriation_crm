@@ -36,9 +36,10 @@ namespace industriation_crm.Server.Controllers
             return _IClient.AddClient(client);
         }
         [HttpPut]
-        public void Put(client client)
+        public string Put(client client)
         {
-            _IClient.UpdateClientDetails(client);
+            string message = _IClient.UpdateClientDetails(client);
+            return message;
         }
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)

@@ -17,6 +17,38 @@
 }
 else
 {
+    @if (view_filter_settings)
+    {
+        <div class="modal" tabindex="-1" style="display:block" role="dialog">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
+                <div class="modal-content b-s">
+                    <div class="modal-header">
+                        <div class="container">
+                            <div class="row-f ind-col-lg-10">
+                                <div class="main-title ind-col-lg-9">Настройка фильтра</div>
+                                <div class="ind-col-lg-1 row-f">
+                                    <div class="ind-col-lg-1 a-i-c">
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="CloseFilterSettings"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="section-field">
+                            <input type="checkbox" @bind="productFilter.filterView.name_view"> Наименование продукта
+                            <input type="checkbox" @bind="productFilter.filterView.article_view"> Артикул продукта
+                            <input type="checkbox" @bind="productFilter.filterView.price_from_view"> Цена от
+                            <input type="checkbox" @bind="productFilter.filterView.price_to_view"> Цена до
+                        </div>
+                        <br />
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
     <div class="section-field">
         <a class="score" type="button" href="/product/add/">
             Добавить продукт
@@ -43,35 +75,46 @@ else
         </div>
         <hr />
         <div class="section-field mb-20">
-            <div class="ind-col-lg-2-5 pad-0-10-0-0">
-                <div class="input-label">
-                    Наименование товара:
+            @if (productFilter.filterView.name_view)
+            {
+                <div class="ind-col-lg-2-5 pad-0-10-0-0">
+                    <div class="input-label">
+                        Наименование товара:
+                    </div>
+                    <input type="text" class="main-input" @bind="productFilter.name" @onkeydown="SearchEnter" @bind:event="oninput" />
                 </div>
-                <input type="text" class="main-input" @bind="productFilter.name" @onkeydown="SearchEnter" @bind:event="oninput" />
-            </div>
-            <div class="ind-col-lg-2-5 pad-0-10-0-0">
-                <div class="input-label">
-                    Артикул:
+            }
+            @if (productFilter.filterView.article_view)
+            {
+                <div class="ind-col-lg-2-5 pad-0-10-0-0">
+                    <div class="input-label">
+                        Артикул:
+                    </div>
+                    <input class="main-input" @bind="productFilter.article" @onkeydown="SearchEnter" @bind:event="oninput" />
                 </div>
-                <input class="main-input" @bind="productFilter.article" @onkeydown="SearchEnter" @bind:event="oninput" />
-            </div>
-            <div class="ind-col-lg-2-5 pad-0-10-0-0">
-                <div class="input-label">
-                    Цена от:
+            }
+            @if (productFilter.filterView.price_from_view)
+            {
+                <div class="ind-col-lg-2-5 pad-0-10-0-0">
+                    <div class="input-label">
+                        Цена от:
+                    </div>
+                    <input type="number" class="main-input" @bind="productFilter.price_from" @onkeydown="SearchEnter" @bind:event="oninput" />
                 </div>
-                <input type="number" class="main-input" @bind="productFilter.price_from" @onkeydown="SearchEnter" @bind:event="oninput" />
-            </div>
-            <div class="ind-col-lg-2-5 pad-0-10-0-0">
-                <div class="input-label">
-                    Цена до:
+            }
+            @if (productFilter.filterView.price_to_view)
+            {
+                <div class="ind-col-lg-2-5 pad-0-10-0-0">
+                    <div class="input-label">
+                        Цена до:
+                    </div>
+                    <input type="number" class="main-input" @bind="productFilter.price_to" @onkeydown="SearchEnter" @bind:event="oninput" />
                 </div>
-                <input type="number" class="main-input" @bind="productFilter.price_to" @onkeydown="SearchEnter" @bind:event="oninput" />
-            </div>
+            }
         </div>
-        <div class="section-field pad-0-5">
-            <button class="score mr-20" @onclick="FilterButtonClick">Поиск</button>
-            <button @onclick="ClearFilter" class="close">X</button>
-        </div>
+        <button @onclick="FilterButtonClick" class="score mb-20 mt-20">Поиск</button>
+        <button @onclick="ClearFilter" class="close">X</button>
+        <button @onclick="()=>view_filter_settings = true" class="score mt-20 mb-20">Настройки фильтра</button>
     </div>
 
 
@@ -142,7 +185,7 @@ else
 
     List<int> page_count = new List<int>();
     protected ProductFilter productFilter = new();
-
+    protected bool view_filter_settings { get; set; }
     protected category? currentCategory = new();
     protected List<category>? categoriesList = new();
     protected List<product>? productList = new();
@@ -157,7 +200,11 @@ else
             await FindByFilter();
         }
     }
-
+    protected async Task CloseFilterSettings()
+    {
+        view_filter_settings = false;
+        await Http.PutAsJsonAsync("api/Filter/SaveProductsFilter", productFilter);
+    }
     protected override async Task OnInitializedAsync()
     {
         categoriesList = await Http.GetFromJsonAsync<List<category>>("api/Category");
@@ -242,7 +289,10 @@ else
     }
     protected async Task ClearFilter()
     {
-        productFilter = new();
+        productFilter.article = null;
+        productFilter.name = null;
+        productFilter.price_from = null;
+        productFilter.price_to = null;
         currentCategory = categoriesList.Where(c => c.id == 1).FirstOrDefault();
         current_page = 1;
         productFilter.user_id = user_id;

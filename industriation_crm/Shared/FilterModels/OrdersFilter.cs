@@ -25,11 +25,28 @@ namespace industriation_crm.Shared.FilterModels
         public int? order_id { get; set; }
         public int stage { get; set; }
 
+        public OrderFilterView filterView { get; set; } = new();
         public int user_id { get; set; }//Для сохранения и получения фильтра из бд
     }
     public class OrdersReturnData
     {
         public int count { get; set; }
         public List<order> orders { get; set; } = new();
+    }
+    public class OrderFilterView
+    {
+        public bool managers_view { get; set; } = true;
+        public bool client_view { get; set; } = true;
+        public bool product_article_view { get; set; } = true;
+        public bool client_email_view { get; set; } = true;
+        public bool order_status_view { get; set; } = true;
+        public bool pay_status_view { get; set; } = true;
+        public bool pay_from_view { get; set; } = true;
+        public bool order_date_from_view { get; set; } = true;
+        public bool order_date_to_view { get; set; } = true;
+        public bool delivey_from_view { get; set; } = true;
+        public bool delivey_to_view { get; set; } = true;
+        public bool order_id_view { get; set; } = true;
+
     }
 }

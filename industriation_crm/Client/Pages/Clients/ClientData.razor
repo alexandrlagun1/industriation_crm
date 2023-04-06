@@ -223,7 +223,7 @@
                                                    Дата: <b>@p.date</b>
                                                 </div>
                                                 <div>
-                                                Сумма: <b>@p.price.Value.ToString("N", NumberMask.GetNi()) @o._current_check.currency</b>
+                                                Сумма: <b>@p?.price?.ToString("N", NumberMask.GetNi()) @o?._current_check?.currency</b>
                                                 </div>
                                             }
                                         }

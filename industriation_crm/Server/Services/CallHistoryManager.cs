@@ -48,8 +48,12 @@ namespace industriation_crm.Server.Services
 
             try
             {
-                var query = _dbContext.call_history.Where(c => c.type!.Contains(callHistoryFilter.type!) && c.client_number!.Contains(callHistoryFilter.phone!));
-                if(callHistoryFilter.managers != null && callHistoryFilter.managers.Count() != 0)
+                var query = _dbContext.call_history.Where(c => c.id != 0);
+                if (!String.IsNullOrEmpty(callHistoryFilter.type))
+                    query = query.Where(c => c.type!.Contains(callHistoryFilter.type));
+                if(!String.IsNullOrEmpty(callHistoryFilter.phone))
+                    query = query.Where(c => c.client_number!.Contains(callHistoryFilter.phone!));
+                if (callHistoryFilter.managers != null && callHistoryFilter.managers.Count() != 0)
                     query = query.Where(c => callHistoryFilter.managers.Contains(c.user_id));
                 if (callHistoryFilter.call_date_from != null)
                     query = query.Where(c => c.date_time > callHistoryFilter.call_date_from);

@@ -242,6 +242,7 @@ namespace industriation_crm.Shared.Models
         [Key]
         public int id { get; set; }
         public string? name { get; set; }
+        
     }
     public class product
     {
@@ -297,6 +298,12 @@ namespace industriation_crm.Shared.Models
             }
             
         }
+        public string? postoplata_condition { get; set; }
+        public int? pay_predoplata_percent { get; set; } 
+        public int? second_pay_predoplata_percent { get; set; }
+        public string? pay_predoplata_condition { get; set; }
+        public string? second_pay_predoplata_condition { get; set; }
+
         public int? client_id { get; set; }
         public int? user_id { get; set; }
         public int? order_status_id { get; set; } = 1;
@@ -312,7 +319,7 @@ namespace industriation_crm.Shared.Models
         public int? stage_id { get; set; } = 1;
         public int? pay_status_id { get; set; } = 4;
         public int? pay_conditions { get; set; } = 1;
-        public int? pay_predoplata_percent { get; set; } = 100;
+        
         public int? supplier_manager_id { get; set; }
         public virtual List<order_check>? order_Checks { get; set; } = new();
         [ForeignKey("supplier_manager_id")]
@@ -345,7 +352,7 @@ namespace industriation_crm.Shared.Models
             }
         }
         [NotMapped]
-        public double? _price_summ //Сколько отсалось оплатить
+        public double? _price_summ //Сколько осталось оплатить
         {
             get
             {
@@ -471,7 +478,7 @@ namespace industriation_crm.Shared.Models
 
 
         [NotMapped]
-        public double? _current_pay_summ
+        public double? _current_pay_summ //Всего оплачено
         {
             get
             {
@@ -507,6 +514,9 @@ namespace industriation_crm.Shared.Models
         [Key]
         public int id { get; set; }
         public string? name { get; set; }
+        public string? style{ get; set; }
+        [NotMapped]
+        public bool is_check { get; set; }
     }
     public class product_to_order
     {

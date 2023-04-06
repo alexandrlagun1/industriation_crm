@@ -16,6 +16,38 @@
 }
 else
 {
+    @if (view_filter_settings)
+    {
+        <div class="modal" tabindex="-1" style="display:block" role="dialog">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
+                <div class="modal-content b-s">
+                    <div class="modal-header">
+                        <div class="container">
+                            <div class="row-f ind-col-lg-10">
+                                <div class="main-title ind-col-lg-9">Настройка фильтра</div>
+                                <div class="ind-col-lg-1 row-f">
+                                    <div class="ind-col-lg-1 a-i-c">
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="CloseFilterSettings"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="section-field">
+                            <input type="checkbox" @bind="clientFilter.filterView.fio_view"> ФИО Клиента
+                            <input type="checkbox" @bind="clientFilter.filterView.email_view"> Email
+                            <input type="checkbox" @bind="clientFilter.filterView.phone_view"> Номер телефона
+                            <input type="checkbox" @bind="clientFilter.filterView.inn_view"> ИНН
+                            <input type="checkbox" @bind="clientFilter.filterView.tag_view"> Тэг
+                        </div>
+                        <br />
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     @if (viewAddClient)
     {
         <AddClient returnToFetchUsers="ReturnToFetchClient"></AddClient>
@@ -28,44 +60,61 @@ else
             </a>
         </div>
         <div class="main-section">
-            <div class="ind-col-lg-5 ind-col-md-7 input-field">
-                <div class="input-label ind-col-lg-5" >
-                    ФИО клиента:
-                </div>
-                <input type="text" class="main-input ind-col-lg-5 ind-col-md-7" @bind-value="clientFilter.client" @onkeydown="FindOnKeyDown" @bind-value:event="oninput">
-            </div>
-            <div class="ind-col-lg-5 ind-col-md-7 input-field">
-                <div class="input-label ind-col-lg-5">
-                    ИНН:
-                </div>
-                <input type="number" class="main-input ind-col-lg-5 ind-col-md-7" @bind-value="clientFilter.inn" @onkeydown="FindOnKeyDown" @bind-value:event="oninput" min="0">
+            <div class="section-field ind-col-lg-10">
+                @if (clientFilter.filterView.inn_view)
+                {
+                    <div class="ind-col-lg-5 input-field ind-col-md-10">
+                        <div class="input-label ind-col-lg-5">
+                            ИНН:
+                        </div>
+                        <input type="number" class="main-input ind-col-lg-5 ind-col-md-7" @bind-value="clientFilter.inn" @onkeydown="FindOnKeyDown" @bind-value:event="oninput" min="0">
+                    </div>
+                }
+                @if (clientFilter.filterView.email_view)
+                {
+                    <div class="ind-col-lg-5 input-field ind-col-md-10">
+                        <div class="input-label ind-col-lg-5">
+                            Email клиента:
+                        </div>
+                        <input @bind-value="clientFilter.client_email" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
+                    </div>
+                }
             </div>
             <div class="section-field ind-col-lg-10">
-                <div class="ind-col-lg-5 input-field ind-col-md-10">
-                    <div class="input-label ind-col-lg-5">
-                        Email клиента:
+                @if (clientFilter.filterView.tag_view)
+                {
+                    <div class="ind-col-lg-5 input-field ind-col-md-10">
+                        <div class="input-label ind-col-lg-5">
+                            Телефон клиента:
+                        </div>
+                        <input @bind-value="clientFilter.client_phone" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
                     </div>
-                    <input @bind-value="clientFilter.client_email" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
-                </div>
+                }
+                @if (clientFilter.filterView.phone_view)
+                {
+                    <div class="ind-col-lg-5 input-field ind-col-md-10">
+                        <div class="input-label ind-col-lg-5">
+                            Тэг:
+                        </div>
+                        <input @bind-value="clientFilter.tag" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
+                    </div>
+                }
             </div>
             <div class="section-field ind-col-lg-10">
-                <div class="ind-col-lg-5 input-field ind-col-md-10">
-                    <div class="input-label ind-col-lg-5">
-                        Телефон клиента:
+                @if (clientFilter.filterView.fio_view)
+                {
+                    <div class="ind-col-lg-5 input-field ind-col-md-10">
+                        <div class="input-label ind-col-lg-5">
+                            ФИО клиента:
+                        </div>
+                        <input type="text" class="main-input ind-col-lg-5 ind-col-md-7" @bind-value="clientFilter.client" @onkeydown="FindOnKeyDown" @bind-value:event="oninput">
                     </div>
-                    <input @bind-value="clientFilter.client_phone" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
-                </div>
+                }
             </div>
-            <div class="section-field ind-col-lg-10">
-                <div class="ind-col-lg-5 input-field ind-col-md-10">
-                    <div class="input-label ind-col-lg-5">
-                        Тэг:
-                    </div>
-                    <input @bind-value="clientFilter.tag" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
-                </div>
-            </div>
+
             <button @onclick="Search" class="score mt-20 mb-20">Поиск</button>
             <button @onclick="ClearFilter" class="close">X</button>
+            <button @onclick="()=>view_filter_settings = true"class="score mt-20 mb-20">Настройки фильтра</button>
             <div class="section-field">
                 <table class="order-table ind-col-lg-10">
                     <thead class="ind-col-lg-10">
@@ -166,6 +215,7 @@ else
     protected bool viewAddClient = false;
     protected int count_on_page = 50;
     protected int current_page = 1;
+    protected bool view_filter_settings { get; set; }
     List<int> page_count = new List<int>();
     protected ClientFilter clientFilter = new();
     protected ClientReturnData clientReturnData = new();
@@ -173,6 +223,7 @@ else
     protected List<client> clientList = new();
     protected int role { get; set; }
     protected int user_id { get; set; }
+
     private async Task FindOnKeyDown(KeyboardEventArgs e)
     {
         if (e.Code == "Enter" || e.Code == "NumpadEnter")
@@ -183,7 +234,7 @@ else
     }
     protected async Task SelectClient(client client)
     {
-            await SelectOrderClient.InvokeAsync(client);
+        await SelectOrderClient.InvokeAsync(client);
     }
     protected override async Task OnInitializedAsync()
     {
@@ -194,6 +245,7 @@ else
         clientFilter.user_id = user_id;
         await GetClient();
     }
+
     protected async Task Search()
     {
         current_page = 1;
@@ -202,11 +254,20 @@ else
     protected async Task ClearFilter()
     {
         current_page = 1;
-        clientFilter = new();
+        clientFilter.client = String.Empty;
+        clientFilter.inn = String.Empty;
+        clientFilter.client_email = String.Empty;
+        clientFilter.client_phone = String.Empty;
+        clientFilter.tag = String.Empty;
+
         clientFilter.user_id = user_id;
         await GetClient();
     }
-
+    protected async Task CloseFilterSettings()
+    {
+        await Http.PutAsJsonAsync("api/Filter/SaveClientsFilter", clientFilter);
+        view_filter_settings = false;
+    }
     protected async Task OnKeyDown(KeyboardEventArgs e)
     {
 

@@ -10,66 +10,113 @@
 {
     <industriation_crm.Client.Pages.Clients.ClientDetails contact_number="@contactNumber"></industriation_crm.Client.Pages.Clients.ClientDetails>
 }
+@if (view_filter_settings)
+{
+    <div class="modal" tabindex="-1" style="display:block" role="dialog">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
+            <div class="modal-content b-s">
+                <div class="modal-header">
+                    <div class="container">
+                        <div class="row-f ind-col-lg-10">
+                            <div class="main-title ind-col-lg-9">Настройка фильтра</div>
+                            <div class="ind-col-lg-1 row-f">
+                                <div class="ind-col-lg-1 a-i-c">
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть" @onclick="CloseFilterSettings"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="section-field">
+                        <input type="checkbox" @bind="callHistoryFilter.filterView.type_view"> Тип звонка
+                        <input type="checkbox" @bind="callHistoryFilter.filterView.phone_view"> Телефон
+                        <input type="checkbox" @bind="callHistoryFilter.filterView.managers_view"> Менеджеры
+                        <input type="checkbox" @bind="callHistoryFilter.filterView.call_date_from_view"> Дата звонков от
+                        <input type="checkbox" @bind="callHistoryFilter.filterView.call_date_to_view"> Дата звонков до
+                    </div>
+                    <br />
 
+                </div>
+            </div>
+        </div>
+    </div>
+}
 <div class="main-section">
     <div class="main-section-label">
         Фильтр:
     </div>
-    <row-f>
-        <div class="custom-select mr-20" onmouseover="customScroll()">
-            <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput" @onkeydown="SearchEnter">
-            </input>
-            @foreach (var m in noSelectManagers!.Where(m => m.name.Contains(manager_search)))
-            {
-                <button @onclick="()=>{noSelectManagers!.Remove(m); SelectManagers.Add(m);}">
-                    <div class="name">@m.name</div>
-                </button>
-            }
-        </div>
-        <div class="manager-field">
-            @foreach (var m in SelectManagers)
-            {
-                <button @onclick="()=>{SelectManagers.Remove(m); noSelectManagers!.Add(m);}">
-                    <div class="name">@m.name</div>
-                    <img src="./icons/delete-icon.svg" />
-                </button>
-            }
-        </div>
-    </row-f>
+    @if (callHistoryFilter.filterView.managers_view)
+    {
+        <row-f>
+            <div class="custom-select mr-20" onmouseover="customScroll()">
+                <input class="custom-input" contenteditable="true" @bind="manager_search" @bind:event="oninput" @onkeydown="SearchEnter">
+                </input>
+                @foreach (var m in noSelectManagers!.Where(m => m.name.Contains(manager_search)))
+                {
+                    <button @onclick="()=>{noSelectManagers!.Remove(m); SelectManagers.Add(m);}">
+                        <div class="name">@m.name</div>
+                    </button>
+                }
+            </div>
+            <div class="manager-field">
+                @foreach (var m in SelectManagers)
+                {
+                    <button @onclick="()=>{SelectManagers.Remove(m); noSelectManagers!.Add(m);}">
+                        <div class="name">@m.name</div>
+                        <img src="./icons/delete-icon.svg" />
+                    </button>
+                }
+            </div>
+        </row-f>
+    }
     <div class="section-field ind-col-lg-10">
-        <div class="ind-col-lg-5 input-field ind-col-md-10">
-            <div class="input-label ind-col-lg-5">
-                Тип:
+        @if (callHistoryFilter.filterView.type_view)
+        {
+            <div class="ind-col-lg-5 input-field ind-col-md-10">
+                <div class="input-label ind-col-lg-5">
+                    Тип:
+                </div>
+                <select name="" id="" class="main-input ind-col-lg-5" @bind="callHistoryFilter.type">
+                    <option value="">Любые</option>
+                    <option value="in">Входящие</option>
+                    <option value="out">Исходящие</option>
+                </select>
             </div>
-            <select name="" id="" class="main-input ind-col-lg-5" @bind="callHistoryFilter.type">
-                <option value="">Любые</option>
-                <option value="in">Входящие</option>
-                <option value="out">Исходящие</option>
-            </select>
-        </div>
-        <div class="ind-col-lg-5 input-field ind-col-md-10">
-            <div class="input-label ind-col-lg-5">
-                Телефон клиента:
+        }
+        @if (callHistoryFilter.filterView.phone_view)
+        {
+            <div class="ind-col-lg-5 input-field ind-col-md-10">
+                <div class="input-label ind-col-lg-5">
+                    Телефон клиента:
+                </div>
+                <input type="text" class="main-input ind-col-lg-5" @bind="callHistoryFilter.phone" @bind:event="oninput" @onkeydown="SearchEnter">
             </div>
-            <input type="text" class="main-input ind-col-lg-5" @bind="callHistoryFilter.phone" @bind:event="oninput" @onkeydown="SearchEnter">
-        </div>
+        }
     </div>
     <div class="section-field ind-col-lg-10">
-        <div class="ind-col-lg-5 input-field ind-col-md-10">
-            <div class="input-label ind-col-lg-5">
-                Дата звонка от:
+        @if (callHistoryFilter.filterView.call_date_from_view)
+        {
+            <div class="ind-col-lg-5 input-field ind-col-md-10">
+                <div class="input-label ind-col-lg-5">
+                    Дата звонка от:
+                </div>
+                <input type="date" @bind="callHistoryFilter.call_date_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="SearchEnter"></input>
             </div>
-            <input type="date" @bind="callHistoryFilter.call_date_from" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="SearchEnter"></input>
-        </div>
-        <div class="ind-col-lg-5 input-field ind-col-md-10">
-            <div class="input-label ind-col-lg-5">
-                Дата звонка до:
+        }
+        @if (callHistoryFilter.filterView.call_date_to_view)
+        {
+            <div class="ind-col-lg-5 input-field ind-col-md-10">
+                <div class="input-label ind-col-lg-5">
+                    Дата звонка до:
+                </div>
+                <input type="date" @bind="callHistoryFilter.call_date_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="SearchEnter"></input>
             </div>
-            <input type="date" @bind="callHistoryFilter.call_date_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="SearchEnter"></input>
-        </div>
+        }
     </div>
     <button @onclick="Search" class="score mb-20 mt-20">Поиск</button>
     <button @onclick="ClearFilter" class="close">X</button>
+    <button @onclick="()=>view_filter_settings = true" class="score mt-20 mb-20">Настройки фильтра</button>
     <div class="section-field">
 
         <table class="order-table ind-col-lg-10">
@@ -196,7 +243,7 @@
     protected List<call_history>? call_Histories = new();
     protected List<user> SelectManagers = new();
     protected List<user>? noSelectManagers = new();
-
+    protected bool view_filter_settings { get; set; }
 
     List<int> page_count = new List<int>();
     protected int count_on_page = 50;
@@ -254,10 +301,19 @@
         StateHasChanged();
 
     }
+    protected async Task CloseFilterSettings()
+    {
+        view_filter_settings = false;
+        await Http.PutAsJsonAsync("api/Filter/SaveCallHistoryFilter", callHistoryFilter);
+    }
     protected async Task ClearFilter()
     {
         current_page = 1;
-        callHistoryFilter = new();
+        callHistoryFilter.managers = new();
+        callHistoryFilter.phone = null;
+        callHistoryFilter.call_date_from = null;
+        callHistoryFilter.call_date_to = null;
+        callHistoryFilter.type = null;
         callHistoryFilter.user_id = user_id;
         await FindByFilter();
     }

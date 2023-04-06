@@ -102,7 +102,7 @@
                     </option>
                     <option>
                         Альфабанк
-                    </option>  
+                    </option>
                     <option>
                         ВТБ
                     </option>
@@ -135,6 +135,9 @@
 
 
 
+
+
+
                     </a>
                     <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
@@ -144,7 +147,7 @@
                         <label class="@contactClass" for="btnradio2">Контактные лица</label>
                     </div>
                 </div>
-            @if (viewContacts == false)
+                @if (viewContacts == false)
             {
                 <div class="section-field">
                     <div class="ind-col-lg-5 ind-col-md-10">
@@ -177,7 +180,7 @@
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label required">
                                 Номер телефона
-                            <div class="req">*</div>    
+                                <div class="req">*</div>
                             </div>
                             <input type="tel" required class="main-input" value="@order?.main_contact?.phone" @oninput="@((ChangeEventArgs e) => {order.main_contact.phone = e.Value.ToString();clientChange = true;})">
                         </div>
@@ -237,9 +240,9 @@
                     <div class="ind-col-lg-5 ind-col-md-10 input-field">
                         <div class="input-label required">
                             ИНН
-                        <div class="req">*</div>   
+                            <div class="req">*</div>
                         </div>
-                        
+
                         <input type="number" required class="main-input" @bind="client.org_inn" min="0">
                     </div>
                 </div>
@@ -332,7 +335,7 @@
                                     <option>$</option>
                                     <option>€</option>
                                 </select>
-                                </td>
+                            </td>
                             <td class="ind-col-lg-1">Количество</td>
                             <td class="ind-col-lg-1">Скидка</td>
                             <td class="ind-col-lg-1">Стоимость</td>
@@ -343,7 +346,7 @@
                         {
                             @foreach (var p in current_order_check!.product_To_Orders.Where(pr => pr.is_delete_from_order == false).OrderBy(p => p.product_postition))
                             {
-                            <tr class="order-row" >
+                                <tr class="order-row">
                                     <td class="ind-col-lg-1" id="model">
                                         <img src="./icons/drag.png" alt="" class="drag" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
                                         @p?.product?.article
@@ -418,7 +421,7 @@
                                                 <div class="input-label mt-10">Дополнительная скидка</div>
                                                 <div class="row-f">
                                                     <div class="ind-col-lg-5 discount-input">
-                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)"/>@current_order_check.currency
+                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />@current_order_check.currency
                                                     </div>
                                                     <div class="ind-col-lg-5 discount-input">
                                                         <input type="number" class="main-input" @bind="@p.percent_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />%
@@ -431,7 +434,7 @@
                                         }
                                     </td>
 
-                                    <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" min="0"/></td>
+                                    <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" min="0" /></td>
                                     <td class="ind-col-lg-1">@p?._discount_total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</td>
                                     <td class="ind-col-lg-1">
                                         @p?._total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
@@ -526,7 +529,7 @@
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label required">
                                 Зафиксированная дата отгрузки на момент оплаты
-                                <div class="req">*</div>    
+                                <div class="req">*</div>
                             </div>
 
                             <input type="date" required class="main-input" @bind="@order.delivery.shipment_date">
@@ -571,16 +574,39 @@
             </div>
             <div class="input-field">
                 <div class="input-label">Условия оплаты</div>
-                <select type="text" class="main-input" @bind="@order.pay_conditions">
-                    <option value="1">Предоплата</option>
+                <select type="text" class="main-input" value="@order.pay_conditions" @onchange="(e)=>ChangePaymentCondition(e)">
+                    <option value="1">100% предоплата</option>
                     <option value="2">Постоплата</option>
+                    <option value="3">Разделение платежа</option>
                 </select>
             </div>
-            @if (order.pay_conditions == 1)
+            @*            @if (order.pay_conditions == 1)
+        {
+        <div class="input-field">
+        <div class="input-label">Предоплата:</div>
+        <input class="main-input" @bind="@order.pay_predoplata_percent"></input>%
+        </div>
+        }*@
+            @if (order.pay_conditions == 2)
             {
                 <div class="input-field">
-                    <div class="input-label">Предоплата:</div>
-                    <input class="main-input" @bind="@order.pay_predoplata_percent"></input>%
+                    <div class="input-label">Условия постоплаты:</div>
+                    <input class="main-input" @bind="@order.postoplata_condition"></input>
+                </div>
+            }
+            @if (order.pay_conditions == 3)
+            {
+                <div class="input-field">
+                    <div class="input-label">Процент:</div>
+                    <input type="number" class="table-input" @bind="@order.pay_predoplata_percent"></input>%
+                    <div class="input-label">Условия:</div>
+                    <input class="main-input" @bind="@order.pay_predoplata_condition"></input>
+                </div>
+                <div class="input-field">
+                    <div class="input-label">Процент:</div>
+                    <input type="number" class="table-input" @bind="@order.second_pay_predoplata_percent"></input>%
+                    <div class="input-label">Условия:</div>
+                    <input class="main-input" @bind="@order.second_pay_predoplata_condition"></input>
                 </div>
             }
             <div class="input-field">
@@ -751,39 +777,62 @@
     protected async Task SaveOrder()
     {
         //удалить (добаление оплат без участия 1с)
-        if (order.order_status_id == 1 && order.pay_conditions == 1)
+        if (order.pay_conditions == 1)
         {
-            double? order_pays_summ = order.order_Pays?.Select(p => p.price).Sum();
-            double? min_predoplata = order._current_check.price_summ / 100 * order.pay_predoplata_percent;
-            if (order_pays_summ + 0.1 >= min_predoplata)
+            if (order.order_status_id == 1)
+            {
+                if (order._current_pay_summ > 0 && order._price_summ == 0)
+                    order.order_status_id = 3;
+            }
+            if (order._current_pay_summ > 0 && order._price_summ > 0)
+            {
+                order.pay_status_id = 1;
+            }
+            if (order._current_pay_summ > 0 && order._price_summ == 0)
+            {
+                order.pay_status_id = 2;
+            }
+        }
+
+        if (order.pay_conditions == 2)
+        {
+            if (order.order_status_id == 1)
                 order.order_status_id = 3;
+            if (order._price_summ != 0)
+                order.pay_status_id = 3;
+            else
+                order.pay_status_id = 2;
         }
-        if (order.order_Pays?.Select(p => p.price).Sum() < order._current_check.price_summ)
+        if (order.pay_conditions == 3)
         {
-            order.pay_status_id = 1;
-        }
-        else
-        {
-            order.pay_status_id = 2;
-        }
-        if (order.order_Pays?.Count == 0)
-        {
-            order.pay_status_id = 4;
+            double? summ = order._price_summ + order._current_pay_summ; //Сумма всего заказа
+            double? need_pay = summ / 100 * order.pay_predoplata_percent;
+
+            if (order._current_pay_summ != 0)
+            {
+                if (order._price_summ != 0)
+                    order.pay_status_id = 1;
+                if (order._price_summ == 0)
+                    order.pay_status_id = 2;
+            }
+            if (order.order_status_id == 1)
+            {
+                if (order._current_pay_summ >= need_pay)
+                    order.order_status_id = 3;
+            }
         }
 
-        if (order.pay_conditions == 2 && order.order_status_id == 1)
-            order.order_status_id = 3;
-        if (order.pay_conditions == 1 && order.order_status_id == 3 && order.order_Pays.Count == 0)
-            order.order_status_id = 1;
+        //if (order.pay_conditions == 2 && order.order_status_id == 1)
+        //    order.order_status_id = 3;
+        //if (order.pay_conditions == 1 && order.order_status_id == 3 && order.order_Pays.Count == 0)
+        //    order.order_status_id = 1;
 
-
-
-        if (order?.pay_conditions == 2 && order.order_status_id == 1)
-        {
-            order.pay_status_id = 3;
-            order.order_status_id = 3;
-            order._current_check.is_pay = 1;
-        }
+        //if (order?.pay_conditions == 2 && order.order_status_id == 1)
+        //{
+        //    order.pay_status_id = 3;
+        //    order.order_status_id = 3;
+        //    order._current_check.is_pay = 1;
+        //}
 
         if (order?.id != 0)
         {
@@ -806,6 +855,35 @@
         await OnParametersSetAsync();
         StateHasChanged();
     }
+    protected void ChangePaymentCondition(ChangeEventArgs e)
+    {
+        int condition_id = Convert.ToInt32(e.Value);
+        order.pay_conditions = condition_id;
+        if (condition_id == 1)
+        {
+            order.pay_predoplata_percent = 100;
+            order.pay_predoplata_condition = null;
+            order.second_pay_predoplata_condition = null;
+            order.second_pay_predoplata_percent = null;
+            order.postoplata_condition = null;
+        }
+        if (condition_id == 2)
+        {
+            order.pay_predoplata_percent = null;
+            order.pay_predoplata_condition = null;
+            order.second_pay_predoplata_condition = null;
+            order.second_pay_predoplata_percent = null;
+            order.postoplata_condition = "Постоплата";
+        }
+        if (condition_id == 3)
+        {
+            order.pay_predoplata_percent = 50;
+            order.second_pay_predoplata_percent = 50;
+            order.postoplata_condition = null;
+            order.pay_predoplata_condition = null;
+            order.second_pay_predoplata_condition = null;
+        }
+    }
     protected void AddCheck()
     {
         order_check order_Check = new order_check();
@@ -825,7 +903,7 @@
     {
         if (order?.order_Checks?.Count > 1)
         {
-            var new_current_check = order?.order_Checks.Where(c => c.id != current_order_check.id).FirstOrDefault();
+            var new_current_check = order?.order_Checks.Where(c => c.current == 0).FirstOrDefault();
             new_current_check.current = 1;
             if (current_order_check.id != 0)
             {
@@ -852,7 +930,8 @@
         //}
         current_order_check = order_Check;
     }
-    protected async Task GetDogovorPrintForm(string pch){
+    protected async Task GetDogovorPrintForm(string pch)
+    {
         if (orderId == 0)
         {
             alert_text = "Перед получением договора сохраните заказ!";
@@ -897,10 +976,11 @@
         for (int i = 0; i < arr1.Count(); i++)
         {
             var oldPostition = Convert.ToInt32(arr1[i].GetString());
-            current_order_check.product_To_Orders.Where(p => p.product_postition == oldPostition).FirstOrDefault().new_position = i+1;
+            current_order_check.product_To_Orders.Where(p => p.product_postition == oldPostition).FirstOrDefault().new_position = i + 1;
 
         }
-        foreach(var p in current_order_check.product_To_Orders){
+        foreach (var p in current_order_check.product_To_Orders)
+        {
             p.product_postition = p.new_position;
         }
         StateHasChanged();

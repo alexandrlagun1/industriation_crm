@@ -17,4 +17,8 @@
     {
         public int id { get; set; }
     }
+    public class GetOrderResult
+    {
+        public bool success { get; set; }
+    }
 }

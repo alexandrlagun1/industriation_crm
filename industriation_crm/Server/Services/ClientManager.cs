@@ -69,7 +69,11 @@ namespace industriation_crm.Server.Services
             ClientReturnData ordersReturnData = new ClientReturnData();
             try
             {
-                var query = _dbContext.client.Where(c => c.org_inn.ToString().Contains(clientFilter.inn) && c.contacts.Where(co => co.main_contact == 1 && co.full_name.Contains(clientFilter.client)).FirstOrDefault() != null);
+                var query = _dbContext.client.Where(c =>  c.id != 0);
+                if(!String.IsNullOrEmpty(clientFilter.client))
+                    query = query.Where(c => c.contacts.Where(co => co.main_contact == 1 && co.full_name.Contains(clientFilter.client)).FirstOrDefault() != null);
+                if (!String.IsNullOrEmpty(clientFilter.inn))
+                    query = query.Where(c => c.org_inn.ToString().Contains(clientFilter.inn));
                 if (clientFilter.role == 6)
                     query = query.Where(c => c.is_supplier == 1);
                 if(!String.IsNullOrEmpty(clientFilter.client_email))
@@ -117,15 +121,22 @@ namespace industriation_crm.Server.Services
                 throw;
             }
         }
-        public void UpdateClientDetails(client client)
+        public string UpdateClientDetails(client client)
         {
             client.orders = null;
             client.contacts = null;
 
             try
             {
+                var _clients = _dbContext.client.Where(c => c.org_inn == client.org_inn).ToList();
+                foreach(var c in _clients)
+                {
+                    if (c.id != client.id)
+                        return "Клиент с таким ИНН уже существует!";
+                }
                 _dbContext.Entry(client).State = EntityState.Modified;
                 _dbContext.SaveChanges();
+                return null;
             }
             catch
             {

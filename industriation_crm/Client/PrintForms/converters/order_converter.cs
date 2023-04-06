@@ -12,7 +12,7 @@ namespace industriation_crm.Client.PrintForms
             order_print_form order_Print_From = new order_print_form();
             order_Print_From.order_id = $"{order.id.ToString()}-{order._current_check.check_number}";
             order_Print_From.pch = pch;
-            order_Print_From.fio = $"{order.user?.job_title} {order.user?.name}";
+            order_Print_From.fio = $"<b>{order.user?.job_title}</b><br>{order.user?.name}";
             if (!String.IsNullOrEmpty(order.user?.phone))
                 order_Print_From.phone = industriation_crm.Masks.PhoneMask.GetNumber(order.user?.phone);
             if (!String.IsNullOrEmpty(order?.user?.email))
@@ -37,9 +37,22 @@ namespace industriation_crm.Client.PrintForms
             order_Print_From.order_data.order_date = order_date;
             order_Print_From.order_data.order_date_dote = order_date_dote;
             if (order.pay_conditions == 1)
-                order_Print_From.order_data.payment_method = $"{order.pay_predoplata_percent}% предоплаты";
+                order_Print_From.order_data.payment_method = $"100% предоплаты";
             if (order.pay_conditions == 2)
-                order_Print_From.order_data.payment_method = "Постоплата";
+                order_Print_From.order_data.payment_method = order.postoplata_condition;
+            if (order.pay_conditions == 3)
+            {
+                if(order.pay_predoplata_percent != null && order.pay_predoplata_percent != 0 && !String.IsNullOrEmpty(order.pay_predoplata_condition))
+                {
+                    order_Print_From.order_data.payment_method += $"{order.pay_predoplata_percent}% ";
+                    order_Print_From.order_data.payment_method += $"{order.pay_predoplata_condition}<br>";
+                }
+                if (order.second_pay_predoplata_percent != null && order.second_pay_predoplata_percent != 0 && !String.IsNullOrEmpty(order.second_pay_predoplata_condition))
+                {
+                    order_Print_From.order_data.payment_method += $"{order.second_pay_predoplata_percent}% ";
+                    order_Print_From.order_data.payment_method += $"{order.second_pay_predoplata_condition}";
+                }
+            }
             order_Print_From.order_data.shipping_method = order.delivery?.delivery_type?.name;
             order_Print_From.order_data.user_name = order.client?.contacts?.Where(c => c.main_contact == 1).FirstOrDefault()?.full_name;
             if (order.delivery.delivery_type_id == 1)
