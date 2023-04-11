@@ -346,32 +346,20 @@
                         {
                             @foreach (var p in current_order_check!.product_To_Orders.Where(pr => pr.is_delete_from_order == false).OrderBy(p => p.product_postition))
                             {
-                                <tr class="order-row">
-                                    <td class="ind-col-lg-1" id="model">
-                                        <img src="./icons/drag.png" alt="" class="drag" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
+                                <tr class="order-row item" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
+
+                                    <td class="ind-col-lg-1 content" id="model" onmousedown="drag(this)">
+                                        <img src="./icons/drag.png" alt="" class="drag">
                                         @p?.product?.article
                                     </td>
-                                    <td class="ind-col-lg-3 ta-left">
+                                    <td class="ind-col-lg-3 ta-left content" onmousedown="drag(this)">
                                         <a href="/product/edit/@p.product.id" class="product-line">
                                             <div class="thumb">
                                                 <img src='@("https://industriation.ru/image/"+p.product.image)' />
                                             </div>
                                             @p?.product?.name
-
-                                            @*<div class="table-link-modal">
-                                <div class="ind-col-lg-2">
-                                <img src='@("https://industriation.ru/image/"+p.product.image)' alt="" class="table-modal-img">
-                                </div>
-                                <div class="ind-col-lg-8">
-                                <div class="table-modal-title">
-                                @p?.product?.name
-                                </div>
-                                <div class="table-modal-price">
-                                @p._product_price.Value.ToString("N", NumberMask.GetNi())
-                                </div>
-                                </div>
-                                </div>*@
                                         </a>
+                                        
                                     </td>
                                     <td class="ind-col-lg-2" data-attr="td-nondrag">
                                         <div class="ind-col-lg-1">
@@ -434,9 +422,9 @@
                                         }
                                     </td>
 
-                                    <td class="ind-col-lg-1"><input type="number" class="main-input" @bind="@p._count" min="0" /></td>
-                                    <td class="ind-col-lg-1">@p?._discount_total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</td>
-                                    <td class="ind-col-lg-1">
+                                    <td class="ind-col-lg-1 content" onmousedown="drag(this)"><input type="number" class="main-input" @bind="@p._count" min="0" /></td>
+                                    <td class="ind-col-lg-1 content" onmousedown="drag(this)">@p?._discount_total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</td>
+                                    <td class="ind-col-lg-1 content" onmousedown="drag(this)">
                                         @p?._total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
                                         <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
                                             <img src="./icons/delete-icon.svg" class="delete-button">

@@ -12,6 +12,32 @@
     Добро пожаловать в CRM-систему ООО "Промышленная Автоматизация"!
 </div>
 
+<table>
+    <tr class="item" draggable="true" onmousedown="qwe()">
+    <td class="handle">
+        handle
+    </td>
+    <td class="content">
+        content
+    </td>
+</tr>
+    <tr class="item" draggable="true">
+        <td class="handle">
+            handle
+        </td>
+        <td class="content">
+            content
+        </td>
+    </tr>
+</table>
+<tr class="order-row" draggable="true">
+    <td>
+        handle
+    </td>
+    <td class="content" id="model" onmousedown="drag()">
+        content
+    </td>
+</tr>
 @code {
     [Inject]
     AuthenticationStateProvider AuthenticationStateProvider { get; set; }

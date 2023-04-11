@@ -2448,3 +2448,10 @@ tbody .order-row.product_new:hover td {
 }
 
 	/* ////////////////////////////////////////////////////////////////// */
+.test-content {
+	user-select: text;
+}
+
+.content {
+	user-select: text;
+}

@@ -22,6 +22,31 @@
             anchorElement.remove();
             URL.revokeObjectURL(url);
         }
+        function qwe() {
+            const itemEl = document.querySelector('.item');
+            let mouseDownEl;
+
+            itemEl.onmousedown = function (evt) {
+                mouseDownEl = evt.target;
+            }
+            itemEl.ondragstart = function (e) {
+                // only the handle div can be picked up to trigger the drag event
+                if (mouseDownEl.matches('.handle')) {
+                    // ...code
+                } else {
+                    e.preventDefault();
+                }
+            }
+
+        } 
+        function drag(element) {
+            let parent = element.closest(".item");
+            parent.ondragstart = function (e) {
+                if (element.matches('.content'))
+                    e.preventDefault();
+            }
+        }   
+        
     </script>
 </head>
 
