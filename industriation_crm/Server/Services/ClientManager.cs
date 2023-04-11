@@ -121,27 +121,33 @@ namespace industriation_crm.Server.Services
                 throw;
             }
         }
-        public string UpdateClientDetails(client client)
+        public void UpdateClientDetails(client client)
         {
             client.orders = null;
             client.contacts = null;
 
             try
             {
-                var _clients = _dbContext.client.Where(c => c.org_inn == client.org_inn).ToList();
-                foreach(var c in _clients)
-                {
-                    if (c.id != client.id)
-                        return "Клиент с таким ИНН уже существует!";
-                }
                 _dbContext.Entry(client).State = EntityState.Modified;
                 _dbContext.SaveChanges();
-                return null;
             }
             catch
             {
                 throw;
             }
+        }
+
+
+
+        public string? CheckClientValidate(client client)
+        {
+            var _clients = _dbContext.client.Where(c => c.org_inn == client.org_inn).ToList();
+            foreach (var c in _clients)
+            {
+                if (c.id != client.id)
+                    return "Клиент с таким ИНН уже существует!";
+            }
+            return null;
         }
     }
 }

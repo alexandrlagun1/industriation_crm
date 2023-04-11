@@ -6,6 +6,7 @@
 @using Newtonsoft.Json
 @inject HttpClient Http
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@using industriation_crm.NumberMask
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
 <div class="main-title">Продукты</div>
@@ -150,7 +151,7 @@ else
                                 </a>
                             </td>
                             <td class="ind-col-lg-1 ind-col-md-2">@product.quantity</td>
-                            <td class="ind-col-lg-1 ind-col-md-1">@product.price</td>
+                            <td class="ind-col-lg-1 ind-col-md-1">@product.price.Value.ToString("N", NumberMask.GetNi())</td>
                             @*                            <td class="ind-col-lg-1 ind-col-md-1">
                     <a href='/product/edit/@product.id' class="score" role="button">
                     <div class="hidden-md">Изменить</div>

@@ -7,8 +7,9 @@ namespace industriation_crm.Server.Interfaces
     {
         public ClientReturnData GetClientDetails(ClientFilter clientFilter);
         public int AddClient(client client);
-        public string UpdateClientDetails(client client);
+        public void UpdateClientDetails(client client);
         public client GetClientData(int id);
         public void DeleteClient(int id);
+        public string? CheckClientValidate(client client);
     }
 }

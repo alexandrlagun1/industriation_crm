@@ -2,6 +2,7 @@
 using industriation_crm.Shared.FilterModels;
 using industriation_crm.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace industriation_crm.Server.Controllers
 {
@@ -36,16 +37,21 @@ namespace industriation_crm.Server.Controllers
             return _IClient.AddClient(client);
         }
         [HttpPut]
-        public string Put(client client)
+        public void Put(client client)
         {
-            string message = _IClient.UpdateClientDetails(client);
-            return message;
+            _IClient.UpdateClientDetails(client);
+
         }
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             _IClient.DeleteClient(id);
             return Ok();
+        }
+        [HttpPost("CheckClientValidate")]
+        public string? CheckClientValidate(client client)
+        {
+            return _IClient.CheckClientValidate(client);
         }
     }
 }
