@@ -13,8 +13,8 @@
 @if (view_filter_settings)
 {
     <div class="modal" tabindex="-1" style="display:block" role="dialog">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
-            <div class="modal-content b-s">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable filters-modal ind-col-lg-7 ind-col-md-8">
+            <div class="modal-content b-s filters-modal-body">
                 <div class="modal-header">
                     <div class="container">
                         <div class="row-f ind-col-lg-10">
@@ -28,12 +28,37 @@
                     </div>
                 </div>
                 <div class="modal-body">
-                    <div class="section-field">
-                        <input type="checkbox" @bind="callHistoryFilter.filterView.type_view"> Тип звонка
-                        <input type="checkbox" @bind="callHistoryFilter.filterView.phone_view"> Телефон
-                        <input type="checkbox" @bind="callHistoryFilter.filterView.managers_view"> Менеджеры
-                        <input type="checkbox" @bind="callHistoryFilter.filterView.call_date_from_view"> Дата звонков от
-                        <input type="checkbox" @bind="callHistoryFilter.filterView.call_date_to_view"> Дата звонков до
+                    <div class="checkbox-list">
+                        <div>
+                            <input id="managers_view" type="checkbox" @bind="callHistoryFilter.filterView.managers_view">
+                            <label for="managers_view">
+                                Менеджеры
+                            </label>
+                        </div>
+                        <div>
+                            <input id="type_view" type="checkbox" @bind="callHistoryFilter.filterView.type_view">
+                            <label for="type_view">
+                                Тип звонка
+                            </label>
+                        </div>
+                        <div>
+                            <input id="phone_view" type="checkbox" @bind="callHistoryFilter.filterView.phone_view">
+                            <label for="phone_view">
+                                Телефон
+                            </label>
+                        </div>
+                        <div>
+                            <input id="call_date_from_view" type="checkbox" @bind="callHistoryFilter.filterView.call_date_from_view">
+                            <label for="call_date_from_view">
+                                Дата звонков от
+                            </label>
+                        </div>
+                        <div>
+                            <input id="call_date_to_view" type="checkbox" @bind="callHistoryFilter.filterView.call_date_to_view">
+                            <label for="call_date_to_view">
+                                Дата звонков до
+                            </label>
+                        </div>
                     </div>
                     <br />
 
@@ -116,7 +141,9 @@
     </div>
     <button @onclick="Search" class="score mb-20 mt-20">Поиск</button>
     <button @onclick="ClearFilter" class="close">X</button>
-    <button @onclick="()=>view_filter_settings = true" class="score mt-20 mb-20">Настройки фильтра</button>
+    <button @onclick="()=>view_filter_settings = true" class="mt-20 mb-20 setting-btn">
+        <i class="fa fa-cogs" aria-hidden="true"></i>
+    </button>
     <div class="section-field">
 
         <table class="order-table ind-col-lg-10">

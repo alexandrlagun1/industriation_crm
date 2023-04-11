@@ -26,8 +26,8 @@ else
     @if (view_filter_settings)
     {
         <div class="modal" tabindex="-1" style="display:block" role="dialog">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
-                <div class="modal-content b-s">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable filters-modal ind-col-lg-7 ind-col-md-8">
+                <div class="modal-content b-s filters-modal-body">
                     <div class="modal-header">
                         <div class="container">
                             <div class="row-f ind-col-lg-10">
@@ -41,21 +41,83 @@ else
                         </div>
                     </div>
                     <div class="modal-body">
-                        <div class="section-field">
-                            <input type="checkbox" @bind="ordersFilter.filterView.client_view"> ФИО Клиента
-                            <input type="checkbox" @bind="ordersFilter.filterView.client_email_view"> Email
-                            <input type="checkbox" @bind="ordersFilter.filterView.delivey_from_view"> Дата доставки от
-                            <input type="checkbox" @bind="ordersFilter.filterView.delivey_to_view"> Дата доставки до
-                            <input type="checkbox" @bind="ordersFilter.filterView.pay_status_view"> Статус оплаты
-                            <input type="checkbox" @bind="ordersFilter.filterView.managers_view"> Менеджеры
-                            <input type="checkbox" @bind="ordersFilter.filterView.order_date_from_view">  Дата заказа от
-                            <input type="checkbox" @bind="ordersFilter.filterView.order_date_to_view"> Дата заказа до
-                            <input type="checkbox" @bind="ordersFilter.filterView.order_id_view"> Идентификатор заказа
-                            <input type="checkbox" @bind="ordersFilter.filterView.product_article_view"> Артикул продуктов
-                            <input type="checkbox" @bind="ordersFilter.filterView.pay_from_view"> Дата оплаты от
-                        </div>
-                        <br />
+                        <div class="checkbox-list">
+                            <div>
+                                <input id="managers_view" type="checkbox" @bind="ordersFilter.filterView.managers_view">
+                                <label for="managers_view">
+                                    Менеджеры
+                                </label>
+                            </div>
+                            <div>
+                                <input id="pay_status_view" type="checkbox" @bind="ordersFilter.filterView.pay_status_view">
+                                <label for="pay_status_view">
+                                    Статус оплаты
+                                </label>
+                            </div>
+                            <div>
+                                <input id="order_id_view" type="checkbox" @bind="ordersFilter.filterView.order_id_view">
+                                <label for="order_id_view">
+                                    Номер заказа
+                                </label>
+                            </div>
+                            <div>
+                                <input id="client_view" type="checkbox" @bind="ordersFilter.filterView.client_view">
+                                <label for="client_view">
+                                    Покупатель
+                                </label>
+                            </div>
+                            <div>
+                                <input id="order_date_from_view" type="checkbox" @bind="ordersFilter.filterView.order_date_from_view">
+                                <label for="order_date_from_view">
+                                    Дата заказа от
+                                </label>
+                            </div>
+                            <div>
+                                <input id="order_date_to_view" type="checkbox" @bind="ordersFilter.filterView.order_date_to_view">
+                                <label for="order_date_to_view">
+                                    Дата заказа до
+                                </label>
+                            </div>
+                            <div>
+                                <input id="delivey_from_view" type="checkbox" @bind="ordersFilter.filterView.delivey_from_view">
+                                <label for="delivey_from_view">
+                                    Дата доставки от
+                                </label>
+                            </div>
+                            <div>
+                                <input id="delivey_to_view" type="checkbox" @bind="ordersFilter.filterView.delivey_to_view">
+                                <label for="delivey_to_view">
+                                    Дата доставки до
+                                </label>
+                            </div>
+                            <div>
+                                <input id="pay_from_view" type="checkbox" @bind="ordersFilter.filterView.pay_from_view">
+                                <label for="pay_from_view">
+                                    Дата оплаты от
+                                </label>
+                            </div>
+                            <div>
+                                <input id="product_article_view" type="checkbox" @bind="ordersFilter.filterView.product_article_view">
+                                <label for="product_article_view">
+                                    Артикул продуктов
+                                </label>
+                            </div>
+                            <div>
+                                <input id="client_email_view" type="checkbox" @bind="ordersFilter.filterView.client_email_view">
+                                <label for="client_email_view">
+                                    Email
+                                </label>
+                            </div>
 
+
+
+
+
+
+
+
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -166,8 +228,6 @@ else
                     <input type="text" @bind="ordersFilter.client" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
             }
-        </div>
-        <div class="section-field ind-col-lg-10">
             @if (ordersFilter.filterView.order_date_from_view)
             {
                 <div class="ind-col-lg-5 input-field ind-col-md-10">
@@ -186,8 +246,6 @@ else
                     <input type="date" @bind="ordersFilter.order_date_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
             }
-        </div>
-        <div class="section-field ind-col-lg-10">
             @if (ordersFilter.filterView.delivey_from_view)
             {
                 <div class="ind-col-lg-5 input-field ind-col-md-10">
@@ -206,8 +264,6 @@ else
                     <input type="date" @bind="ordersFilter.delivey_to" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
             }
-        </div>
-        <div class="section-field ind-col-lg-10">
             @if (ordersFilter.filterView.pay_from_view)
             {
                 <div class="ind-col-lg-5 input-field ind-col-md-10">
@@ -226,8 +282,6 @@ else
                     <input @bind="ordersFilter.product_article" class="main-input ind-col-lg-5" @bind:event="oninput" @onkeydown="FindOnKeyDown"></input>
                 </div>
             }
-        </div>
-        <div class="section-field ind-col-lg-10">
             @if (ordersFilter.filterView.client_email_view)
             {
                 <div class="ind-col-lg-5 input-field ind-col-md-10">
@@ -240,14 +294,16 @@ else
         </div>
         <button @onclick="FindByFilter" class="score mb-20 mt-20">Поиск</button>
         <button @onclick="ClearFilter" class="close">X</button>
-        <button @onclick="()=>view_filter_settings = true" class="score mt-20 mb-20">Настройки фильтра</button>
+        <button @onclick="()=>view_filter_settings = true" class="mt-20 mb-20 setting-btn">
+            <i class="fa fa-cogs" aria-hidden="true"></i>
+        </button>
         <div class="section-fied flex mb-20 orderds-checkboxes">
             @foreach (var s in allOrderStatuses)
             {
                 <div class="custom-box">
                     <label class="@s.style label-for-custom-checkbox" for="@s.name"></label>
                     <input class="custom-checkbox" id="@s.name" type="checkbox" @bind="s.is_check" @bind:event="oninput" @onkeydown="FindOnKeyDown">
-                    <div class="name"> - @s.name</div>
+                    <label for="@s.name" class="name"> - @s.name</label>
                 </div>
             }
         </div>

@@ -21,8 +21,8 @@ else
     @if (view_filter_settings)
     {
         <div class="modal" tabindex="-1" style="display:block" role="dialog">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
-                <div class="modal-content b-s">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable filters-modal ind-col-lg-7 ind-col-md-8">
+                <div class="modal-content b-s filters-modal-body">
                     <div class="modal-header">
                         <div class="container">
                             <div class="row-f ind-col-lg-10">
@@ -36,11 +36,31 @@ else
                         </div>
                     </div>
                     <div class="modal-body">
-                        <div class="section-field">
-                            <input type="checkbox" @bind="productFilter.filterView.name_view"> Наименование продукта
-                            <input type="checkbox" @bind="productFilter.filterView.article_view"> Артикул продукта
-                            <input type="checkbox" @bind="productFilter.filterView.price_from_view"> Цена от
-                            <input type="checkbox" @bind="productFilter.filterView.price_to_view"> Цена до
+                        <div class="checkbox-list">
+                            <div>
+                                <input id="name_view" type="checkbox" @bind="productFilter.filterView.name_view">
+                                <label for="name_view">
+                                    Наименование продукта
+                                </label>
+                            </div>
+                            <div>
+                                <input id="article_view" type="checkbox" @bind="productFilter.filterView.article_view">
+                                <label for="article_view">
+                                    Артикул продукта
+                                </label>
+                            </div>
+                            <div>
+                                <input id="price_from_view" type="checkbox" @bind="productFilter.filterView.price_from_view">
+                                <label for="price_from_view">
+                                    Цена от
+                                </label>
+                            </div>
+                            <div>
+                                <input id="price_to_view" type="checkbox" @bind="productFilter.filterView.price_to_view">
+                                <label for="price_to_view">
+                                    Цена до
+                                </label>
+                            </div>   
                         </div>
                         <br />
 
@@ -115,7 +135,9 @@ else
         </div>
         <button @onclick="FilterButtonClick" class="score mb-20 mt-20">Поиск</button>
         <button @onclick="ClearFilter" class="close">X</button>
-        <button @onclick="()=>view_filter_settings = true" class="score mt-20 mb-20">Настройки фильтра</button>
+        <button @onclick="()=>view_filter_settings = true" class="mt-20 mb-20 setting-btn">
+            <i class="fa fa-cogs" aria-hidden="true"></i>
+        </button>
     </div>
 
 

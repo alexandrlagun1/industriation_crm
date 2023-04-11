@@ -6,39 +6,16 @@
 @inject HubConnection HubConnection
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Authorization
-
+@using System.Data
 
 <div class="alert alert-success fade-in" role="alert" style="text-align: center; background-color: #eaf7ff; color: #0099ff;">
     Добро пожаловать в CRM-систему ООО "Промышленная Автоматизация"!
 </div>
 
-<table>
-    <tr class="item" draggable="true" onmousedown="qwe()">
-    <td class="handle">
-        handle
-    </td>
-    <td class="content">
-        content
-    </td>
-</tr>
-    <tr class="item" draggable="true">
-        <td class="handle">
-            handle
-        </td>
-        <td class="content">
-            content
-        </td>
-    </tr>
-</table>
-<tr class="order-row" draggable="true">
-    <td>
-        handle
-    </td>
-    <td class="content" id="model" onmousedown="drag()">
-        content
-    </td>
-</tr>
+
 @code {
+
+
     [Inject]
     AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     string userid;

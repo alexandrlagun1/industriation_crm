@@ -504,6 +504,16 @@ li {
 
 /* COLUMNS LG 1-10  */
 
+.ind-col-lg-02 {
+	flex: 0 0 2%;
+	max-width: 2%;
+}
+
+.ind-col-lg-08 {
+	flex: 0 0 8%;
+	max-width: 8%;
+}
+
 .ind-col-lg-1 {
 	flex: 0 0 10%;
 	max-width: 10%;
@@ -1663,6 +1673,7 @@ td.ind-col-lg-1 {
 	color: #0099ff;
 	border: none;
 	margin-right: 10px;
+	background-color: transparent;
 }
 
 
@@ -2232,7 +2243,7 @@ video {
 }
 
 .nav-buttons .tab-active {
-	background-color: red;
+	background-color: #0062a3;
 	transition: background-color .5s;
 }
 
@@ -2414,11 +2425,12 @@ tbody .order-row.product_new:hover td {
 	content: '';
 }
 
-.custom-checkbox:checked.custom-checkbox:before{
+.custom-checkbox:checked.custom-checkbox:before {
+	font-family: 'FontAwesome';
 	position: absolute;
 	top: -2px;
-	left: 3px;
-	content: 'X';
+	left: 1px;
+	content: '\f00c';
 	z-index: 3;
 	font-size: 13px;
 	color: #fff;
@@ -2445,6 +2457,77 @@ tbody .order-row.product_new:hover td {
 	border: 1px solid #ddd;
 	padding: 5px 10px;
 	flex-wrap: wrap;
+}
+
+.setting-btn {
+	background-color: #fff;
+	border: none;
+	color: #000;
+	font-size: 25px;
+	vertical-align: sub;
+	padding: 5px;
+	transition: color .5s;
+}
+
+.setting-btn:hover{
+	color: #0099ff;
+}
+
+.filters-modal {
+	margin: 0;
+	display: flex;
+	height: 100%;
+	width: 100%;
+	max-width: 100%;
+}
+
+.filters-modal-body {
+	max-width: 400px;
+	margin: auto;
+}
+
+.checkbox-list div {
+	margin-bottom: 5px;
+	padding: 5px 10px;
+	display: flex;
+	align-items: center;
+	transition: background-color .5s;
+}
+
+.checkbox-list div:hover {
+	background-color: #eaf7ff;
+}
+
+
+.checkbox-list div input {
+	margin-right: 7px;
+	width: 15px;
+	height: 15px
+}
+
+.checkbox-list div label {
+	width: 100%;
+}
+
+.call-btn {
+	color: #008127;
+	border: none;
+	background-color: transparent;
+	font-size: 25px;
+	margin-left: 7px;
+	transition: color .2s;
+}
+
+.call-btn:hover {
+	color: #4cb96e;
+}
+
+.width-65 {
+	max-width: 65px;
+}
+
+.score-active {
+	background-color: #0062a3 !important;
 }
 
 	/* ////////////////////////////////////////////////////////////////// */

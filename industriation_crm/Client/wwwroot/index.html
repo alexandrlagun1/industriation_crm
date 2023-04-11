@@ -10,6 +10,7 @@
     <link href="css/app.css" rel="stylesheet" />
     <link href="industriation_crm.Client.styles.css" rel="stylesheet" />
     <link rel="stylesheet" href="bootstrap 2.0.css" />
+    <link rel="stylesheet" href="icon.css" />
     <script>
         window.downloadFileFromStream = async (fileName, contentStreamReference) => {
             const arrayBuffer = await contentStreamReference.arrayBuffer();
@@ -96,7 +97,25 @@
         //$('body').on('click', '.oi-bell', function () {
         //    $('body').find(".header-bar.modal").css({ display: "block" });
         //});
+       function qwe() {
+           const itemEl = document.querySelector('.item');
+           const handleEl = document.querySelector('.handle');
 
+           let mouseDownEl;
+
+           itemEl.onmousedown = function (evt) {
+               mouseDownEl = evt.target;
+               console.log(evt.target);
+           }
+           itemEl.ondragstart = function (e) {
+               // only the handle div can be picked up to trigger the drag event
+               if (mouseDownEl.matches('.handle')) {
+                   // ...code
+               } else {
+                   e.preventDefault();
+               }
+           }
+       }
        $('body').on('mousemove', '#sortable', function (e) {  
 
            if (e.target.getAttribute('data-attr') != 'td-drag') {

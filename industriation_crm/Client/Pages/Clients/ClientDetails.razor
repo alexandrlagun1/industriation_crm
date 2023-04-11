@@ -19,8 +19,8 @@ else
     @if (view_filter_settings)
     {
         <div class="modal" tabindex="-1" style="display:block" role="dialog">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable ind-col-lg-7 ind-col-md-8">
-                <div class="modal-content b-s">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable filters-modal ind-col-lg-7 ind-col-md-8">
+                <div class="modal-content b-s filters-modal-body">
                     <div class="modal-header">
                         <div class="container">
                             <div class="row-f ind-col-lg-10">
@@ -34,12 +34,37 @@ else
                         </div>
                     </div>
                     <div class="modal-body">
-                        <div class="section-field">
-                            <input type="checkbox" @bind="clientFilter.filterView.fio_view"> ФИО Клиента
-                            <input type="checkbox" @bind="clientFilter.filterView.email_view"> Email
-                            <input type="checkbox" @bind="clientFilter.filterView.phone_view"> Номер телефона
-                            <input type="checkbox" @bind="clientFilter.filterView.inn_view"> ИНН
-                            <input type="checkbox" @bind="clientFilter.filterView.tag_view"> Тэг
+                        <div class="checkbox-list">
+                            <div>
+                                <input id="inn_view" type="checkbox" @bind="clientFilter.filterView.inn_view">
+                                <label for="inn_view">
+                                    ИНН
+                                </label>
+                            </div>
+                            <div>
+                                <input id="email_view" type="checkbox" @bind="clientFilter.filterView.email_view">
+                                <label for="email_view">
+                                    Email
+                                </label>
+                            </div>
+                            <div>
+                                <input id="phone_view" type="checkbox" @bind="clientFilter.filterView.phone_view">
+                                <label for="phone_view">
+                                    Телефон клиента
+                                </label>
+                            </div>
+                            <div>
+                                <input id="tag_view" type="checkbox" @bind="clientFilter.filterView.tag_view">
+                                <label for="tag_view">
+                                    Тэг
+                                </label>
+                            </div>
+                            <div>
+                                <input id="fio_view" type="checkbox" @bind="clientFilter.filterView.fio_view">
+                                <label for="fio_view">
+                                    ФИО Клиента
+                                </label>
+                            </div>
                         </div>
                         <br />
 
@@ -79,9 +104,7 @@ else
                         <input @bind-value="clientFilter.client_email" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
                     </div>
                 }
-            </div>
-            <div class="section-field ind-col-lg-10">
-                @if (clientFilter.filterView.tag_view)
+                @if (clientFilter.filterView.phone_view)
                 {
                     <div class="ind-col-lg-5 input-field ind-col-md-10">
                         <div class="input-label ind-col-lg-5">
@@ -90,7 +113,7 @@ else
                         <input @bind-value="clientFilter.client_phone" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
                     </div>
                 }
-                @if (clientFilter.filterView.phone_view)
+                @if (clientFilter.filterView.tag_view)
                 {
                     <div class="ind-col-lg-5 input-field ind-col-md-10">
                         <div class="input-label ind-col-lg-5">
@@ -99,8 +122,6 @@ else
                         <input @bind-value="clientFilter.tag" class="main-input ind-col-lg-5" @onkeydown="FindOnKeyDown" @bind-value:event="oninput"></input>
                     </div>
                 }
-            </div>
-            <div class="section-field ind-col-lg-10">
                 @if (clientFilter.filterView.fio_view)
                 {
                     <div class="ind-col-lg-5 input-field ind-col-md-10">
@@ -114,7 +135,9 @@ else
 
             <button @onclick="Search" class="score mt-20 mb-20">Поиск</button>
             <button @onclick="ClearFilter" class="close">X</button>
-            <button @onclick="()=>view_filter_settings = true"class="score mt-20 mb-20">Настройки фильтра</button>
+            <button @onclick="()=>view_filter_settings = true" class="mt-20 mb-20 setting-btn">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+            </button>
             <div class="section-field">
                 <table class="order-table ind-col-lg-10">
                     <thead class="ind-col-lg-10">
