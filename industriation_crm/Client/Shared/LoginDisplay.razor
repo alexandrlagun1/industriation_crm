@@ -8,11 +8,15 @@
     <Authorized>
         @if (user_tasks.Where(t => t.is_view == false).FirstOrDefault() != null)
         {
-            <button @onclick="()=>viewNotifications=true" class="oi oi-bell header-notification header-notification-alert"></button>
+            <button @onclick="()=>viewNotifications=true" class="header-notification header-notification-alert">
+                <i class="fa fa-bell" aria-hidden="true"></i>
+            </button>
         }
         else
         {
-            <button @onclick="()=>viewNotifications=true" class="oi oi-bell"></button>
+            <button @onclick="()=>viewNotifications=true" class="header-notification">
+                <i class="fa fa-bell" aria-hidden="true"></i>
+            </button>
         }
         @if (viewNotifications)
         {

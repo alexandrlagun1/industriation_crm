@@ -26,9 +26,14 @@ else
         <Alert text="@alertText" CloseAlert="CloseAlert" type="alertType"></Alert>
     }
     <div class="buttons-bar mb-10">
-        <button @onclick="()=>showClientData = false" class="score">Редактирование</button>
-        <button @onclick="()=>showClientData = true" class="score">Данные</button>
-
+        @if (showClientData == false) {
+            <button @onclick="()=>showClientData = false"  class="score score-active">Редактирование</button>
+            <button @onclick="()=>showClientData = true" class="score">Данные</button>
+        } else {
+            <button @onclick="()=>showClientData = false"  class="score">Редактирование</button>
+            <button @onclick="()=>showClientData = true" class="score score-active">Данные</button>
+        }
+        
     </div>
     <EditForm Model="@client" OnValidSubmit="SaveClient">
         <DataAnnotationsValidator />
@@ -441,7 +446,7 @@ else
         {
             var clientResponse = await Http.PutAsJsonAsync("api/Client", client);
             string message = await clientResponse.Content.ReadAsStringAsync();
-            if(message != null)
+            if (message != null)
             {
                 alertText = message;
                 showAlert = true;

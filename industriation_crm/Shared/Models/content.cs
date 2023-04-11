@@ -46,6 +46,21 @@ namespace industriation_crm.Shared.Models
     public class order_check
     {
         [NotMapped]
+        public string _css_class
+        {
+            get
+            {
+                if(current == 1)
+                {
+                    return "score-active";
+                }
+                else
+                {
+                    return "score";
+                }
+            }
+        }
+        [NotMapped]
         public bool is_add { get; set; }
         [NotMapped]
         public bool is_delete { get; set; }

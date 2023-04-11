@@ -21,6 +21,9 @@
                 <div class="button-bar mb-20">
                     <button @onclick="()=>ViewTasks = false" class="score">Уведомления</button>
                     <button @onclick="()=>ViewTasks = true" class="score">Задачи</button>
+                    @if (ViewTasks == true) {
+                    <button @onclick="openCreatetaskModal" class="score ml-5" style="float: right">Создать</button>
+                    }
                 </div>
                 @if (viewCreateTask)
                 {
@@ -64,8 +67,7 @@
                 }
                 else
                 {
-                    <button @onclick="openCreatetaskModal" class="score">Создать</button>
-                    <br />
+                    
                     @foreach (var t in user_tasks!.OrderByDescending(ut => ut.date))
                     {
                         @if (t.complete == 1)

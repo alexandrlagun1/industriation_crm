@@ -27,255 +27,260 @@
 {
     <NewProductToOrder orderId="orderId" CloseModal="CloseAddProductModal" AddProductToproductToOrder="AddProductToProductToOrder"></NewProductToOrder>
 }
-
-@if (role == 1)
-{
-    <div class="buttons-bar mb-10">
-        <button @onclick="()=>ViewOrderManagement = false" class="score">Информация о заказе</button>
-        <button @onclick="()=>ViewOrderManagement = true" class="score">Управление заказом</button>
-        @if (order?.order_Pays?.Count() == 0)
-        {
-            <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
-        }
-        @if (order?.stage_id > 1@* || user_id != order?.user_id*@)
-        {
-            <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
-            <style type="text/css">
-                .main-section input,
-                .main-section textarea,
-                .main-section select {
-                    user-select: none;
-                    opacity: .7;
-                    pointer-events: none;
-                    background-color: #eee;
-                }
-
-                .main-section button,
-                .add-payment {
-                    opacity: .7;
-                    pointer-events: none;
-                    user-select: none;
-                }
-            </style>
-        }
-        else
-        {
-            <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
-        }
-
-    </div>
-}
-
-
-<EditForm Model="@order" OnValidSubmit="SaveOrder">
-    <DataAnnotationsValidator />
-
-    @if (ViewOrderManagement || role != 1)
+<div>
+    @if (role == 1)
     {
-        <industriation_crm.Client.Pages.order_management.OrderManagementInfo order="order!"></industriation_crm.Client.Pages.order_management.OrderManagementInfo>
-    }
-    else
-    {
-        <div class="main-title">@Title</div>
-        <div class="main-section  flex">
-            <div class="main-section-label">Печать документов</div>
-            <div class="section-field ind-col-lg-5">
-                <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5" @bind="@schet_type">
-                    <option value="1">
-                        Сбербанк
-                    </option>
-                    <option value="2">
-                        Альфабанк
-                    </option>
-                    <option value="3">
-                        ВТБ
-                    </option>
-                </select>
-                <button class="score mr-5" @onclick='()=>GetOrderPrintForm("1")' type="button">Счет</button>
-                <button class="score" @onclick='()=>GetOrderPrintForm("0")' type="button">Счет без печати</button>
-            </div>
-            @*            Второй блок для договоров (БЕЗ ФУНКЦИОНАЛА)*@
-            <div class="section-field ind-col-lg-5">
-                <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5">
-                    <option>
-                        Сбербанк
-                    </option>
-                    <option>
-                        Альфабанк
-                    </option>
-                    <option>
-                        ВТБ
-                    </option>
-                </select>
-                <button class="score mr-5" type="button" @onclick='()=>GetDogovorPrintForm("1")'>Договор</button>
-                <button class="score" type="button" @onclick='()=>GetDogovorPrintForm("0")'>Договор без печати</button>
-            </div>
-        </div>
-
-        <hr class="custom-hr" />
-        <div class="main-section">
-            <div class="main-section-label">Менеджер</div>
-            <div class="section-field">
-                <InputSelect class="main-input ind-col-lg-3" @bind-Value="order.user_id">
-                    @foreach (var m in managers)
-                    {
-                        <option value="@m.id">@m.name</option>
-                    }
-                </InputSelect>
-            </div>
-        </div>
-        <div class="main-section">
-            <div class="main-section-label">Контрагент</div>
-            <div class="contragent ind-col-lg-10">
-                <a href="/client/edit/@client.id" target="_blank" class="contragent">
-                    @if (client?.client_type == 1)
-                        @client?.org_name
-                    else
-                        @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
-
-
-
-
-
-
-                    </a>
-                    <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
-                        <label class="@clientClass" for="btnradio1">Клиент</label>
-
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" @onchange='@(() => { viewContacts = true; contactClass="contact contact--active"; clientClass="client";})'>
-                        <label class="@contactClass" for="btnradio2">Контактные лица</label>
-                    </div>
-                </div>
-                @if (viewContacts == false)
+        <div class="buttons-bar mb-10">
+            @if (ViewOrderManagement == false)
             {
-                <div class="section-field">
-                    <div class="ind-col-lg-5 ind-col-md-10">
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label required">
-                                Фамилия
-                                <div class="req">*</div>
-                            </div>
-
-                            <input type="text" required class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
-                        </div>
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label required">
-                                Имя
-                                <div class="req">*</div>
-                            </div>
-
-                            <input type="text" required class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
-                        </div>
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Отчество</div>
-                            <input type="text" class="main-input" value="@order?.main_contact?.patronymic" @oninput="@((ChangeEventArgs e) => {order.main_contact.patronymic = e.Value.ToString();clientChange = true;})">
-                        </div>
-                    </div>
-                    <div class="ind-col-lg-5 ind-col-md-10">
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">E-mail</div>
-                            <input type="email" class="main-input" value="@order?.main_contact?.email" @oninput="@((ChangeEventArgs e) => {order.main_contact.email = e.Value.ToString();clientChange = true;})">
-                        </div>
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label required">
-                                Номер телефона
-                                <div class="req">*</div>
-                            </div>
-                            <input type="tel" required class="main-input" value="@order?.main_contact?.phone" @oninput="@((ChangeEventArgs e) => {order.main_contact.phone = e.Value.ToString();clientChange = true;})">
-                        </div>
-                    </div>
-                </div>
-                @if (order?.main_contact?.contact_phones != null)
-                {
-                    @foreach (var p in order?.main_contact?.contact_phones)
-                    {
-                        <div class="section-field">
-                            <div class="ind-col-lg-5 input-field">
-                                <div class="input-label">Доп. телефон</div>
-                                <input type="tel" class="main-input" value="@p.phone" @oninput="@((ChangeEventArgs e) => {p.phone = e.Value.ToString();clientChange = true;})">
-                            </div>
-                        </div>
-                    }
-                }
+                <button @onclick="()=>ViewOrderManagement = false" class="score score-active">Информация о заказе</button>
+                <button @onclick="()=>ViewOrderManagement = true" class="score">Управление заказом</button>
             }
             else
             {
-                <br />
-                <div class="section-field ind-col-lg-10">
-                    <table class="order-table ind-col-lg-10">
-                        <thead class="table-success ind-col-lg-10">
-                            <tr class="order-row ind-col-lg-10">
-                                <td class="ind-col-lg-1">ID</td>
-                                <td class="ind-col-lg-3">Имя</td>
-                                <td class="ind-col-lg-6">Основной контакт</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var _contact in client.contacts)
-                            {
-                                <tr class="order-row ind-col-lg-10">
-                                    <td class="ind-col-lg-1">@_contact.id</td>
-                                    <td class="ind-col-lg-3">@_contact.name</td>
-                                    <td class="ind-col-lg-6">
-                                        <input class="form-check-input" type="radio" @onchange="()=>ChangeMainContact(_contact)" name="maincontact" checked="@GetIsMain(_contact.id)">
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-
-                    </table>
-                </div>
+                <button @onclick="()=>ViewOrderManagement = false" class="score">Информация о заказе</button>
+                <button @onclick="()=>ViewOrderManagement = true" class="score score-active">Управление заказом</button>
             }
-        </div>
-        @if (client?.client_type == 1 || client?.client_type == 2)
-        {
-            <div class="main-section">
-                <div class="main-section-label">Реквизиты организации</div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">Полное наименование</div>
-                        <input type="text" class="main-input" @bind="client.org_name">
-                    </div>
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label required">
-                            ИНН
-                            <div class="req">*</div>
-                        </div>
 
-                        <input type="number" required class="main-input" @bind="client.org_inn" min="0">
-                    </div>
+            @if (order?.order_Pays?.Count() == 0)
+            {
+                <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
+            }
+            @if (order?.stage_id > 1@* || user_id != order?.user_id*@)
+            {
+                <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
+                <style type="text/css">
+                    .main-section input,
+                    .main-section textarea,
+                    .main-section select {
+                        user-select: none;
+                        opacity: .7;
+                        pointer-events: none;
+                        background-color: #eee;
+                    }
+
+                    .main-section button,
+                    .add-payment {
+                        opacity: .7;
+                        pointer-events: none;
+                        user-select: none;
+                    }
+                </style>
+            }
+            else
+            {
+                <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
+            }
+
+        </div>
+    }
+
+
+    <EditForm Model="@order" OnValidSubmit="SaveOrder">
+        <DataAnnotationsValidator />
+
+        @if (ViewOrderManagement || role != 1)
+        {
+            <industriation_crm.Client.Pages.order_management.OrderManagementInfo order="order!"></industriation_crm.Client.Pages.order_management.OrderManagementInfo>
+        }
+        else
+        {
+            <div class="main-title">@Title</div>
+            <div class="main-section  flex">
+                <div class="main-section-label">Печать документов</div>
+                <div class="section-field ind-col-lg-5">
+                    <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5" @bind="@schet_type">
+                        <option value="1">
+                            Сбербанк
+                        </option>
+                        <option value="2">
+                            Альфабанк
+                        </option>
+                        <option value="3">
+                            ВТБ
+                        </option>
+                    </select>
+                    <button class="score mr-5" @onclick='()=>GetOrderPrintForm("1")' type="button">Счет</button>
+                    <button class="score" @onclick='()=>GetOrderPrintForm("0")' type="button">Счет без печати</button>
                 </div>
+                @*            Второй блок для договоров (БЕЗ ФУНКЦИОНАЛА)*@
+                <div class="section-field ind-col-lg-5">
+                    <select class="main-input ind-col-lg-5 ind-col-md-3 mr-5">
+                        <option>
+                            Сбербанк
+                        </option>
+                        <option>
+                            Альфабанк
+                        </option>
+                        <option>
+                            ВТБ
+                        </option>
+                    </select>
+                    <button class="score mr-5" type="button" @onclick='()=>GetDogovorPrintForm("1")'>Договор</button>
+                    <button class="score" type="button" @onclick='()=>GetDogovorPrintForm("0")'>Договор без печати</button>
+                </div>
+            </div>
+
+            <hr class="custom-hr" />
+            <div class="main-section">
+                <div class="main-section-label">Менеджер</div>
                 <div class="section-field">
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">Адрес регистрации</div>
-                        <input type="text" class="main-input" @bind="client.org_address">
-                    </div>
-                    @if (client.client_type == 1)
-                    {
-                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                            <div class="input-label">ОГРН</div>
-                            <input type="number" class="main-input" @bind="client.org_ogrn" min="0">
-                        </div>
-                    }
-                    @if (client.client_type == 2)
-                    {
-                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                            <div class="input-label">ОГРНИП</div>
-                            <input type="number" class="main-input" @bind="client.org_ogrnip" min="0">
-                        </div>
-                    }
+                    <InputSelect class="main-input ind-col-lg-3" @bind-Value="order.user_id">
+                        @foreach (var m in managers)
+                        {
+                            <option value="@m.id">@m.name</option>
+                        }
+                    </InputSelect>
                 </div>
-                @if (client.client_type == 1)
+            </div>
+            <div class="main-section">
+                <div class="main-section-label">Контрагент</div>
+                <div class="contragent ind-col-lg-10">
+                    <a href="/client/edit/@client.id" target="_blank" class="contragent">
+                        @if (client?.client_type == 1)
+                            @client?.org_name
+                        else
+                            @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
+
+
+                        </a>
+                        <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
+                            <label class="@clientClass" for="btnradio1">Клиент</label>
+
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" @onchange='@(() => { viewContacts = true; contactClass="contact contact--active"; clientClass="client";})'>
+                            <label class="@contactClass" for="btnradio2">Контактные лица</label>
+                        </div>
+                    </div>
+                @if (viewContacts == false)
                 {
                     <div class="section-field">
-                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                            <div class="input-label">КПП</div>
-                            <input type="number" class="main-input" @bind="client.org_kpp" min="0">
+                        <div class="ind-col-lg-5 ind-col-md-10">
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label required">
+                                    Фамилия
+                                    <div class="req">*</div>
+                                </div>
+
+                                <input type="text" required class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
+                            </div>
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label required">
+                                    Имя
+                                    <div class="req">*</div>
+                                </div>
+
+                                <input type="text" required class="main-input" value="@order?.main_contact?.name" @oninput="@((ChangeEventArgs e) => {order.main_contact.name = e.Value.ToString();clientChange = true;})">
+                            </div>
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">Отчество</div>
+                                <input type="text" class="main-input" value="@order?.main_contact?.patronymic" @oninput="@((ChangeEventArgs e) => {order.main_contact.patronymic = e.Value.ToString();clientChange = true;})">
+                            </div>
                         </div>
+                        <div class="ind-col-lg-5 ind-col-md-10">
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">E-mail</div>
+                                <input type="email" class="main-input" value="@order?.main_contact?.email" @oninput="@((ChangeEventArgs e) => {order.main_contact.email = e.Value.ToString();clientChange = true;})">
+                            </div>
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label required">
+                                    Номер телефона
+                                    <div class="req">*</div>
+                                </div>
+                                <input type="tel" required class="main-input" value="@order?.main_contact?.phone" @oninput="@((ChangeEventArgs e) => {order.main_contact.phone = e.Value.ToString();clientChange = true;})">
+                            </div>
+                        </div>
+                    </div>
+                    @if (order?.main_contact?.contact_phones != null)
+                    {
+                        @foreach (var p in order?.main_contact?.contact_phones)
+                        {
+                            <div class="section-field">
+                                <div class="ind-col-lg-5 input-field">
+                                    <div class="input-label">Доп. телефон</div>
+                                    <input type="tel" class="main-input" value="@p.phone" @oninput="@((ChangeEventArgs e) => {p.phone = e.Value.ToString();clientChange = true;})">
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+                else
+                {
+                    <br />
+                    <div class="section-field ind-col-lg-10">
+                        <table class="order-table ind-col-lg-10">
+                            <thead class="table-success ind-col-lg-10">
+                                <tr class="order-row ind-col-lg-10">
+                                    <td class="ind-col-lg-1">ID</td>
+                                    <td class="ind-col-lg-3">Имя</td>
+                                    <td class="ind-col-lg-6">Основной контакт</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var _contact in client.contacts)
+                                {
+                                    <tr class="order-row ind-col-lg-10">
+                                        <td class="ind-col-lg-1">@_contact.id</td>
+                                        <td class="ind-col-lg-3">@_contact.name</td>
+                                        <td class="ind-col-lg-6">
+                                            <input class="form-check-input" type="radio" @onchange="()=>ChangeMainContact(_contact)" name="maincontact" checked="@GetIsMain(_contact.id)">
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
                     </div>
                 }
             </div>
+            @if (client?.client_type == 1 || client?.client_type == 2)
+            {
+                <div class="main-section">
+                    <div class="main-section-label">Реквизиты организации</div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Полное наименование</div>
+                            <input type="text" class="main-input" @bind="client.org_name">
+                        </div>
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label required">
+                                ИНН
+                                <div class="req">*</div>
+                            </div>
+
+                            <input type="number" required class="main-input" @bind="client.org_inn" min="0">
+                        </div>
+                    </div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Адрес регистрации</div>
+                            <input type="text" class="main-input" @bind="client.org_address">
+                        </div>
+                        @if (client.client_type == 1)
+                        {
+                            <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                                <div class="input-label">ОГРН</div>
+                                <input type="number" class="main-input" @bind="client.org_ogrn" min="0">
+                            </div>
+                        }
+                        @if (client.client_type == 2)
+                        {
+                            <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                                <div class="input-label">ОГРНИП</div>
+                                <input type="number" class="main-input" @bind="client.org_ogrnip" min="0">
+                            </div>
+                        }
+                    </div>
+                    @if (client.client_type == 1)
+                    {
+                        <div class="section-field">
+                            <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                                <div class="input-label">КПП</div>
+                                <input type="number" class="main-input" @bind="client.org_kpp" min="0">
+                            </div>
+                        </div>
+                    }
+                </div>
 
             <div class="main-section">
                 <div class="main-section-label">Банковские реквизиты</div>
@@ -457,216 +462,226 @@
                             %
                         </div>
 
-                    }
-                </div>
-            </div>
-            <hr class="custom-hr" />
-            <button type="button" class="add-item" @onclick="()=>OpenProductAddModel=true">Добавить позицию</button>
-            <div class="section-field ind-col-lg-10">
-                <div class="ind-col-lg-10">
-                    <div class="ind-col-lg-10 row-f">
-                        <div class="ind-col-lg-7"></div>
-                        <div class="ind-col-lg-3 row-f">
-                            <div class="ind-col-lg-7" style="text-align: right;">
-                                Стоимость товаров:
-                            </div>
-                            <div class="ind-col-lg-3" style="text-align: right;">
-                                @current_order_check?._total_product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ind-col-lg-10 row-f">
-                        <div class="ind-col-lg-7"></div>
-                        <div class="ind-col-lg-3 row-f">
-                            <div class="ind-col-lg-7" style="text-align: right;">
-                                Стоимость доставки:
-                            </div>
-                            <div class="ind-col-lg-3" style="text-align: right;">
-                                @order.delivery._price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ind-col-lg-10 row-f">
-                        <div class="ind-col-lg-7"></div>
-                        <div class="ind-col-lg-3 row-f">
-                            <div class="ind-col-lg-7" style="text-align: right;">
-                                Итог:
-                            </div>
-                            <div class="ind-col-lg-3" style="text-align: right;">
-                                @order.products_with_delivery_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="row-f">
-            <div class="main-section ind-col-lg-5 ind-col-md-7">
-                <div class="main-section-label">Отгрузка и доставка</div>
-                <div class="section-field">
+                <hr class="custom-hr" />
+                <button type="button" class="add-item" @onclick="()=>OpenProductAddModel=true">Добавить позицию</button>
+                <div class="section-field ind-col-lg-10">
                     <div class="ind-col-lg-10">
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Тип доставки</div>
-                            <select type="text" class="main-input" value="@order.delivery?.delivery_type?.id" @onchange="ChangeDeliveryType">
-                                @foreach (var delivery_type in delivery_Types!)
-                                {
-                                    <option value="@delivery_type.id">@delivery_type.id. @delivery_type.name</option>
-                                }
-                            </select>
+                        <div class="ind-col-lg-10 row-f">
+                            <div class="ind-col-lg-7"></div>
+                            <div class="ind-col-lg-3 row-f">
+                                <div class="ind-col-lg-7" style="text-align: right;">
+                                    Стоимость товаров:
+                                </div>
+                                <div class="ind-col-lg-3" style="text-align: right;">
+                                    @current_order_check?._total_product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
+                                </div>
+                            </div>
                         </div>
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label required">
-                                Зафиксированная дата отгрузки на момент оплаты
-                                <div class="req">*</div>
+                        <div class="ind-col-lg-10 row-f">
+                            <div class="ind-col-lg-7"></div>
+                            <div class="ind-col-lg-3 row-f">
+                                <div class="ind-col-lg-7" style="text-align: right;">
+                                    Стоимость доставки:
+                                </div>
+                                <div class="ind-col-lg-3" style="text-align: right;">
+                                    @order.delivery._price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ind-col-lg-10 row-f">
+                            <div class="ind-col-lg-7"></div>
+                            <div class="ind-col-lg-3 row-f">
+                                <div class="ind-col-lg-7" style="text-align: right;">
+                                    Итог:
+                                </div>
+                                <div class="ind-col-lg-3" style="text-align: right;">
+                                    @order.products_with_delivery_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row-f">
+                <div class="main-section ind-col-lg-5 ind-col-md-7">
+                    <div class="main-section-label">Отгрузка и доставка</div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-10">
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">Тип доставки</div>
+                                <select type="text" class="main-input" value="@order.delivery?.delivery_type?.id" @onchange="ChangeDeliveryType">
+                                    @foreach (var delivery_type in delivery_Types!)
+                                    {
+                                        <option value="@delivery_type.id">@delivery_type.id. @delivery_type.name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label required">
+                                    Зафиксированная дата отгрузки на момент оплаты
+                                    <div class="req">*</div>
+                                </div>
+
+                                <input type="date" required class="main-input" @bind="@order.delivery.shipment_date">
+                            </div>
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">Стоимость</div>
+                                <input type="number" step="0.01" class="main-input" @bind="order.delivery._price" min="0">
                             </div>
 
-                            <input type="date" required class="main-input" @bind="@order.delivery.shipment_date">
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">ФИО Получателя</div>
+                                <input type="text" class="main-input" @bind="@order.delivery.recipient_name">
+                            </div>
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">Телефон Получателя</div>
+                                <input type="tel" class="main-input" @bind="@order.delivery.recipient_phone">
+                            </div>
+                            <div class="ind-col-lg-10 input-field">
+                                <div class="input-label">Адрес получателя</div>
+                                <textarea type="text" class="main-input" @bind="@order.delivery.address" />
+                            </div>
                         </div>
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Стоимость</div>
-                            <input type="number" step="0.01" class="main-input" @bind="order.delivery._price" min="0">
-                        </div>
-
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">ФИО Получателя</div>
-                            <input type="text" class="main-input" @bind="@order.delivery.recipient_name">
-                        </div>
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Телефон Получателя</div>
-                            <input type="tel" class="main-input" @bind="@order.delivery.recipient_phone">
-                        </div>
-                        <div class="ind-col-lg-10 input-field">
-                            <div class="input-label">Адрес получателя</div>
-                            <textarea type="text" class="main-input" @bind="@order.delivery.address" />
+                    </div>
+                </div>
+                <div class="ind-col-lg-5 ind-col-md-3 background-for-comment">
+                    <div class="main-section ind-col-lg-10">
+                        <div class="main-section-label">Комментарии к заказу</div>
+                        <div class="section-field">
+                            <div class="ind-col-lg-10 flex">
+                                <textarea type="text" class="main-input" @bind="order.comments"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="ind-col-lg-5 ind-col-md-3 background-for-comment">
-                <div class="main-section ind-col-lg-10">
-                    <div class="main-section-label">Комментарии к заказу</div>
-                    <div class="section-field">
-                        <div class="ind-col-lg-10 flex">
-                            <textarea type="text" class="main-input" @bind="order.comments"></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="main-section ind-col-lg-5 ind-col-md-10">
-            <div class="main-section-label">Оплата</div>
-            <div class="section-field">
-                <input type="number" step="0.01" class="main-input" @bind="pay" min="0"></input>
-                <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
-            </div>
+            <div class="main-section ind-col-lg-5 ind-col-md-10">
+                <div class="main-section-label">Оплата</div>
+                <div class="section-field">
+                    <input type="number" step="0.01" class="main-input" @bind="pay" min="0" placeholder="Оплата"></input>
+                    <buton type="button" class="add-payment" @onclick="AddNewOrderPay">Добавить оплату</buton>
+                </div>
+                <hr />
+                <div class="input-field">
+                    <div class="input-label">Условия оплаты</div>
+                    <select type="text" class="main-input" value="@order.pay_conditions" @onchange="(e)=>ChangePaymentCondition(e)">
+                        <option value="1">100% предоплата</option>
+                        <option value="2">Постоплата</option>
+                        <option value="3">Разделение платежа</option>
+                    </select>
+                </div>
+                @*            @if (order.pay_conditions == 1)
+            {
             <div class="input-field">
-                <div class="input-label">Условия оплаты</div>
-                <select type="text" class="main-input" value="@order.pay_conditions" @onchange="(e)=>ChangePaymentCondition(e)">
-                    <option value="1">100% предоплата</option>
-                    <option value="2">Постоплата</option>
-                    <option value="3">Разделение платежа</option>
-                </select>
+            <div class="input-label">Предоплата:</div>
+            <input class="main-input" @bind="@order.pay_predoplata_percent"></input>%
             </div>
-            @*            @if (order.pay_conditions == 1)
-        {
-        <div class="input-field">
-        <div class="input-label">Предоплата:</div>
-        <input class="main-input" @bind="@order.pay_predoplata_percent"></input>%
-        </div>
-        }*@
-            @if (order.pay_conditions == 2)
-            {
-                <div class="input-field">
-                    <div class="input-label">Условия постоплаты:</div>
-                    <input class="main-input" @bind="@order.postoplata_condition"></input>
-                </div>
-            }
-            @if (order.pay_conditions == 3)
-            {
-                <div class="input-field">
-                    <div class="input-label">Процент:</div>
-                    <input type="number" class="table-input" @bind="@order.pay_predoplata_percent"></input>%
-                    <div class="input-label">Условия:</div>
-                    <input class="main-input" @bind="@order.pay_predoplata_condition"></input>
-                </div>
-                <div class="input-field">
-                    <div class="input-label">Процент:</div>
-                    <input type="number" class="table-input" @bind="@order.second_pay_predoplata_percent"></input>%
-                    <div class="input-label">Условия:</div>
-                    <input class="main-input" @bind="@order.second_pay_predoplata_condition"></input>
-                </div>
-            }
-            <div class="input-field">
-                <div class="input-label">К оплате:</div>
-                <label>@order._price_summ.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</label>
-            </div>
-            <hr class="custom-hr" />
-
-
-            @foreach (var p in order?.order_Pays!.Where(o => o.isRemove == false))
-            {
-                <div class="payment-field ind-col-lg-10">
+            }*@
+                @if (order.pay_conditions == 2)
+                {
                     <div class="input-field">
-                        <div class="input-label">
-                            Дата оплаты
-                        </div>
-                        <label>@p.date</label>
+                        <div class="input-label">Условия постоплаты:</div>
+                        <input class="main-input" @bind="@order.postoplata_condition"></input>
                     </div>
-                    <div class="input-field">
-                        <div class="input-label">
-                            Сумма
+                }
+                @if (order.pay_conditions == 3)
+                {
+                    <div class="section-field ind-col-lg-10">
+                        <div class="input-field ind-col-lg-7">
+                            <div class="input-label">Условия:</div>
+                            <input placeholder="Введите условие #1" class="main-input" @bind="@order.pay_predoplata_condition"></input>
                         </div>
-                        <label>@p.price @current_order_check.currency</label>
+                        <div class="input-field ind-col-lg-3">
+                            @*<div class="input-label">Процент:</div>*@
+                            <input min="1" max="100" type="number" class="table-input width-65 mr-5" @bind="@order.pay_predoplata_percent"></input>%
+                        </div>
                     </div>
-                    @*<div class="input-field">
-            <div class="input-label">
-            Оплата счета
-            </div>
-            <label>@(order?.id)-@(order?._pay_check?.check_number)</label>
-            </div>*@
-                    @*<button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>*@
+                    <div class="section-field ind-col-lg-10">
+                        <div class="input-field ind-col-lg-7">
+                            <div class="input-label">Условия:</div>
+                            <input placeholder="Введите условие #2" class="main-input" @bind="@order.second_pay_predoplata_condition"></input>
+                        </div>
+                        <div class="input-field ind-col-lg-3">
+                            @*<div class="input-label">Процент:</div>*@
+                            <input min="1" max="100" type="number" class="table-input width-65 mr-5" @bind="@order.second_pay_predoplata_percent"></input>%
+                        </div>
+                    </div>
+
+                }
+                <div class="input-field">
+                    <div class="input-label">К оплате:</div>
+                    <label>@order._price_summ.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</label>
                 </div>
+                <hr class="custom-hr" />
+
+
+                @foreach (var p in order?.order_Pays!.Where(o => o.isRemove == false))
+                {
+                    <div class="payment-field ind-col-lg-10">
+                        <div class="input-field">
+                            <div class="input-label">
+                                Дата оплаты
+                            </div>
+                            <label>@p.date</label>
+                        </div>
+                        <div class="input-field">
+                            <div class="input-label">
+                                Сумма
+                            </div>
+                            <label>@p.price @current_order_check.currency</label>
+                        </div>
+                        @*<div class="input-field">
+                <div class="input-label">
+                Оплата счета
+                </div>
+                <label>@(order?.id)-@(order?._pay_check?.check_number)</label>
+                </div>*@
+                        @*<button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>*@
+                    </div>
+                }
+            </div>
+        }
+        <div class="bottom-buttons ind-col-lg-10">
+            <input type="checkbox" @bind="order.retail_synchro">Отправлять в Retail
+            <button type="submit" class="save">Сохранить</button>
+            <button class="close" @onclick="Cancel">Закрыть</button>
+            @if (order?.stage_id == 1 && (order?.order_status_id == 3 || order?.order_status_id == 4) && role == 1)
+            {
+                <button class="score" type="button" @onclick="Bill">Передать в снабжение</button>
+
+            }
+            @if (role == 6 && (order.supplier_manager_id == null || order.supplier_manager_id == user_id))
+            {
+                if (order.order_status_id == 3 || order.order_status_id == 5)
+                {
+                    <button class="score" type="button" @onclick="CreateSupplierOrder">Сформировать заказ поставщику</button>
+                    <button class="close" type="button" @onclick="ReturnOrderToManager">На пересогласование</button>
+                }
+            }
+            @if (role == 1 && order?.stage_id == 2 && order?.order_status_id == 6)
+            {
+                <button class="score" type="button" @onclick="ChangeStatus_OnStock">На складе</button>
+            }
+            @if (role == 1 && order?.stage_id == 3 && order?.order_status_id == 9)
+            {
+                <button class="score" type="button" @onclick="ChangeStatus_OnDelivery">Передан в доставку</button>
+            }
+            @if (role == 1 && order?.stage_id == 3 && order?.order_status_id == 10)
+            {
+                <button class="score" type="button" @onclick="ChangeStatus_Delivered">Доставлен</button>
+            }
+            @if (role == 1 && order?.stage_id == 3 && order?.order_status_id == 11)
+            {
+                <button class="score" type="button" @onclick="ChangeStatus_Closed">Закрыт</button>
             }
         </div>
-    }
-    <div class="bottom-buttons ind-col-lg-10">
-        <input type="checkbox" @bind="order.retail_synchro">Отправлять в Retail
-        <button type="submit" class="save">Сохранить</button>
-        <button class="close" @onclick="Cancel">Закрыть</button>
-        @if (order?.stage_id == 1 && (order?.order_status_id == 3 || order?.order_status_id == 4) && role == 1)
-        {
-            <button class="score" type="button" @onclick="Bill">Передать в снабжение</button>
+    </EditForm>
 
-        }
-        @if (role == 6 && (order.supplier_manager_id == null || order.supplier_manager_id == user_id))
-        {
-            if (order.order_status_id == 3 || order.order_status_id == 5)
-            {
-                <button class="score" type="button" @onclick="CreateSupplierOrder">Сформировать заказ поставщику</button>
-                <button class="close" type="button" @onclick="ReturnOrderToManager">На пересогласование</button>
-            }
-        }
-        @if (role == 1 && order?.stage_id == 2 && order?.order_status_id == 6)
-        {
-            <button class="score" type="button" @onclick="ChangeStatus_OnStock">На складе</button>
-        }
-        @if (role == 1 && order?.stage_id == 3 && order?.order_status_id == 9)
-        {
-            <button class="score" type="button" @onclick="ChangeStatus_OnDelivery">Передан в доставку</button>
-        }
-        @if (role == 1 && order?.stage_id == 3 && order?.order_status_id == 10)
-        {
-            <button class="score" type="button" @onclick="ChangeStatus_Delivered">Доставлен</button>
-        }
-        @if (role == 1 && order?.stage_id == 3 && order?.order_status_id == 11)
-        {
-            <button class="score" type="button" @onclick="ChangeStatus_Closed">Закрыт</button>
-        }
-    </div>
-</EditForm>
-
-
+</div>
 @code {
     protected order_check? current_order_check { get; set; } = new order_check { check_number = 1, is_add = true, current = 1 };
     protected double? pay { get; set; }
@@ -706,6 +721,11 @@
     protected int? user_id { get; set; }
     protected product_to_order drag_product_to_order { get; set; }
 
+    protected void CloseProductModalByBack()
+    {
+        if (OpenProductAddModel)
+            OpenProductAddModel = false;
+    }
     //Методы инициализвции
     protected override async Task OnInitializedAsync()
     {

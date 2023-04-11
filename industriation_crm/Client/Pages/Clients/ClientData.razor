@@ -48,7 +48,10 @@
                     </div>
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">Телефон</div>
-                        @main_contact?.phone <button type="button" @onclick="()=>CallToClient(main_contact?.phone)">Звонок</button>
+                        @main_contact?.phone 
+                        <button class="call-btn" type="button" @onclick="()=>CallToClient(main_contact?.phone)">
+                            <i class="fa fa-phone" aria-hidden="true"></i>
+                        </button>
                     </div>
                     <div class="ind-col-lg-10 input-field">
                         <div class="input-label">Тэг</div>
