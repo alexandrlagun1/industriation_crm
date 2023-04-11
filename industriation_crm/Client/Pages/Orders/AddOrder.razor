@@ -143,6 +143,7 @@
                             @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
 
 
+
                         </a>
                         <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
                             <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
@@ -152,7 +153,7 @@
                             <label class="@contactClass" for="btnradio2">Контактные лица</label>
                         </div>
                     </div>
-                @if (viewContacts == false)
+                    @if (viewContacts == false)
                 {
                     <div class="section-field">
                         <div class="ind-col-lg-5 ind-col-md-10">
@@ -282,185 +283,186 @@
                     }
                 </div>
 
+                <div class="main-section">
+                    <div class="main-section-label">Банковские реквизиты</div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">БИК</div>
+                            <input type="number" class="main-input" @bind="client.bank_bik" min="0">
+                        </div>
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Корреспондентский счет</div>
+                            <input type="number" class="main-input" @bind="client.bank_cor_schet" min="0">
+                        </div>
+                    </div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Наименование банка</div>
+                            <input type="text" class="main-input" @bind="client.bank_name">
+                        </div>
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Расчетный счет</div>
+                            <input type="number" class="main-input" @bind="client.bank_ras_schet" min="0">
+                        </div>
+                    </div>
+                </div>
+            }
             <div class="main-section">
-                <div class="main-section-label">Банковские реквизиты</div>
+                <div class="main-section-label">Состав заказа</div>
                 <div class="section-field">
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">БИК</div>
-                        <input type="number" class="main-input" @bind="client.bank_bik" min="0">
-                    </div>
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">Корреспондентский счет</div>
-                        <input type="number" class="main-input" @bind="client.bank_cor_schet" min="0">
-                    </div>
+                    @foreach (var c in order?.order_Checks.Where(c => c.is_delete == false).ToList())
+                    {
+                        <button class="score mr-5 @c._css_class" @onclick='()=>ChangeCurrentCheck(c)' type="button">
+                            @if (c.is_pay == 1)
+                            {
+                                <div>Счет @c.check_number (*)</div>
+                            }
+                            else
+                            {
+                                <div>Счет @c.check_number</div>
+                            }
+                        </button>
+
+                    }
+                    <button type="button" class="add-item" @onclick="AddCheck">+</button>
+                    <button type="button" class="delete-button" @onclick="RemoveCheck">
+                        <img src="./icons/delete-icon.svg" class="delete-button">
+                    </button>
+                    <table class="order-table ind-col-lg-10">
+                        <thead class="table-success ind-col-lg-10">
+                            <tr class="order-row ind-col-lg-10">
+                                <td class="ind-col-lg-1">Артикул продукта</td>
+                                <td class="ind-col-lg-3">Наименование</td>
+                                <td class="ind-col-lg-2">Срок доставки</td>
+                                <td class="ind-col-lg-1">
+                                    Цена
+                                    <select name="" id="" class="table-input" @bind="current_order_check.currency">
+                                        <option>₽</option>
+                                        <option>$</option>
+                                        <option>€</option>
+                                    </select>
+                                </td>
+                                <td class="ind-col-lg-1">Количество</td>
+                                <td class="ind-col-lg-1">Скидка</td>
+                                <td class="ind-col-lg-1">Стоимость</td>
+                            </tr>
+                        </thead>
+                        <tbody class="ind-col-lg-10">
+                            @if (current_order_check != null && current_order_check.product_To_Orders != null)
+                            {
+                                @foreach (var p in current_order_check!.product_To_Orders.Where(pr => pr.is_delete_from_order == false).OrderBy(p => p.product_postition))
+                                {
+                                    <tr class="order-row item" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
+                                        <td class="ind-col-lg-02" onmousedown="drag(this)">
+                                            <i class="fa fa-bars" aria-hidden="true"></i>
+                                        </td>
+                                        <td class="ind-col-lg-08 content" id="model" onmousedown="drag(this)">
+                                            @p?.product?.article
+                                        </td>
+                                        <td class="ind-col-lg-3 ta-left content" onmousedown="drag(this)">
+                                            <a href="/product/edit/@p.product.id" class="product-line">
+                                                <div class="thumb">
+                                                    <img src='@("https://industriation.ru/image/"+p.product.image)' />
+                                                </div>
+                                                @p?.product?.name
+                                            </a>
+
+                                        </td>
+                                        <td class="ind-col-lg-2" data-attr="td-nondrag">
+                                            <div class="ind-col-lg-1">
+                                                От:
+                                            </div>
+                                            <div class="ind-col-lg-2">
+                                                <input type="number" class="table-input" @bind="p.from_delivery_period" min="0">
+                                            </div>
+                                            <div class="ind-col-lg-1">
+                                                До:
+                                            </div>
+                                            <div class="ind-col-lg-2">
+                                                <input type="number" class="table-input" @bind="p.to_delivery_period" min="0">
+                                            </div>
+                                            <div class="ind-col-lg-4">
+                                                <select name="" id="" class="table-input" @bind="p.delivery_period_type_id">
+                                                    @foreach (var delivery_period_type in delivery_Period_Types!)
+                                                    {
+                                                        <option value="@delivery_period_type.id">@delivery_period_type.name</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td class="ind-col-lg-1" data-attr="td-nondrag">
+                                            <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">
+                                                @if (p.ruble_discount == 0 && p.percent_discount == 0)
+                                                {
+                                                    <span>@p._product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</span>
+                                                }
+                                                else
+                                                {
+                                                    <div class="prev-price">
+                                                        @p._product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
+                                                    </div>
+                                                    <div class="price-with-discount">
+                                                        @p._product_price_with_discount.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
+                                                    </div>
+                                                }
+                                            </button>
+                                            @if (p.showPriceModal)
+                                            {
+                                                <div class="price-modal" tabindex="0">
+                                                    <div class="input-label mb-10">Цена</div>
+                                                    <div class="row-f ind-col-lg-10">
+                                                        <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />
+                                                    </div>
+                                                    <div class="input-label mt-10">Дополнительная скидка</div>
+                                                    <div class="row-f">
+                                                        <div class="ind-col-lg-5 discount-input">
+                                                            <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />@current_order_check.currency
+                                                        </div>
+                                                        <div class="ind-col-lg-5 discount-input">
+                                                            <input type="number" class="main-input" @bind="@p.percent_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />%
+                                                        </div>
+                                                    </div>
+                                                    <div class="discount-buttons mt-10">
+                                                        <button type="button" class="score" @onclick="() => p.showPriceModal = false">Закрыть</button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </td>
+
+                                        <td class="ind-col-lg-1 content" onmousedown="drag(this)"><input type="number" class="main-input" @bind="@p._count" min="0" /></td>
+                                        <td class="ind-col-lg-1 content" onmousedown="drag(this)">@p?._discount_total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</td>
+                                        <td class="ind-col-lg-1 content" onmousedown="drag(this)">
+                                            @p?._total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
+                                            <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
+                                                <img src="./icons/delete-icon.svg" class="delete-button">
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
                 </div>
-                <div class="section-field">
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">Наименование банка</div>
-                        <input type="text" class="main-input" @bind="client.bank_name">
-                    </div>
-                    <div class="ind-col-lg-5 ind-col-md-10 input-field">
-                        <div class="input-label">Расчетный счет</div>
-                        <input type="number" class="main-input" @bind="client.bank_ras_schet" min="0">
-                    </div>
-                </div>
-            </div>
-        }
-        <div class="main-section">
-            <div class="main-section-label">Состав заказа</div>
-            <div class="section-field">
-                @foreach (var c in order?.order_Checks.Where(c => c.is_delete == false).ToList())
-                {
-                    <button class="score mr-5" @onclick='()=>ChangeCurrentCheck(c)' type="button">
-                        @if (c.is_pay == 1)
+                <div class="section-field a-i-c mt-20">
+                    <div class="section-field ind-col-lg-10">
+                        @if (current_order_check?.product_To_Orders == null || current_order_check?.product_To_Orders.Count == 0)
                         {
-                            <div>Счет @c.check_number (*)</div>
+                            <p align="center" class="ind-col-lg-10">Товары в заказе отсутствуют</p>
                         }
                         else
                         {
-                            <div>Счет @c.check_number</div>
-                        }
-                    </button>
-
-                }
-                <button type="button" class="add-item" @onclick="AddCheck">+</button>
-                <button type="button" class="delete-button" @onclick="RemoveCheck">
-                    <img src="./icons/delete-icon.svg" class="delete-button">
-                </button>
-                <table class="order-table ind-col-lg-10">
-                    <thead class="table-success ind-col-lg-10">
-                        <tr class="order-row ind-col-lg-10">
-                            <td class="ind-col-lg-1">Артикул продукта</td>
-                            <td class="ind-col-lg-3">Наименование</td>
-                            <td class="ind-col-lg-2">Срок доставки</td>
-                            <td class="ind-col-lg-1">
-                                Цена
-                                <select name="" id="" class="table-input" @bind="current_order_check.currency">
-                                    <option>₽</option>
-                                    <option>$</option>
-                                    <option>€</option>
-                                </select>
-                            </td>
-                            <td class="ind-col-lg-1">Количество</td>
-                            <td class="ind-col-lg-1">Скидка</td>
-                            <td class="ind-col-lg-1">Стоимость</td>
-                        </tr>
-                    </thead>
-                    <tbody class="ind-col-lg-10">
-                        @if (current_order_check != null && current_order_check.product_To_Orders != null)
-                        {
-                            @foreach (var p in current_order_check!.product_To_Orders.Where(pr => pr.is_delete_from_order == false).OrderBy(p => p.product_postition))
-                            {
-                                <tr class="order-row item" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
-
-                                    <td class="ind-col-lg-1 content" id="model" onmousedown="drag(this)">
-                                        <img src="./icons/drag.png" alt="" class="drag">
-                                        @p?.product?.article
-                                    </td>
-                                    <td class="ind-col-lg-3 ta-left content" onmousedown="drag(this)">
-                                        <a href="/product/edit/@p.product.id" class="product-line">
-                                            <div class="thumb">
-                                                <img src='@("https://industriation.ru/image/"+p.product.image)' />
-                                            </div>
-                                            @p?.product?.name
-                                        </a>
-                                        
-                                    </td>
-                                    <td class="ind-col-lg-2" data-attr="td-nondrag">
-                                        <div class="ind-col-lg-1">
-                                            От:
-                                        </div>
-                                        <div class="ind-col-lg-2">
-                                            <input type="number" class="table-input" @bind="p.from_delivery_period" min="0">
-                                        </div>
-                                        <div class="ind-col-lg-1">
-                                            До:
-                                        </div>
-                                        <div class="ind-col-lg-2">
-                                            <input type="number" class="table-input" @bind="p.to_delivery_period" min="0">
-                                        </div>
-                                        <div class="ind-col-lg-4">
-                                            <select name="" id="" class="table-input" @bind="p.delivery_period_type_id">
-                                                @foreach (var delivery_period_type in delivery_Period_Types!)
-                                                {
-                                                    <option value="@delivery_period_type.id">@delivery_period_type.name</option>
-                                                }
-                                            </select>
-                                        </div>
-                                    </td>
-                                    <td class="ind-col-lg-1" data-attr="td-nondrag">
-                                        <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">
-                                            @if (p.ruble_discount == 0 && p.percent_discount == 0)
-                                            {
-                                                <span>@p._product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</span>
-                                            }
-                                            else
-                                            {
-                                                <div class="prev-price">
-                                                    @p._product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
-                                                </div>
-                                                <div class="price-with-discount">
-                                                    @p._product_price_with_discount.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
-                                                </div>
-                                            }
-                                        </button>
-                                        @if (p.showPriceModal)
-                                        {
-                                            <div class="price-modal" tabindex="0">
-                                                <div class="input-label mb-10">Цена</div>
-                                                <div class="row-f ind-col-lg-10">
-                                                    <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />
-                                                </div>
-                                                <div class="input-label mt-10">Дополнительная скидка</div>
-                                                <div class="row-f">
-                                                    <div class="ind-col-lg-5 discount-input">
-                                                        <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />@current_order_check.currency
-                                                    </div>
-                                                    <div class="ind-col-lg-5 discount-input">
-                                                        <input type="number" class="main-input" @bind="@p.percent_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />%
-                                                    </div>
-                                                </div>
-                                                <div class="discount-buttons mt-10">
-                                                    <button type="button" class="score" @onclick="() => p.showPriceModal = false">Закрыть</button>
-                                                </div>
-                                            </div>
-                                        }
-                                    </td>
-
-                                    <td class="ind-col-lg-1 content" onmousedown="drag(this)"><input type="number" class="main-input" @bind="@p._count" min="0" /></td>
-                                    <td class="ind-col-lg-1 content" onmousedown="drag(this)">@p?._discount_total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</td>
-                                    <td class="ind-col-lg-1 content" onmousedown="drag(this)">
-                                        @p?._total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
-                                        <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
-                                            <img src="./icons/delete-icon.svg" class="delete-button">
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="section-field a-i-c mt-20">
-                <div class="section-field ind-col-lg-10">
-                    @if (current_order_check?.product_To_Orders == null || current_order_check?.product_To_Orders.Count == 0)
-                    {
-                        <p align="center" class="ind-col-lg-10">Товары в заказе отсутствуют</p>
-                    }
-                    else
-                    {
-                        <div class="ind-col-lg-7 ind-col-md-4"></div>
-                        <div class="ind-col-lg-1 ind-col-md-2 ta-right">
-                            <label>Разовая скидка</label>
-                        </div>
-                        <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
-                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex1" type="number" min="0" @bind="@current_order_check._ruble_discount">
-                            @current_order_check.currency
-                        </div>
-                        <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
-                            <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex2" type="number" min="0" @bind="@current_order_check._percent_discount">
-                            %
-                        </div>
+                            <div class="ind-col-lg-7 ind-col-md-4"></div>
+                            <div class="ind-col-lg-1 ind-col-md-2 ta-right">
+                                <label>Разовая скидка</label>
+                            </div>
+                            <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
+                                <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex1" type="number" min="0" @bind="@current_order_check._ruble_discount">
+                                @current_order_check.currency
+                            </div>
+                            <div class="ind-col-lg-1 ind-col-md-2 a-i-c">
+                                <input class="main-input ind-col-lg-6 mr-10 ml-a" id="ex2" type="number" min="0" @bind="@current_order_check._percent_discount">
+                                %
+                            </div>
 
                         }
                     </div>
