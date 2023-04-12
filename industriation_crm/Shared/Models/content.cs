@@ -776,6 +776,7 @@ namespace industriation_crm.Shared.Models
         public int id { get; set; }
         public double? price { get; set; }
         public int? order_id { get; set; }
+        public int? retail_id { get; set; }
         public DateTime? date { get; set; }
         [NotMapped]
         public bool? is_new { get; set; }

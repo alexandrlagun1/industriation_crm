@@ -54,9 +54,10 @@ namespace industriation_crm.Server.Controllers
         [HttpPut]
         public void Put(order order)
         {
-            _IOrder.UpdateOrderDetails(order, true);
             if (order?.retail_synchro == true)
                 RetailOrderCreator.UpdateOrder(order);
+            _IOrder.UpdateOrderDetails(order, true);
+            
         }
         [HttpPut("bill")]
         public async Task<IActionResult> Bill(order order)

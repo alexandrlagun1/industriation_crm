@@ -642,7 +642,7 @@
                 </div>
                 <label>@(order?.id)-@(order?._pay_check?.check_number)</label>
                 </div>*@
-                        @*<button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>*@
+                        <button type="button" class="remove-payment" @onclick="()=>RemoveOrderPay(p)">Удалить оплату</button>
                     </div>
                 }
             </div>
@@ -957,6 +957,7 @@
 
             using var streamRef = new DotNetStreamReference(stream: fileStream);
             await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"Договор {order?.id} от {order?.order_date?.ToString("dd.MM.yyyy")}.pdf", streamRef);
+            await SaveOrder();
         }
     }
     //Печатные формы
@@ -977,6 +978,7 @@
 
             using var streamRef = new DotNetStreamReference(stream: fileStream);
             await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"Счет на оплату {order?.id}-{order._current_check.check_number} от {order?.order_date?.ToString("dd.MM.yyyy")}.pdf", streamRef);
+            await SaveOrder();
         }
     }
 
@@ -1226,9 +1228,9 @@
         order_Pay.date = DateTime.Now;
         order.order_Pays.Add(order_Pay);
     }
-    //protected void RemoveOrderPay(order_pay order_Pay)
-    //{
-    //    order_Pay.isRemove = true;
-    //}
+    protected void RemoveOrderPay(order_pay order_Pay)
+    {
+        order_Pay.isRemove = true;
+    }
 
 }

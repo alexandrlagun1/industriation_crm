@@ -2,6 +2,7 @@
 using industriation_crm.Server.Models;
 using industriation_crm.Shared.DaData;
 using industriation_crm.Shared.Models;
+using industriation_crm.Shared.RetailData;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities;
@@ -341,7 +342,7 @@ namespace industriation_crm.Server.Retail
                 var res = httpClient.SendAsync(req).Result;
                 string s = res.Content.ReadAsStringAsync().Result;
 
-                foreach (var p in order.order_Pays.Where(p => p.is_new == true))
+                foreach (var p in order.order_Pays.Where(p => p.is_new == true && p.isRemove == false))
                 {
                     var payDict = new Dictionary<string, string>();
                     payDict.Add("site", "industriation");
@@ -350,6 +351,16 @@ namespace industriation_crm.Server.Retail
                     var payreq = new HttpRequestMessage(HttpMethod.Post, $"https://industriation.retailcrm.ru/api/v5/orders/payments/create") { Content = new FormUrlEncodedContent(payDict) };
                     payreq.Headers.Add("X-API-KEY", "D4xEMlk1WsvXPdv6RnDk72n3eLkbcuXB");
                     var payres = httpClient.SendAsync(payreq).Result;
+                    PaymentAnswer? paymentAnswer = payres.Content.ReadFromJsonAsync<PaymentAnswer>().Result;
+                    p.retail_id = paymentAnswer.id;
+                }
+                foreach(var p in order.order_Pays.Where(p => p.retail_id != null && p.isRemove == true))
+                {
+                   
+                    var payreq = new HttpRequestMessage(HttpMethod.Post, $"https://industriation.retailcrm.ru/api/v5/orders/payments/{p.retail_id}/delete");
+                    payreq.Headers.Add("X-API-KEY", "D4xEMlk1WsvXPdv6RnDk72n3eLkbcuXB");
+                    httpClient.SendAsync(payreq);
+                   
                 }
             }
         }
