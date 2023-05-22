@@ -22,11 +22,11 @@ namespace industriation_crm.Server.Services
 
                 List<user> users = new List<user>();
                 if (trigger == "all")
-                    users = _dbContext.user.Include(c => c.roles).Include(c => c.clients).ToList();
+                    users = _dbContext.user.Include(c => c.roles)/*.Include(c => c.clients)*/.ToList();
                 if (trigger == "managers")
-                    users = _dbContext.user.Include(c => c.roles).Include(c => c.clients).Where(u => u.roles.id == 1).ToList();
+                    users = _dbContext.user.Include(c => c.roles)/*.Include(c => c.clients)*/.Where(u => u.roles.id == 1).ToList();
                 if (trigger == "suppliers")
-                    users = _dbContext.user.Include(c => c.roles).Include(c => c.clients).Where(u => u.roles.id == 6).ToList();
+                    users = _dbContext.user.Include(c => c.roles)/*.Include(c => c.clients)*/.Where(u => u.roles.id == 6).ToList();
 
                 return users;
             }

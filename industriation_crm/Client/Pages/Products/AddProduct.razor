@@ -1,14 +1,17 @@
 ﻿@page "/product/add/"
 @page "/product/edit/{productId:int}"
+@using industriation_crm.Shared.Img;
 @using industriation_crm.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+
+
 <link rel="stylesheet" href="bootstrap 2.0.css" />
 
 <EditForm Model="@product" OnValidSubmit="SaveProduct">
     <div class="main-title">@Title продукт</div>
     <hr />
-    
+
     <div class="main-section">
         <div class="main-section-label">Основная информация о продукте</div>
         <div class="row-f">
@@ -52,11 +55,26 @@
                         </div>
                     </div>
                 </div>
+                @* <div class="ind-col-lg-10">
+                <div class="section-field ind-col-lg-8">
+                <InputFile @key=@(_inputFileId) OnChange="@LoadFiles" />
+                </div>
+                <div class="section-field ind-col-lg-2">
+                <button @onclick="ClearInputFile" type="button" class="close">X</button>
+                </div>
+
+                </div>
+                @if (!String.IsNullOrEmpty(imageFile.base64data))
+                {
+                <img src="data:@imageFile.contentType;base64,@imageFile.base64data" />
+
+                }*@
             </div>
             <div class="ind-col-lg-7">
                 <div class="product-thumb">
-                    @if(!String.IsNullOrEmpty(@product.image)){
-                     <img src='@("https://industriation.ru/image/"+@product.image)' />
+                    @if (!String.IsNullOrEmpty(@product.image))
+                    {
+                        <img src='@(@product.image)' />
                     }
                 </div>
             </div>
@@ -64,7 +82,7 @@
     </div>
     <div class="bottom-buttons ind-col-lg-10">
         <button type="submit" class="save">Сохранить</button>
-        <button type="button"  class="close" @onclick="Cancel">Закрыть</button>
+        <button type="button" class="close" @onclick="Cancel">Закрыть</button>
     </div>
 </EditForm>
 @code {
@@ -72,11 +90,32 @@
     public int productId { get; set; }
     protected string Title = "Добавить";
     protected product product = new();
+    ImageFile imageFile = new();
+    private string _inputFileId = Guid.NewGuid().ToString();
     protected override async Task OnInitializedAsync()
     {
 
     }
+    protected void ClearInputFile()
+    {
+        imageFile = new();
+        _inputFileId = Guid.NewGuid().ToString();
+    }
+    protected async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        var resizedFile = await e.File.RequestImageFileAsync(e.File.ContentType, 640, 480); // resize the image file
+        var buf = new byte[resizedFile.Size]; // allocate a buffer to fill with the file's data
+        using (var stream = resizedFile.OpenReadStream())
+        {
+            await stream.ReadAsync(buf); // copy the stream to the buffer
+        }
+        imageFile.fileName = e.File.Name;
+        imageFile.base64data = Convert.ToBase64String(buf);
+        imageFile.contentType = e.File.ContentType;
 
+
+
+    }
     protected override async Task OnParametersSetAsync()
     {
         if (productId != 0)
@@ -87,17 +126,21 @@
     }
     protected async Task SaveProduct()
     {
-
-        if (product.id != 0)
+        if (!String.IsNullOrEmpty(imageFile.base64data))
         {
-            await Http.PutAsJsonAsync("api/product", product);
+            await Http.PostAsJsonAsync("api/Product/AddImg", imageFile);
         }
-        else
+        if (product.id == 0 || product.id == null)
         {
             product.category_id = 100000;
 
             await Http.PostAsJsonAsync("api/product", product);
         }
+        else
+        {
+            await Http.PutAsJsonAsync("api/product", product);
+        }
+
         Cancel();
     }
     public void Cancel()

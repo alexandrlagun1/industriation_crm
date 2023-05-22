@@ -1,5 +1,7 @@
 ﻿using industriation_crm.Shared.Models;
 using industriation_crm.Shared.FilterModels;
+using industriation_crm.Shared.Img;
+
 namespace industriation_crm.Server.Interfaces
 {
     public interface IProduct

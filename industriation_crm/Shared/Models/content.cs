@@ -76,6 +76,10 @@ namespace industriation_crm.Shared.Models
         public int? order_id { get; set; }
         public int? is_pay { get; set; }
         public int? check_number { get; set; }
+        public int? print_form_id { get; set; }
+
+        [ForeignKey("print_form_id")]
+        public print_form_data? print_form_data { get; set; } = new();
         public virtual List<product_to_order>? product_To_Orders { get; set; } = new();
         [ForeignKey("order_id")]
         public virtual order? order { get; set; }
@@ -259,19 +263,32 @@ namespace industriation_crm.Shared.Models
         public string? name { get; set; }
         
     }
+    public class print_form_data
+    {
+        [Key]
+        public int id { get; set; }
+        public string? signatory_position_im_pad { get; set; } = "Директор";
+        public string? io_surname { get; set; } = "______________________";
+        public string? basis_contract { get; set; } = "Устава";
+        public string? signatory_position_rod_pad { get; set; } = "Директора";
+        public string? signatory_fio_rod_pad { get; set; } = "_________________________________________";
+        public string? spec_number { get; set; } = "1";
+
+    }
     public class product
     {
         [Key]
         public int? id { get; set; }
         public string? name { get; set; }
-        public double? price { get; set; }
+        public double? price { get; set; } = 0;
         public int? category_id { get; set; }
         public int? external_id { get; set; }
         public string? image { get; set; }
         public string? article { get; set; }
-        public string? unit { get; set; }
+        public string? unit { get; set; } = "шт";
         public string? manufacturer { get; set; }
-        public int? quantity { get; set; }
+        public int? quantity { get; set; } = 0;
+        public string? site_url { get; set; }
 
     }
     public class order
@@ -280,6 +297,7 @@ namespace industriation_crm.Shared.Models
         public int id { get; set; }
         [NotMapped]
         public bool retail_synchro { get; set; } = true;
+        public string? retail_id { get; set; } 
         public string order_status_name 
         { 
             get 
@@ -313,6 +331,7 @@ namespace industriation_crm.Shared.Models
             }
             
         }
+        public string? retail_sposob_oplaty { get; set; } = "predoplata";
         public string? postoplata_condition { get; set; }
         public int? pay_predoplata_percent { get; set; } 
         public int? second_pay_predoplata_percent { get; set; }
@@ -529,14 +548,14 @@ namespace industriation_crm.Shared.Models
         [Key]
         public int id { get; set; }
         public string? name { get; set; }
+        public string? retail_status { get; set; }
         public string? style{ get; set; }
         [NotMapped]
         public bool is_check { get; set; }
     }
     public class product_to_order
     {
-        [NotMapped]
-        public int new_position { get; set; }
+        
         [NotMapped]
         public string tr_class { get; set; } = "";
         [NotMapped]
@@ -555,6 +574,23 @@ namespace industriation_crm.Shared.Models
         public int? product_id { get; set; }
         public int? supplier_order_id { get; set; }
         public double? product_price { get; set; }
+        [NotMapped]
+        public bool _empty_tr = false;
+        [NotMapped]
+        public int? new_position { get; set; }
+        [NotMapped]
+        public bool _start_drag = false;
+        [NotMapped]
+        public int? _drag_position
+        {
+            get
+            {
+                if (_start_drag)
+                    return new_position;
+                else
+                    return product_postition;
+            }
+        }
         public int? product_postition { get; set; } = 0;
         public int? from_delivery_period { get; set; } = 1;
         public int? to_delivery_period { get; set; } = 3;

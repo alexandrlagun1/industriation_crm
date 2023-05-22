@@ -3,6 +3,7 @@ using industriation_crm.Server.Interfaces;
 using industriation_crm.Server.Models;
 using industriation_crm.Server.Retail;
 using industriation_crm.Shared.FilterModels;
+using industriation_crm.Shared.Img;
 using industriation_crm.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,8 @@ namespace industriation_crm.Server.Services
         {
             _dbContext = dbContext;
         }
+
+
         public void AddProduct(product product)
         {
             try

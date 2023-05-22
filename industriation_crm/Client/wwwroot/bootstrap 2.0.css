@@ -2539,6 +2539,13 @@ tbody .order-row.product_new:hover td {
 	user-select: text;
 }
 
+.empty-tr {
+	min-height: 109px;
+	height: 100%;
+	display: block;
+	border: 1px solid #000;
+	background-color: #eaf7ff;
+}
 .td-thumb {
 	height: 80px;
 	max-width: 80px;

@@ -75,11 +75,11 @@ else
                 <div class="section-field">
                     <div class="ind-col-lg-5 ind-col-md-10">
                         <div class="ind-col-lg-10 input-field">
-                            <div class="input-label required">
+                            <div class="input-label">
                                 Фамилия
-                                <div class="req">*</div>
+                                @*<div class="req">*</div>*@
                             </div>
-                            <input type="text" required class="main-input" @bind-value="main_contact.surname" />
+                            <input type="text" class="main-input" @bind-value="main_contact.surname" />
                         </div>
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label required">
@@ -104,7 +104,7 @@ else
                     <div class="ind-col-lg-5 ind-col-md-10">
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">E-mail</div>
-                            <input type="email" class="main-input" @bind-value="main_contact.email" />
+                            <input type="email"  class="main-input" @bind-value="main_contact.email" />
                         </div>
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Доп. E-mail</div>
@@ -112,7 +112,7 @@ else
                         </div>
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">ФИО получателя</div>
-                            <input type="tel" class="main-input" @bind-value="client.delivery_cont" />
+                            <input type="text" class="main-input" @bind-value="client.delivery_cont" />
                         </div>
                         <div class="ind-col-lg-10 input-field">
                             <div class="input-label">Телефон получателя</div>
@@ -453,7 +453,7 @@ else
                 showAlert = true;
                 return;
             }
-
+            await Http.PutAsJsonAsync("api/Client", client);
             if (main_contact != null)
                 await Http.PutAsJsonAsync("api/Contact", main_contact);
         }

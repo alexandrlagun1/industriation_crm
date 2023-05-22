@@ -334,7 +334,14 @@ else
                         <tr class="order-row ind-col-lg-10">
                             <td class="ind-col-lg-1">
                                 <a href='/order/edit/@order.id'>
-                                    @order.id
+                                    @if (String.IsNullOrEmpty(order.retail_id))
+                                    {
+                                        @order.id
+                                    }
+                                    else
+                                    {
+                                        @order.retail_id
+                                    }
                                 </a>
                             </td>
                             <td class="ind-col-lg-2"><a href="/contact/edit/@order.client_id/@order.main_contact?.id/false" target="_blank">@order.main_contact?.full_name</a>  </td>

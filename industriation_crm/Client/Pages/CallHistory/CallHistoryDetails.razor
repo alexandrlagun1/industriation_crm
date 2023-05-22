@@ -167,7 +167,12 @@
                         <td class="ind-col-lg-2">
                             @call.user?.name
                         </td>
-                        <td class="ind-col-lg-1">@call.client_number</td>
+                        <td class="ind-col-lg-1">
+                            @call.client_number
+                            <button class="call-btn" type="button" @onclick="()=>CallToClient(call.client_number)">
+                                <i class="fa fa-phone" aria-hidden="true"></i>
+                            </button>
+                            </td>
                         <td class="ind-col-lg-2">
                             @if (call.contact != null)
                             {
@@ -344,6 +349,13 @@
         callHistoryFilter.user_id = user_id;
         await FindByFilter();
     }
+    protected async Task CallToClient(string phone)
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user_id = authState.User.Claims.Where(_ => _.Type == ClaimTypes.NameIdentifier).Select(_ => Convert.ToInt32(_.Value)).First();
+        await Http.GetAsync($"api/Megafon?user_id={user_id}&phone={phone}");
+    }
+
     protected void OpenSelectClient(string num)
     {
         contactNumber = num;

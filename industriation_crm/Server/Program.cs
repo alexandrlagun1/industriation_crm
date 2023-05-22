@@ -1,21 +1,24 @@
 using industriation_crm.Server.Interfaces;
 using industriation_crm.Server.Middleware;
 using industriation_crm.Server.Models;
+using industriation_crm.Server.Queues;
 using industriation_crm.Server.Services;
 using industriation_crm.Server.SignalRNotification;
 using industriation_crm.Shared.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Serilog;
 using System.Text.Json.Serialization;
+using Serilog.Core;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DatabaseContext>
     (options =>
     {
-        options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))/*.LogTo(Console.WriteLine, LogLevel.Information)*/;
-        //options.ConfigureWarnings(warnings =>warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
+        options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"));
     });
 
 builder.Services.AddOidcAuthentication(options =>
@@ -43,6 +46,13 @@ builder.Services.AddScoped<IOrderStatus, OrderStatusManager>();
 builder.Services.AddScoped<IPayStatus, PayStatusManager>();
 builder.Services.AddScoped<IOrderCheck, OrderCheckManager>();
 
+builder.Services.AddHostedService<LongRunningService>();
+builder.Services.AddHostedService<PriceService>();
+builder.Services.AddHostedService<RemoveProductService>();
+builder.Services.AddSingleton<BackgroundWorkerQueue>();
+builder.Services.AddSingleton<BackgroundPriceQueue>();
+builder.Services.AddSingleton<BackgroundRemoveProductQueue>();
+
 builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddRazorPages();
@@ -51,6 +61,8 @@ builder.Services.AddLocalization();
 //Авторизация
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
+
+
 
 builder.Services.AddCors(options =>
 {
@@ -65,6 +77,14 @@ builder.Services.AddCors(options =>
     });
 });
 
+var levelSwitch = new LoggingLevelSwitch();
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.File("log.txt", Serilog.Events.LogEventLevel.Error)
+    .CreateLogger();
+
+/* this is used instead of .UseSerilog to add Serilog to providers */
+builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
 var app = builder.Build();
 
@@ -72,6 +92,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
+    app.UseExceptionHandler("/Error");
 }
 else
 {

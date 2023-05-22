@@ -167,13 +167,18 @@ else
                             <td class="ind-col-lg-5 ind-col-md-3">
                                 <a class="product-line" href='/product/edit/@product.id'>
                                     <div class="thumb">
-                                        <img src="@("https://industriation.ru/image/"+@product.image)">
+                                        <img src="@(product.image)">
                                     </div>
                                     @product.name
                                 </a>
                             </td>
                             <td class="ind-col-lg-1 ind-col-md-2">@product.quantity</td>
-                            <td class="ind-col-lg-1 ind-col-md-1">@product.price.Value.ToString("N", NumberMask.GetNi())</td>
+                            <td class="ind-col-lg-1 ind-col-md-1">
+                                @if (product?.price != null)
+                                {
+                                    @product?.price.Value.ToString("N", NumberMask.GetNi())
+                                }
+                            </td>
                             @*                            <td class="ind-col-lg-1 ind-col-md-1">
                     <a href='/product/edit/@product.id' class="score" role="button">
                     <div class="hidden-md">Изменить</div>

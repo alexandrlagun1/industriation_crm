@@ -54,15 +54,18 @@ namespace industriation_crm.Server.Controllers
         [HttpGet("userprofile")]
         public async Task<IActionResult> UserProfileAsync(int id)
         {
+            int? userId = null;
 
-            int userId = HttpContext.User.Claims
+            userId = HttpContext.User.Claims
             .Where(_ => _.Type == ClaimTypes.NameIdentifier)
             .Select(_ => Convert.ToInt32(_.Value))
             .First();
 
-            var userProfile = _IUser.GetUserData(userId);
+
+            var userProfile = _IUser.GetUserData(userId.Value);
 
             return Ok(userProfile);
+
 
 
 

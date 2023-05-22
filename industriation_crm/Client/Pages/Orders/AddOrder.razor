@@ -41,37 +41,49 @@
                 <button @onclick="()=>ViewOrderManagement = false" class="score">Информация о заказе</button>
                 <button @onclick="()=>ViewOrderManagement = true" class="score score-active">Управление заказом</button>
             }
+            <div>
+                Статус заказа:
+                <select @bind="order.order_status_id">
+                    <option value="1">Выставлен счет</option>
+                    <option value="3">Сделка состоялась</option>
+                    <option value="9">На складе</option>
+                    <option value="10">Передан в доставку</option>
+                    <option value="11">Доставлен</option>
+                    <option value="12">Выполнен</option>
+                    <option value="7">Отменен</option>
+                </select>
+            </div>
+            @*
+        @if (order?.order_Pays?.Count() == 0)
+        {
+        <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
+        }
+        @if (order?.stage_id > 1)
+        {
+        <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
+        <style type="text/css">
+        .main-section input,
+        .main-section textarea,
+        .main-section select {
+        user-select: none;
+        opacity: .7;
+        pointer-events: none;
+        background-color: #eee;
+        }
 
-            @if (order?.order_Pays?.Count() == 0)
-            {
-                <button @onclick="OrderCancellation" class="close">Отменить заказ</button>
-            }
-            @if (order?.stage_id > 1@* || user_id != order?.user_id*@)
-            {
-                <button @onclick="OrderPayReturn" class="close close-btn-disabled">Оформить возврат</button>
-                <style type="text/css">
-                    .main-section input,
-                    .main-section textarea,
-                    .main-section select {
-                        user-select: none;
-                        opacity: .7;
-                        pointer-events: none;
-                        background-color: #eee;
-                    }
-
-                    .main-section button,
-                    .add-payment {
-                        opacity: .7;
-                        pointer-events: none;
-                        user-select: none;
-                    }
-                </style>
-            }
-            else
-            {
-                <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
-            }
-
+        .main-section button,
+        .add-payment {
+        opacity: .7;
+        pointer-events: none;
+        user-select: none;
+        }
+        </style>
+        }
+        else
+        {
+        <button @onclick="OrderPayReturn" class="close">Оформить возврат</button>
+        }
+        *@
         </div>
     }
 
@@ -141,9 +153,6 @@
                             @client?.org_name
                         else
                             @client?.contacts?.Where(c=>c.main_contact == 1).FirstOrDefault()?.full_name
-
-
-
                         </a>
                         <div class="btn-group p-r" role="group" aria-label="Basic radio toggle button group">
                             <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange='@(() => { viewContacts = false; contactClass="contact"; clientClass="client client--active";})'>
@@ -158,12 +167,10 @@
                     <div class="section-field">
                         <div class="ind-col-lg-5 ind-col-md-10">
                             <div class="ind-col-lg-10 input-field">
-                                <div class="input-label required">
+                                <div class="input-label">
                                     Фамилия
-                                    <div class="req">*</div>
                                 </div>
-
-                                <input type="text" required class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
+                                <input type="text" class="main-input" value="@order?.main_contact?.surname" @oninput="@((ChangeEventArgs e) => {order.main_contact.surname = e.Value.ToString();clientChange = true;})">
                             </div>
                             <div class="ind-col-lg-10 input-field">
                                 <div class="input-label required">
@@ -306,6 +313,39 @@
                         </div>
                     </div>
                 </div>
+                <div class="main-section">
+                    <div class="main-section-label">Данные печатных форм</div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Должность лица подписывающего договор (в именительном падеже)</div>
+                            <input type="text" class="main-input" @bind="current_order_check.print_form_data.signatory_position_im_pad" min="0">
+                        </div>
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Основание для подписания договора</div>
+                            <input type="text" class="main-input" @bind="current_order_check.print_form_data.basis_contract" min="0">
+                        </div>
+                    </div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Должность лица подписывающего договор (в родительном падеже)</div>
+                            <input type="text" class="main-input" @bind="current_order_check.print_form_data.signatory_position_rod_pad" min="0">
+                        </div>
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Фамилия И.О.(инициалы сокращенно в именительном падеже)</div>
+                            <input type="text" class="main-input" @bind="current_order_check.print_form_data.io_surname" min="0">
+                        </div>
+                    </div>
+                    <div class="section-field">
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">ФИО(полностью) лица подписывающего договор (в родительном падеже)</div>
+                            <input type="text" class="main-input" @bind="current_order_check.print_form_data.signatory_fio_rod_pad" min="0">
+                        </div>
+                        <div class="ind-col-lg-5 ind-col-md-10 input-field">
+                            <div class="input-label">Номер в спецификации</div>
+                            <input type="text" class="main-input" @bind="current_order_check.print_form_data.spec_number" min="0">
+                        </div>
+                    </div>
+                </div>
             }
             <div class="main-section">
                 <div class="main-section-label">Состав заказа</div>
@@ -333,7 +373,7 @@
                             <tr class="order-row ind-col-lg-10">
                                 <td class="ind-col-lg-1">Артикул продукта</td>
                                 <td class="ind-col-lg-3">Наименование</td>
-                                <td class="ind-col-lg-2">Срок доставки</td>
+                                <td class="ind-col-lg-2">Срок поставки</td>
                                 <td class="ind-col-lg-1">
                                     Цена
                                     <select name="" id="" class="table-input" @bind="current_order_check.currency">
@@ -350,94 +390,103 @@
                         <tbody class="ind-col-lg-10">
                             @if (current_order_check != null && current_order_check.product_To_Orders != null)
                             {
-                                @foreach (var p in current_order_check!.product_To_Orders.Where(pr => pr.is_delete_from_order == false).OrderBy(p => p.product_postition))
+                                @foreach (var p in current_order_check!.product_To_Orders.Where(pr => pr.is_delete_from_order == false).OrderBy(p => p._drag_position))
                                 {
-                                    <tr class="order-row item" draggable="true" ondragover="event.preventDefault();" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
-                                        <td class="ind-col-lg-02" onmousedown="drag(this)">
-                                            <i class="fa fa-bars" aria-hidden="true"></i>
-                                        </td>
-                                        <td class="ind-col-lg-08 content" id="model" onmousedown="drag(this)">
-                                            @p?.product?.article
-                                        </td>
-                                        <td class="ind-col-lg-3 ta-left content" onmousedown="drag(this)">
-                                            <a href="/product/edit/@p.product.id" class="product-line">
-                                                <div class="thumb">
-                                                    <img src='@("https://industriation.ru/image/"+p.product.image)' />
-                                                </div>
-                                                @p?.product?.name
-                                            </a>
+                                    if (p._empty_tr)
+                                    {
+                                        <tr class="ind-col-lg-10 empty-tr">
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr class="order-row item" draggable="true" ondragover="event.preventDefault();" @ondragenter="()=>OnDragEnter(p)" @ondrop="()=>OnDrop(p)" @ondragstart="()=>OnDragStart(p)">
+                                            <td class="ind-col-lg-02" onmousedown="drag(this)">
+                                                <div>@p?.product_postition</div>
+                                                <i class="fa fa-bars" aria-hidden="true"></i> 
+                                            </td>
+                                            <td class="ind-col-lg-08 content" id="model" onmousedown="drag(this)">
+                                                @p?.product?.article
+                                            </td>
+                                            <td class="ind-col-lg-3 ta-left content" onmousedown="drag(this)">
+                                                <a href="/product/edit/@p.product.id" class="product-line">
+                                                    <div class="thumb">
+                                                        <img src='@(p.product.image)' />
+                                                    </div>
+                                                    @p?.product?.name
+                                                </a>
 
-                                        </td>
-                                        <td class="ind-col-lg-2" data-attr="td-nondrag">
-                                            <div class="ind-col-lg-1">
-                                                От:
-                                            </div>
-                                            <div class="ind-col-lg-2">
-                                                <input type="number" class="table-input" @bind="p.from_delivery_period" min="0">
-                                            </div>
-                                            <div class="ind-col-lg-1">
-                                                До:
-                                            </div>
-                                            <div class="ind-col-lg-2">
-                                                <input type="number" class="table-input" @bind="p.to_delivery_period" min="0">
-                                            </div>
-                                            <div class="ind-col-lg-4">
-                                                <select name="" id="" class="table-input" @bind="p.delivery_period_type_id">
-                                                    @foreach (var delivery_period_type in delivery_Period_Types!)
+                                            </td>
+                                            <td class="ind-col-lg-2" data-attr="td-nondrag">
+                                                <div class="ind-col-lg-1">
+                                                    От:
+                                                </div>
+                                                <div class="ind-col-lg-2">
+                                                    <input type="number" class="table-input" @bind="p.from_delivery_period" min="0">
+                                                </div>
+                                                <div class="ind-col-lg-1">
+                                                    До:
+                                                </div>
+                                                <div class="ind-col-lg-2">
+                                                    <input type="number" class="table-input" @bind="p.to_delivery_period" min="0">
+                                                </div>
+                                                <div class="ind-col-lg-4">
+                                                    <select name="" id="" class="table-input" @bind="p.delivery_period_type_id">
+                                                        @foreach (var delivery_period_type in delivery_Period_Types!)
+                                                        {
+                                                            <option value="@delivery_period_type.id">@delivery_period_type.name</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td class="ind-col-lg-1" data-attr="td-nondrag">
+                                                <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">
+                                                    @if ((p.ruble_discount == 0 || p.ruble_discount == null)&& (p.percent_discount == 0 || p.percent_discount == null))
                                                     {
-                                                        <option value="@delivery_period_type.id">@delivery_period_type.name</option>
+                                                        <span>@p._product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</span>
                                                     }
-                                                </select>
-                                            </div>
-                                        </td>
-                                        <td class="ind-col-lg-1" data-attr="td-nondrag">
-                                            <button type="button" class="price-button" step="0.1" @onclick="()=>p.showPriceModal=true">
-                                                @if (p.ruble_discount == 0 && p.percent_discount == 0)
-                                                {
-                                                    <span>@p._product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</span>
-                                                }
-                                                else
-                                                {
-                                                    <div class="prev-price">
-                                                        @p._product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
-                                                    </div>
-                                                    <div class="price-with-discount">
-                                                        @p._product_price_with_discount.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
-                                                    </div>
-                                                }
-                                            </button>
-                                            @if (p.showPriceModal)
-                                            {
-                                                <div class="price-modal" tabindex="0">
-                                                    <div class="input-label mb-10">Цена</div>
-                                                    <div class="row-f ind-col-lg-10">
-                                                        <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />
-                                                    </div>
-                                                    <div class="input-label mt-10">Дополнительная скидка</div>
-                                                    <div class="row-f">
-                                                        <div class="ind-col-lg-5 discount-input">
-                                                            <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />@current_order_check.currency
+                                                    else
+                                                    {
+                                                        <div class="prev-price">
+                                                            @p._product_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
                                                         </div>
-                                                        <div class="ind-col-lg-5 discount-input">
-                                                            <input type="number" class="main-input" @bind="@p.percent_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />%
+                                                        <div class="price-with-discount">
+                                                            @p._product_price_with_discount.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
+                                                        </div>
+                                                    }
+                                                </button>
+                                                @if (p.showPriceModal)
+                                                {
+                                                    <div class="price-modal" tabindex="0">
+                                                        <div class="input-label mb-10">Цена</div>
+                                                        <div class="row-f ind-col-lg-10">
+                                                            <input type="number" class="main-input price-input" step="0.1" @bind="@p._product_price" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />
+                                                        </div>
+                                                        <div class="input-label mt-10">Дополнительная скидка</div>
+                                                        <div class="row-f">
+                                                            <div class="ind-col-lg-5 discount-input">
+                                                                <input type="number" class="main-input" step="0.1" @bind="@p.ruble_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />@current_order_check.currency
+                                                            </div>
+                                                            <div class="ind-col-lg-5 discount-input">
+                                                                <input type="number" class="main-input" @bind="@p.percent_discount" min="0" @bind:event="oninput" @onkeydown="(e)=>ClosePriceModal(e,p)" />%
+                                                            </div>
+                                                        </div>
+                                                        <div class="discount-buttons mt-10">
+                                                            <button type="button" class="score" @onclick="() => p.showPriceModal = false">Закрыть</button>
                                                         </div>
                                                     </div>
-                                                    <div class="discount-buttons mt-10">
-                                                        <button type="button" class="score" @onclick="() => p.showPriceModal = false">Закрыть</button>
-                                                    </div>
-                                                </div>
-                                            }
-                                        </td>
+                                                }
+                                            </td>
 
-                                        <td class="ind-col-lg-1 content" onmousedown="drag(this)"><input type="number" class="main-input" @bind="@p._count" min="0" /></td>
-                                        <td class="ind-col-lg-1 content" onmousedown="drag(this)">@p?._discount_total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</td>
-                                        <td class="ind-col-lg-1 content" onmousedown="drag(this)">
-                                            @p?._total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
-                                            <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
-                                                <img src="./icons/delete-icon.svg" class="delete-button">
-                                            </button>
-                                        </td>
-                                    </tr>
+                                            <td class="ind-col-lg-1 content" onmousedown="drag(this)"><input type="number" class="main-input" @bind="@p._count" min="0" /></td>
+                                            <td class="ind-col-lg-1 content" onmousedown="drag(this)">@p?._discount_total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency</td>
+                                            <td class="ind-col-lg-1 content" onmousedown="drag(this)">
+                                                @p?._total_price.Value.ToString("N", NumberMask.GetNi()) @current_order_check.currency
+                                                <button type="button" class="delete-button" @onclick="(async () => await RemoveProductToOrder(p!))">
+                                                    <img src="./icons/delete-icon.svg" class="delete-button">
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
                                 }
                             }
                         </tbody>
@@ -522,12 +571,22 @@
                                 </select>
                             </div>
                             <div class="ind-col-lg-10 input-field">
-                                <div class="input-label required">
-                                    Зафиксированная дата отгрузки на момент оплаты
-                                    <div class="req">*</div>
-                                </div>
-
-                                <input type="date" required class="main-input" @bind="@order.delivery.shipment_date">
+                                @if (order.order_Pays.Count == 0 && order.pay_status_id == 4)
+                                {
+                                    <div class="input-label">
+                                        Зафиксированная дата отгрузки на момент оплаты
+                                    </div>
+                                    <input type="date" class="main-input" @bind="@order.delivery.shipment_date">
+                                }
+                                else
+                                {
+                                    <div class="input-label required">
+                                        Зафиксированная дата отгрузки на момент оплаты
+                                        <div class="req">*</div>
+                                    </div>
+                                    <input type="date" required class="main-input" @bind="@order.delivery.shipment_date">
+                                }
+                                
                             </div>
                             <div class="ind-col-lg-10 input-field">
                                 <div class="input-label">Стоимость</div>
@@ -574,6 +633,15 @@
                         <option value="1">100% предоплата</option>
                         <option value="2">Постоплата</option>
                         <option value="3">Разделение платежа</option>
+                    </select>
+                </div>
+                <div class="input-field">
+                    <div class="input-label">Условия оплаты в Retail</div>
+                    <select type="text" class="main-input" @bind="@order.retail_sposob_oplaty">
+                        <option value="predoplata">100% в течение 5 календарных дней с даты выставления счета</option>
+                        <option value="chstichnaya_predoplata">50% в течение 5 календарных дней с даты выставления счета. 50% в течение 5 календарных дней с даты получения уведомления о готовности товара к отгрузке</option>
+                        <option value="100_oplata_10_dney">100% в течение 10 календарных дней с даты поставки товара</option>
+                        <option value="100_predoplata">100% предоплата</option>
                     </select>
                 </div>
                 @*            @if (order.pay_conditions == 1)
@@ -786,6 +854,7 @@
     }
     protected async Task SaveOrder()
     {
+        
         //удалить (добаление оплат без участия 1с)
         if (order.pay_conditions == 1)
         {
@@ -1004,19 +1073,84 @@
 
     }
     //Методы Drag&Drop
-
+    protected void OnDragEnter(product_to_order _product_to_order)
+    {
+        int? position = _product_to_order.product_postition;
+        if (drag_product_to_order.product_postition < position)
+        {
+            drag_product_to_order.product_postition++;
+            _product_to_order.product_postition--;
+            //foreach (var p in current_order_check.product_To_Orders.Where(pro => pro.product_postition != drag_product_to_order.product_postition))
+            //{
+            //    if (p.product_postition < position)
+            //    {
+            //        p.product_postition -= 1;
+            //    }
+            //}
+            //_product_to_order.product_postition -= 1;
+        }
+        if (drag_product_to_order.product_postition > position)
+        {
+            drag_product_to_order.product_postition--;
+            _product_to_order.product_postition++;
+            //foreach (var p in current_order_check.product_To_Orders.Where(pro => pro.product_postition != drag_product_to_order.product_postition))
+            //{
+            //    if (p.product_postition > position)
+            //    {
+            //        p.product_postition += 1;
+            //    }
+            //}
+            //_product_to_order.product_postition += 1;
+        }
+        // drag_product_to_order.product_postition = position;
+    }
+    protected void OnDragLeave()
+    {
+        //foreach (var p in current_order_check.product_To_Orders)
+        //{
+        //    p._start_drag = false;
+        //}
+    }
     protected void OnDragStart(product_to_order _product_to_order)
     {
         drag_product_to_order = _product_to_order;
+        //foreach(var pr in current_order_check.product_To_Orders)
+        //{
+        //    pr.new_position = pr.product_postition;
+        //}
+        // current_order_check.product_To_Orders.ForEach(p => p._start_drag = true);
+        //_product_to_order._empty_tr = true;
+
     }
 
     protected void OnDrop(product_to_order _product_to_order)
     {
-        int? position = _product_to_order.product_postition;
-        _product_to_order.product_postition = drag_product_to_order.product_postition;
-        drag_product_to_order.product_postition = position;
-        drag_product_to_order = null;
-        Console.WriteLine(position);
+
+        //int? position = _product_to_order.product_postition;
+        //if(drag_product_to_order.product_postition < position){
+        //    foreach(var p in current_order_check.product_To_Orders.Where(pro=>pro.product_postition != drag_product_to_order.product_postition))
+        //    {
+        //        if (p.product_postition < position)
+        //        {
+        //            p.product_postition -= 1;
+        //        }
+        //    }
+        //    _product_to_order.product_postition -= 1;
+        //}
+        //if(drag_product_to_order.product_postition > position)
+        //{
+        //    foreach(var p in current_order_check.product_To_Orders.Where(pro=>pro.product_postition != drag_product_to_order.product_postition))
+        //    {
+        //        if (p.product_postition > position)
+        //        {
+        //            p.product_postition += 1;
+        //        }
+        //    }
+        //    _product_to_order.product_postition += 1;
+        //}
+        //drag_product_to_order.product_postition = position;
+        //current_order_check.product_To_Orders.ForEach(p => p._start_drag = false);
+        //drag_product_to_order = null;
     }
     protected void ClosePriceModal(KeyboardEventArgs e, product_to_order product)
     {

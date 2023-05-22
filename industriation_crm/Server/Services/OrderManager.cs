@@ -34,6 +34,7 @@ namespace industriation_crm.Server.Services
                 }
                 if (c.id != 0 && c.is_delete == false)
                 {
+                    _dbContext.Entry(c.print_form_data).State = EntityState.Modified;
                     _dbContext.Entry(c).State = EntityState.Modified;
                     _dbContext.SaveChanges();
                 }
@@ -129,7 +130,7 @@ namespace industriation_crm.Server.Services
             try
             {
 
-                order? order = _dbContext.order.Include(o => o.order_Checks).ThenInclude(c => c.product_To_Orders).ThenInclude(p => p.product).Include(o => o.tasks).Include(o => o.order_Pays).Include(o => o.delivery).ThenInclude(d => d.delivery_type).Include(o => o.user).Include(o => o.client).ThenInclude(c => c.contacts).ThenInclude(c => c.contact_phones).Include(o => o.order_status).Include(o => o.main_contact).Include(o => o.order_Histories).Include(o => o.stage).FirstOrDefault(u => u.id == id);
+                order? order = _dbContext.order.Include(o=>o.order_Checks).ThenInclude(c=>c.print_form_data).Include(o => o.order_Checks).ThenInclude(c => c.product_To_Orders).ThenInclude(p => p.product).Include(o => o.tasks).Include(o => o.order_Pays).Include(o => o.delivery).ThenInclude(d => d.delivery_type).Include(o => o.user).Include(o => o.client).ThenInclude(c => c.contacts).ThenInclude(c => c.contact_phones).Include(o => o.order_status).Include(o => o.main_contact).Include(o => o.order_Histories).Include(o => o.stage).FirstOrDefault(u => u.id == id);
                 // order.product_To_Orders.ForEach((p) => { p.order_percent_discount = order._percent_discount; p.order_ruble_discount = order._ruble_discount; });
                 if (order != null)
                 {

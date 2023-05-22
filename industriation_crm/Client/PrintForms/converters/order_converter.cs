@@ -86,18 +86,18 @@ namespace industriation_crm.Client.PrintForms
 
                 if (p.delivery_period_type_id == 1)
                 {
-                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetDaysFormat(p.to_delivery_period)}";
-                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetDaysFormat(p.to_delivery_period)}";
+                    product.dDate = $"Срок поставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetDaysFormat(p.to_delivery_period)}";
+                    product.dDateFull = $"Срок поставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetDaysFormat(p.to_delivery_period)}";
                 }
                 if (p.delivery_period_type_id == 2)
                 {
-                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetWeekFormat(p.to_delivery_period)}";
-                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetWeekFormat(p.to_delivery_period)}";
+                    product.dDate = $"Срок поставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetWeekFormat(p.to_delivery_period)}";
+                    product.dDateFull = $"Срок поставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetWeekFormat(p.to_delivery_period)}";
                 }
                 if (p.delivery_period_type_id == 3)
                 {
-                    product.dDate = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetMonthFormat(p.to_delivery_period)}";
-                    product.dDateFull = $"Срок доставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetMonthFormat(p.to_delivery_period)}";
+                    product.dDate = $"Срок поставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetMonthFormat(p.to_delivery_period)}";
+                    product.dDateFull = $"Срок поставки: {p.from_delivery_period}-{p.to_delivery_period} {industriation_crm.Shared.DaysMonthyearsConverter.GetMonthFormat(p.to_delivery_period)}";
                 }
                 product.unit = p.product?.unit;
                 order_Print_From.order_data.products.Add(product);

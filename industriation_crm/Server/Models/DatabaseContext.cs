@@ -1,5 +1,6 @@
 ﻿using industriation_crm.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace industriation_crm.Server.Models
 {
@@ -14,6 +15,7 @@ namespace industriation_crm.Server.Models
         public DbSet<client> client { get; set; }
         public DbSet<product> product { get; set; }
         public DbSet<order> order { get; set; }
+        public DbSet<print_form_data> print_form_data { get; set; }
         public DbSet<product_to_order> product_to_order { get; set; }
         public DbSet<supplier_order> supplier_order { get; set; }
         public DbSet<order_check> order_check { get; set; }
@@ -38,7 +40,8 @@ namespace industriation_crm.Server.Models
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySQL("Server=91.109.201.60; Port=3306; Database=industriation_crm; Uid=alexandr; Pwd=P@ssw0rd; charset=utf8mb4;");
+            var connection = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
+            optionsBuilder.UseMySQL(connection);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
