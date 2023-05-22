@@ -45,7 +45,7 @@ namespace industriation_crm.Server.Controllers
         public void Post(product product)
         {
             _IProduct.AddProduct(product);
-            RetailOrderCreator.AddProduct(product);
+            //RetailOrderCreator.AddProduct(product);
         }
         [HttpPut]
         public void Put(product product)
@@ -157,8 +157,8 @@ namespace industriation_crm.Server.Controllers
                     Log.Error(e.ToString());
 
                 }
-                if (product.external_id != null)
-                    RetailOrderCreator.CheckRetailProduct(product);
+                //if (product.external_id != null)
+                //    RetailOrderCreator.CheckRetailProduct(product);
 
             }, industriation_Product.is_clone);
             return Ok();
@@ -172,7 +172,7 @@ namespace industriation_crm.Server.Controllers
             _backgroundRemoveProductQueue.QueueBackgroundWorkItem(async token =>
             {
                 Log.Error($"Удаление продукта {industriation_Product.product_id}");
-                RetailOrderCreator.TryRemoveProduct(industriation_Product);
+                //RetailOrderCreator.TryRemoveProduct(industriation_Product);
             });
 
             return Ok();
@@ -225,7 +225,7 @@ namespace industriation_crm.Server.Controllers
                         Log.Error(e.ToString());
 
                     }
-                    RetailOrderCreator.updatePrice(price_Model.product_id, price.ToString());
+                    //RetailOrderCreator.updatePrice(price_Model.product_id, price.ToString());
                 }
             });
             return Ok();
